@@ -13,7 +13,7 @@ Liquidity Provider dashboard: posisi LP, add/remove liquidity, monitor pool, cla
 
 ## Cara jalanin
 ```bash
-cd /home/gumilang/lp-dashboard
+cd /home/gumilang/lp-dashboard-arc-mainnet
 python3 -m http.server 3011
 # buka http://localhost:3011/index.html
 ```
