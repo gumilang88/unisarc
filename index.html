@@ -302,6 +302,25 @@ main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 5rem}
       <div class="add-panel">
         <div class="card-title"><h2>1 - Select Pool</h2></div>
         <div class="pool-select" id="poolChips"></div>
+        <button class="px-btn yellow" style="width:100%;margin-top:.6rem" id="btnManualPool">＋ Manual Add (custom contract)</button>
+
+        <div class="px-card" id="manualPanel" style="display:none;padding:1rem 1.1rem;margin-top:.8rem;box-shadow:4px 4px 0 #000">
+          <div class="card-title" style="margin:0 0 .6rem"><h2>Manual Pool</h2></div>
+          <div class="mfield">
+            <label>Token A contract</label>
+            <input id="manAddrA" placeholder="0x..." />
+          </div>
+          <div class="mfield">
+            <label>Token B contract (or leave = USDC)</label>
+            <input id="manAddrB" placeholder="0x... (default USDC)" />
+          </div>
+          <div class="mfield">
+            <label>Fee tier</label>
+            <select id="manFee"><option value="100">0.01%</option><option value="500">0.05%</option><option value="3000" selected>0.30%</option><option value="10000">1.00%</option></select>
+          </div>
+          <button class="px-btn" style="width:100%" id="btnResolvePool">Resolve & Add</button>
+          <p id="manStatus" style="font-family:var(--vt);font-size:15px;color:var(--cyan);margin-top:.5rem;word-break:break-all"></p>
+        </div>
 
         <div class="card-title" style="margin-top:1rem"><h2>2 - Deposit Amounts</h2></div>
         <div class="amount-row">
@@ -741,8 +760,39 @@ function renderPositions() {
 
 function renderPoolChips() {
   $('poolChips').innerHTML = S.pools.map(p =>
-    `<button class="pool-chip ${p.id===S.selected?'active':''}" data-pool="${p.id}">${p.a} / ${p.b}</button>`).join('');
+    `<button class="pool-chip ${p.id===S.selected?'active':''}" data-pool="${p.id}">${p.a} / ${p.b}</button>`).join('') +
+    (S.selected === '__manual__' ? `<button class="pool-chip active" data-pool="__manual__">Custom</button>` : ``);
 }
+let CUSTOM_POOL = null; // last resolved manual pool
+async function resolveManualPool() {
+  const a0 = ($('manAddrA').value || '').trim().toLowerCase();
+  let a1 = ($('manAddrB').value || '').trim().toLowerCase();
+  if (!a1) a1 = USDC_ADDR;
+  const fee = parseInt($('manFee').value, 10);
+  const st = $('manStatus'); const btn = $('btnResolvePool');
+  if (!/^0x[0-9a-f]{40}$/.test(a0) || !/^0x[0-9a-f]{40}$/.test(a1))
+    { st.textContent = 'Invalid address — need 0x + 40 hex.'; st.style.color = 'var(--red)'; return; }
+  st.textContent = 'Resolving pool on-chain...'; st.style.color = 'var(--cyan)';
+  btn.disabled = true;
+  try {
+    const [m0, m1] = await Promise.all([tokenMeta(a0), tokenMeta(a1)]);
+    const pool = await getPool(a0, a1, fee);
+    if (!pool || pool === '0x0000000000000000000000000000000000000000') {
+      st.textContent = 'Pool not found — pair/fee not initialized on Uniswap V3 Arc.'; st.style.color = 'var(--red)';
+      return;
+    }
+    CUSTOM_POOL = { id: '__manual__', a: m0.symbol, b: m1.symbol, addr: pool, tvl: 0, priceB: 0, reserveA: 0, reserveB: 0, vol: 0, apr: 0, spark: [1], icon: m1.icon || '' };
+    // push to pools list so it renders + currentPool() finds it
+    S.pools.unshift(CUSTOM_POOL);
+    S.selected = '__manual__';
+    renderPoolChips(); renderAddSide();
+    setTimeout(() => { $('manualPanel').style.display = 'none'; $('btnManualPool').textContent = '＋ Manual Add (custom contract)'; }, 0);
+    st.textContent = `Pool ${m0.symbol}/${m1.symbol} (${fee/10000}%) → 0x${pool.slice(-8)}`; st.style.color = 'var(--green)';
+    toast('Manual pool resolved: ' + m0.symbol + '/' + m1.symbol, 'ok');
+  } catch (e) { st.textContent = 'Failed: ' + e.message; st.style.color = 'var(--red)'; }
+  finally { btn.disabled = false; }
+}
+
 function currentPool() { return S.pools.find(p=>p.id===S.selected) || S.pools[0]; }
 function renderAddSide() {
   const p = currentPool();
@@ -1061,6 +1111,15 @@ $('posSearch').addEventListener('input', renderPositions);
 $('poolChips').addEventListener('click', e=>{
   if (e.target.classList.contains('pool-chip')) { S.selected = e.target.dataset.pool; renderPoolChips(); renderAddSide(); }
 });
+$('btnManualPool').addEventListener('click', ()=>{
+  const panel = $('manualPanel');
+  const open = panel.style.display !== 'none';
+  panel.style.display = open ? 'none' : 'block';
+  $('btnManualPool').textContent = open ? '＋ Manual Add (custom contract)' : '× Close manual';
+});
+$('btnResolvePool').addEventListener('click', resolveManualPool);
+$('manAddrA').addEventListener('input', ()=>{ $('manStatus').textContent = ''; });
+$('manAddrB').addEventListener('input', ()=>{ $('manStatus').textContent = ''; });
 $('btnAdd').addEventListener('click', ()=>{ if (!S.address) return toast('Connect wallet first', 'err'); toast('Add flow: select a position in Positions tab to add liquidity (V3 increaseLiquidity)', ''); });
 document.querySelectorAll('.max-btn').forEach(b=>b.addEventListener('click', ()=>{
   const side = b.dataset.max;
