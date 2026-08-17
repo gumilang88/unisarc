@@ -138,9 +138,9 @@ main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 5rem}
 .amount-row{display:flex;align-items:center;gap:.6rem;padding:.7rem .9rem;border:3px solid #000;background:var(--pop);margin-bottom:.7rem}
 .amount-row .side{font-family:var(--px);font-size:13px;text-transform:uppercase;color:rgba(255,255,255,.6);white-space:nowrap}
 .amount-row input{flex:1;background:transparent;border:0;outline:0;color:var(--cyan);font-family:var(--vt);font-size:1.6rem;min-width:0}
-.amount-row .tk-pill{display:flex;align-items:center;gap:.4rem;padding:.3rem .6rem;background:var(--card2);border:3px solid #000;font-family:var(--px);font-size:13px;text-transform:uppercase;white-space:nowrap}
-.tkimg-sm{width:18px;height:18px;border:2px solid #000;object-fit:cover;background:var(--pop);display:inline-block;vertical-align:-3px}
-.amount-row .tk-pill .dot{width:17px;height:17px;border:2px solid #000;display:grid;place-items:center;font-family:var(--px);font-size:13px;color:var(--ink)}
+.amount-row .tk-pill{display:flex;align-items:center;gap:.5rem;padding:.3rem .7rem;background:var(--card2);border:2px solid #000;font-family:var(--px);font-size:13px;text-transform:uppercase;white-space:nowrap;line-height:1}
+.tkimg-sm{width:24px;height:24px;object-fit:contain;display:inline-block;flex:0 0 24px;border-radius:50%;background:#fff}
+.amount-row .tk-pill .dot{width:24px;height:24px;display:grid;place-items:center;font-family:var(--px);font-size:13px;color:var(--ink);border-radius:50%}
 .max-btn{font-family:var(--px);font-size:13px;padding:.4rem;border:2px solid #000;background:var(--cyan);color:var(--ink)}
 .ratio-bar{display:flex;align-items:center;gap:.6rem;margin:.9rem 0}
 .ratio-bar .line{flex:1;height:10px;border:3px solid #000;background:var(--pop);display:flex}
@@ -830,11 +830,11 @@ function renderAddSide() {
   $('symB').textContent = p.b;
   const tkA = token(p.a), tkB = token(p.b);
   const iconA = tkA.icon || USDC_ICON;
-  const iconB = p.icon || tkB.icon || '';
-  $('chipA').innerHTML = `<img class="tkimg-sm" src="${iconA}" alt="" onerror="this.outerHTML='${p.a.slice(0,1)}'"/>`;
-  $('chipB').innerHTML = iconB ? `<img class="tkimg-sm" src="${iconB}" alt="" onerror="this.outerHTML='${p.b.slice(0,1)}'"/>` : '<span>' + p.b.slice(0,1) + '</span>';
-  $('chipA').style.background = tkA.color;
-  $('chipB').style.background = tkB.color || '#34d399';
+  const iconB = p.icon || tkB.icon || USDC_ICON;
+  $('chipA').innerHTML = `<img class="tkimg-sm" src="${iconA}" alt="${p.a}" onerror="this.outerHTML='${p.a.slice(0,1)}'"/>`;
+  $('chipB').innerHTML = `<img class="tkimg-sm" src="${iconB}" alt="${p.b}" onerror="this.outerHTML='${p.b.slice(0,1)}'"/>`;
+  $('chipA').style.background = '';  // no box — clean circle logo
+  $('chipB').style.background = '';
   const a = parseFloat($('amtA').value) || 0, b = parseFloat($('amtB').value) || 0;
   $('detailPrice').textContent = '1 ' + p.b + ' ≈ ' + fmt(p.priceB) + ' ' + p.a;
   $('detailReserves').textContent = fmt(p.reserveA) + ' ' + p.a + ' / ' + fmt(p.reserveB) + ' ' + p.b;
