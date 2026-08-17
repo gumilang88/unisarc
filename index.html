@@ -140,9 +140,9 @@ main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 5rem}
 .amount-row{display:flex;align-items:center;gap:.6rem;padding:.7rem .9rem;border:3px solid #000;background:var(--pop);margin-bottom:.7rem}
 .amount-row .side{font-family:var(--px);font-size:13px;text-transform:uppercase;color:rgba(255,255,255,.6);white-space:nowrap}
 .amount-row input{flex:1;background:transparent;border:0;outline:0;color:var(--cyan);font-family:var(--vt);font-size:1.6rem;min-width:0}
-.amount-row .tk-pill{display:flex;align-items:center;gap:.5rem;padding:.3rem .7rem;background:var(--card2);border:2px solid #000;font-family:var(--px);font-size:13px;text-transform:uppercase;white-space:nowrap;line-height:1}
-.tkimg-sm{width:32px;height:32px;object-fit:contain;display:inline-block;flex:0 0 32px;border-radius:50%;background:transparent}
-.amount-row .tk-pill .dot{width:32px;height:32px;display:grid;place-items:center;font-family:var(--px);font-size:13px;color:var(--ink);border-radius:50%}
+.amount-row .tk-pill{display:flex;align-items:center;gap:.5rem;padding:.2rem 0;background:transparent;border:0;font-family:var(--px);font-size:13px;text-transform:uppercase;white-space:nowrap;line-height:1}
+.tkimg-sm{width:28px;height:28px;object-fit:contain;display:inline-block;flex:0 0 28px;border-radius:4px;background:transparent}
+.amount-row .tk-pill .dot{width:28px;height:28px;display:grid;place-items:center;font-family:var(--px);font-size:12px;color:#fff;background:#5b1d7d;border-radius:4px}
 .max-btn{font-family:var(--px);font-size:13px;padding:.4rem;border:2px solid #000;background:var(--cyan);color:var(--ink)}
 .ratio-bar{display:flex;align-items:center;gap:.6rem;margin:.9rem 0}
 .ratio-bar .line{flex:1;height:10px;border:3px solid #000;background:var(--pop);display:flex}
@@ -315,8 +315,8 @@ main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 5rem}
   .amount-row{ padding:.55rem .65rem; border-width:2px }
   .amount-row .side{ font-size:11px }
   .amount-row input{ font-size:1.2rem }
-  .amount-row .tk-pill{ font-size:11px; padding:.25rem .5rem; border-width:2px }
-  .tkimg-sm, .amount-row .tk-pill .dot{ width:24px; height:24px; flex-basis:24px }
+  .amount-row .tk-pill{ font-size:11px; padding:.15rem 0 }
+  .tkimg-sm, .amount-row .tk-pill .dot{ width:22px; height:22px; flex-basis:22px; border-radius:4px }
   .max-btn{ font-size:11px }
 
   /* detail table */
@@ -436,13 +436,13 @@ main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 5rem}
           <span class="side">Token A</span>
           <input id="amtA" type="text" inputmode="decimal" placeholder="0.00" />
           <button class="max-btn" data-max="a">MAX</button>
-          <span class="tk-pill"><span class="dot" id="chipA">A</span></span>
+          <span class="tk-pill"><span class="dot" id="chipA">A</span><span id="symA">—</span></span>
         </div>
         <div class="amount-row">
           <span class="side">Token B</span>
           <input id="amtB" type="text" inputmode="decimal" placeholder="0.00" />
           <button class="max-btn" data-max="b">MAX</button>
-          <span class="tk-pill"><span class="dot" id="chipB">B</span></span>
+          <span class="tk-pill"><span class="dot" id="chipB">B</span><span id="symB">—</span></span>
         </div>
         <div class="ratio-bar">
           <div class="line"><i id="ratioA" style="width:50%;background:var(--cyan)"></i><i id="ratioB" style="width:50%;background:var(--yellow)"></i></div>
@@ -962,6 +962,8 @@ function currentPool() { return S.pools.find(p=>p.id===S.selected) || S.pools[0]
 function renderAddSide() {
   const p = currentPool();
   if (!p) return;
+  $('symA').textContent = p.a;
+  $('symB').textContent = p.b;
   const tkA = token(p.a), tkB = token(p.b);
   // custom/manual pools: use resolved icon if any, else letter fallback (not USDC)
   const isCustom = p.id === '__manual__';
