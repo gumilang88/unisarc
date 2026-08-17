@@ -108,6 +108,7 @@ main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 5rem}
 .pool-id .tk{width:32px;height:32px;border:3px solid #000;display:grid;place-items:center;
        font-family:var(--px);font-size:13px;color:var(--ink)}
 .tk.t0{background:var(--cyan)} .tk.t1{background:var(--yellow)}
+.tkimg{width:32px;height:32px;border:3px solid #000;object-fit:cover;background:var(--pop)}
 .pool-id .nm{font-family:var(--px);font-size:13px;text-transform:uppercase}
 .pool-id .sub{font-family:var(--vt);font-size:15px;color:rgba(255,255,255,.6);margin-top:.2rem}
 .pool-apr{font-family:var(--px);font-size:14px;text-transform:uppercase;padding:.5rem .6rem;border:3px solid #000;box-shadow:3px 3px 0 #000}
@@ -119,9 +120,12 @@ main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 5rem}
 .pd .v{font-family:var(--vt);font-size:1.25rem;line-height:1.15;margin-top:.15rem}
 .pd .v small{color:rgba(255,255,255,.55);font-size:15px}
 .share-bar{height:10px;border:3px solid #000;background:var(--pop);margin:.6rem 0 .95rem}
-.share-bar i{display:block;height:100%;background:repeating-linear-gradient(90deg,var(--cyan) 0 8px,var(--yellow) 8px 16px)}
+.share-bar i{display:block;height:100%;background:var(--green)}
 .pos-actions{display:flex;gap:.6rem}
 .pos-actions .px-btn{flex:1;text-align:center}
+.pxa{background:var(--red);color:#fff;border:3px solid #000;box-shadow:4px 4px 0 #000}
+.pxa:hover{background:#e0445c}
+.pxa:active{transform:translate(2px,2px);box-shadow:1px 1px 0 #000}
 
 /* ---------- add LP ---------- */
 .add-wrap{display:grid;grid-template-columns:1.1fr .9fr;gap:1.6rem;align-items:start}
@@ -135,6 +139,7 @@ main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 5rem}
 .amount-row .side{font-family:var(--px);font-size:13px;text-transform:uppercase;color:rgba(255,255,255,.6);white-space:nowrap}
 .amount-row input{flex:1;background:transparent;border:0;outline:0;color:var(--cyan);font-family:var(--vt);font-size:1.6rem;min-width:0}
 .amount-row .tk-pill{display:flex;align-items:center;gap:.4rem;padding:.3rem .6rem;background:var(--card2);border:3px solid #000;font-family:var(--px);font-size:13px;text-transform:uppercase;white-space:nowrap}
+.tkimg-sm{width:18px;height:18px;border:2px solid #000;object-fit:cover;background:var(--pop);display:inline-block;vertical-align:-3px}
 .amount-row .tk-pill .dot{width:17px;height:17px;border:2px solid #000;display:grid;place-items:center;font-family:var(--px);font-size:13px;color:var(--ink)}
 .max-btn{font-family:var(--px);font-size:13px;padding:.4rem;border:2px solid #000;background:var(--cyan);color:var(--ink)}
 .ratio-bar{display:flex;align-items:center;gap:.6rem;margin:.9rem 0}
@@ -432,12 +437,12 @@ const CFG = {
   router:  '0x53bf6b0684ec7ef91e1387da3d1a1769bc5a6f77',   // SwapRouter02
   reward:  '',   // e.g. '0x...'  → enables claimRewards() (contract with claim()/pendingRewards())
   tokens: [
-    { symbol: 'USDC',   name: 'USD Coin',                 decimals: 6,  address: '0x3600000000000000000000000000000000000000', color: '#3ddad8' },
-    { symbol: 'EURC',   name: 'Euro Coin',                decimals: 6,  address: '0xbEf5f6d51CB62b58e6A8f77868681825C6fe21c1', color: '#f06943' },
-    { symbol: 'cirBTC', name: 'Circle Wrapped Bitcoin',   decimals: 8,  address: '0x171A4217b86A807A64eB94757Db6849fb4bDbAA0', color: '#ffbe39' },
-    { symbol: 'USYC',   name: 'US Yield Coin',            decimals: 6,  address: '0xe9185F0c5F296Ed1797AaE4238D26CCaBEadb86C', color: '#7ee081' },
-    { symbol: 'SYN',    name: 'Synthra',                  decimals: 18, address: '0xC5124C846c6e6307986988dFb7e743327aA05F19', color: '#a78bfa' },
-    { symbol: 'SWPRC',  name: 'Swaparc',                  decimals: 6,  address: '0xBE7477BF91526FC9988C8f33e91B6db687119D45', color: '#fb7185' },
+    { symbol: 'USDC',   name: 'USD Coin',                 decimals: 6,  address: '0x3600000000000000000000000000000000000000', color: '#3ddad8', icon: 'https://assets.coingecko.com/coins/images/6319/large/usdc.png' },
+    { symbol: 'EURC',   name: 'Euro Coin',                decimals: 6,  address: '0xbEf5f6d51CB62b58e6A8f77868681825C6fe21c1', color: '#f06943', icon: 'https://assets.coingecko.com/coins/images/26045/large/euro.png' },
+    { symbol: 'cirBTC', name: 'Circle Wrapped Bitcoin',   decimals: 8,  address: '0x171A4217b86A807A64eB94757Db6849fb4bDbAA0', color: '#ffbe39', icon: 'https://assets.coingecko.com/coins/images/1/large/bitcoin.png' },
+    { symbol: 'USYC',   name: 'US Yield Coin',            decimals: 6,  address: '0xe9185F0c5F296Ed1797AaE4238D26CCaBEadb86C', color: '#7ee081', icon: '' },
+    { symbol: 'SYN',    name: 'Synthra',                  decimals: 18, address: '0xC5124C846c6e6307986988dFb7e743327aA05F19', color: '#a78bfa', icon: '' },
+    { symbol: 'SWPRC',  name: 'Swaparc',                  decimals: 6,  address: '0xBE7477BF91526FC9988C8f33e91B6db687119D45', color: '#fb7185', icon: '' },
   ],
 };
 
@@ -445,7 +450,7 @@ const LIVE = true;
 const RADAR_API = 'https://api.radardex.pro';
 const POOL_TOKENS = ['Architects','ARCANINE','STEVE','WARP','ARCAT','BUILDOG','TOLLY','SLJ','COOL','SHARC','AROS','Arc House','BLOP','CRAB','INTERNET','STONKS'];
 
-const RADAR_SNAPSHOT = [{"symbol": "Architects", "address": "0x8bcb94279fc2c984ec34e0c1f2192df8c69ea4f0", "price": 0.002431927139929907, "liquidityUsdc": 84253.309687, "volume24": 20065.600965, "change24h": -3.0030672482083114, "spark": [0.00217323, 0.00214223, 0.00216742, 0.00220464, 0.00221871, 0.00226617, 0.00225141, 0.00221307, 0.00220454, 0.00249969, 0.00251203, 0.00251076, 0.00251184, 0.00245949, 0.00250628, 0.00243193]}, {"symbol": "ARCANINE", "address": "0xf3715bf5c2de299f08b81180ffb739a8372a175f", "price": 0.000280418079587923, "liquidityUsdc": 33334.217473, "volume24": 7083.21389, "change24h": -5.021945806305996, "spark": [0.000281302, 0.000295771, 0.000293974, 0.000293068, 0.000298484, 0.000305831, 0.000305831, 0.000299568, 0.00030686, 0.000301115, 0.000306256, 0.000306256, 0.000286395, 0.000285833, 0.000286124, 0.000280418]}, {"symbol": "STEVE", "address": "0xa23632d6a32174ff4ee8e76aacf9f244e10cfd73", "price": 0.00027682882532923, "liquidityUsdc": 32600.811582, "volume24": 2193.923443, "change24h": 5.444364132031077, "spark": [0.000262228, 0.000261789, 0.00025895, 0.00025895, 0.000254949, 0.00026709, 0.00026709, 0.000269523, 0.000273611, 0.0002715, 0.0002715, 0.0002715, 0.000275483, 0.000275736, 0.000275817, 0.000276829]}, {"symbol": "WARP", "address": "0x384c60f98ecd4c26345499345c03d677e40f115e", "price": 0.00045408815396818, "liquidityUsdc": 31346.911802, "volume24": 36335.325201, "change24h": -30.229325048325666, "spark": [0.000474457, 0.000461916, 0.000399694, 0.000407477, 0.000409602, 0.000473887, 0.000458667, 0.000430406, 0.000429964, 0.000438722, 0.000438722, 0.000541577, 0.000500982, 0.000450662, 0.000454088, 0.000454088]}, {"symbol": "ARCAT", "address": "0x07704b06981ea962b87296362a1281484d160000", "price": 0.000247414953320093, "liquidityUsdc": 29649.965791, "volume24": 12322.072981, "change24h": -13.458658788449052, "spark": [0.000263832, 0.000223524, 0.000218939, 0.000217662, 0.000217198, 0.000215212, 0.000215212, 0.000218332, 0.00021876, 0.00021787, 0.00021787, 0.000235132, 0.000237161, 0.000252311, 0.000247415, 0.000247415]}, {"symbol": "BUILDOG", "address": "0x4cb8382b9daf7992d3b27d32f7db650c57881daa", "price": 0.000136094491642367, "liquidityUsdc": 21295.674522, "volume24": 1078.323731, "change24h": 3.0104258285435876, "spark": [0.000134423, 0.000134139, 0.000134802, 0.000134788, 0.000134788, 0.000132022, 0.000132022, 0.00013182, 0.000131892, 0.000131892, 0.000131782, 0.000134817, 0.000133198, 0.000133198, 0.000133164, 0.000136094]}, {"symbol": "TOLLY", "address": "0xbc43ce8dec648ea298c4275559b81d6261c90b67", "price": 0.000103256807884444, "liquidityUsdc": 17617.717062, "volume24": 5477.290393, "change24h": 21.922376492820327, "spark": [9.02368e-05, 9.04257e-05, 9.36857e-05, 9.36857e-05, 9.32772e-05, 9.32772e-05, 9.33021e-05, 9.48405e-05, 9.5128e-05, 9.30882e-05, 9.99588e-05, 9.87157e-05, 0.000103439, 0.000105475, 0.000103585, 0.000103257]}, {"symbol": "SLJ", "address": "0x127f80844ff3d672410ce4b6f4f9ea1a8d6a7ae6", "price": 0.000126655417565479, "liquidityUsdc": 16779.673156, "volume24": 2252.935812, "change24h": -11.205278515095033, "spark": [0.000142638, 0.000141127, 0.000141127, 0.000141127, 0.000141127, 0.000139558, 0.000139558, 0.000139558, 0.000137281, 0.000134513, 0.000134513, 0.000123828, 0.000125749, 0.000125749, 0.000126655]}, {"symbol": "COOL", "address": "0xeb64987643db71c76b2a2be7e723decc995e5b37", "price": 9.1231466291204e-05, "liquidityUsdc": 16667.74495, "volume24": 4201.954634, "change24h": 11.417586527498244, "spark": [9.01689e-05, 9.49956e-05, 9.24743e-05, 9.09417e-05, 9.09417e-05, 9.09417e-05, 9.62734e-05, 9.30665e-05, 9.49756e-05, 9.50729e-05, 9.51913e-05, 9.17686e-05, 9.01464e-05, 9.32732e-05, 9.12315e-05, 9.12315e-05]}, {"symbol": "Aros", "address": "0x3af1d499cb46cd5504a5a3cb864dcc105b74470d", "price": 6.6255605662725e-05, "liquidityUsdc": 15980.975718, "volume24": 6.357947, "change24h": 0, "spark": [6.62556e-05, 6.62556e-05, 6.62556e-05, 6.62556e-05, 6.62556e-05, 6.62556e-05, 6.62556e-05, 6.62556e-05, 6.62556e-05, 6.62556e-05, 6.62556e-05, 6.62556e-05, 6.62556e-05]}, {"symbol": "SHARC", "address": "0xf2627e7566d01f6c8ff2892f4a802fee6d2898af", "price": 8.0384579124579e-05, "liquidityUsdc": 15344.362603, "volume24": 6827.245719, "change24h": -16.209339030202354, "spark": [0.000101128, 0.000103197, 0.000100696, 0.000102487, 9.57861e-05, 9.44658e-05, 9.11989e-05, 9.03093e-05, 8.95949e-05, 8.95949e-05, 8.92668e-05, 8.5722e-05, 7.91799e-05, 8.25815e-05, 8.19604e-05, 8.03846e-05]}, {"symbol": "AROS", "address": "0x313c87e367791fe16ae97754554f4871bfe7fcb6", "price": 0.000101942886494717, "liquidityUsdc": 14646.469252, "volume24": 3143.738133, "change24h": 35.754195535640676, "spark": [7.50937e-05, 7.50937e-05, 7.50937e-05, 7.50937e-05, 7.50937e-05, 7.50937e-05, 9.88584e-05, 9.42758e-05, 9.42758e-05, 9.42758e-05, 9.36387e-05, 9.34859e-05, 9.34859e-05, 0.000101943, 0.000101943, 0.000101943]}, {"symbol": "Arc House", "address": "0x1fa496cca20d1249972bee850bb3fc612f808cab", "price": 9.6629937331469e-05, "liquidityUsdc": 14376.984155, "volume24": 6613.599552, "change24h": 13.249984615777105, "spark": [9.08481e-05, 0.000110332, 0.000110237, 0.000114834, 0.000109944, 0.000110208, 0.000103826, 9.52411e-05, 9.7686e-05, 9.7686e-05, 9.7686e-05, 9.47039e-05, 9.47039e-05, 8.9836e-05, 9.66299e-05, 9.66299e-05]}, {"symbol": "peg", "address": "0x2bfe315f219cc9fdc9ce0266e6c115927f0e4c10", "price": 8.8153481596843e-05, "liquidityUsdc": 13359.732812, "volume24": 2651.778916, "change24h": -9.85812368700252, "spark": [9.77941e-05, 0.000100873, 0.000100873, 0.000100873, 0.000100873, 0.000100873, 0.000100873, 0.00010083, 0.000100798, 0.00010289, 0.000104884, 0.000104884, 8.67782e-05, 8.67782e-05, 8.78856e-05, 8.81535e-05]}];
+const RADAR_SNAPSHOT = [{"symbol": "Architects", "address": "0x8bcb94279fc2c984ec34e0c1f2192df8c69ea4f0", "price": 0.002431927139929907, "liquidityUsdc": 84253.309687, "volume24": 20065.600965, "change24h": -3.0030672482083114, "spark": [0.00217323, 0.00214223, 0.00216742, 0.00220464, 0.00221871, 0.00226617, 0.00225141, 0.00221307, 0.00220454, 0.00249969, 0.00251203, 0.00251076, 0.00251184, 0.00245949, 0.00250628, 0.00243193], "icon": "https://arc-api-production-ef9c.up.railway.app/api/image/a02941c5-9a8a-4195-b0f8-e7f1eadbcbfc"}, {"symbol": "ARCANINE", "address": "0xf3715bf5c2de299f08b81180ffb739a8372a175f", "price": 0.000280418079587923, "liquidityUsdc": 33334.217473, "volume24": 7083.21389, "change24h": -5.021945806305996, "spark": [0.000281302, 0.000295771, 0.000293974, 0.000293068, 0.000298484, 0.000305831, 0.000305831, 0.000299568, 0.00030686, 0.000301115, 0.000306256, 0.000306256, 0.000286395, 0.000285833, 0.000286124, 0.000280418], "icon": "https://i.ibb.co/hFJDb0Gb/arcaninetoken.png"}, {"symbol": "STEVE", "address": "0xa23632d6a32174ff4ee8e76aacf9f244e10cfd73", "price": 0.00027682882532923, "liquidityUsdc": 32600.811582, "volume24": 2193.923443, "change24h": 5.444364132031077, "spark": [0.000262228, 0.000261789, 0.00025895, 0.00025895, 0.000254949, 0.00026709, 0.00026709, 0.000269523, 0.000273611, 0.0002715, 0.0002715, 0.0002715, 0.000275483, 0.000275736, 0.000275817, 0.000276829], "icon": "https://i.ibb.co/5Wxj7dzy/Capture-d-cran-2026-07-15-190425.png"}, {"symbol": "WARP", "address": "0x384c60f98ecd4c26345499345c03d677e40f115e", "price": 0.00045408815396818, "liquidityUsdc": 31346.911802, "volume24": 36335.325201, "change24h": -30.229325048325666, "spark": [0.000474457, 0.000461916, 0.000399694, 0.000407477, 0.000409602, 0.000473887, 0.000458667, 0.000430406, 0.000429964, 0.000438722, 0.000438722, 0.000541577, 0.000500982, 0.000450662, 0.000454088, 0.000454088], "icon": "https://gold-negative-silkworm-810.mypinata.cloud/ipfs/QmSdDCPWv4ah7wrjGizhcT5RKWMZfSmLYVwXGHhUpMybJL"}, {"symbol": "ARCAT", "address": "0x07704b06981ea962b87296362a1281484d160000", "price": 0.000247414953320093, "liquidityUsdc": 29649.965791, "volume24": 12322.072981, "change24h": -13.458658788449052, "spark": [0.000263832, 0.000223524, 0.000218939, 0.000217662, 0.000217198, 0.000215212, 0.000215212, 0.000218332, 0.00021876, 0.00021787, 0.00021787, 0.000235132, 0.000237161, 0.000252311, 0.000247415, 0.000247415], "icon": "https://cyan-bright-dormouse-440.mypinata.cloud/ipfs/QmQybedZvBS4MV8sVkxY7gfo7kyEuUXQcQMm3L39evAReF"}, {"symbol": "BUILDOG", "address": "0x4cb8382b9daf7992d3b27d32f7db650c57881daa", "price": 0.000136094491642367, "liquidityUsdc": 21295.674522, "volume24": 1078.323731, "change24h": 3.0104258285435876, "spark": [0.000134423, 0.000134139, 0.000134802, 0.000134788, 0.000134788, 0.000132022, 0.000132022, 0.00013182, 0.000131892, 0.000131892, 0.000131782, 0.000134817, 0.000133198, 0.000133198, 0.000133164, 0.000136094], "icon": "https://i.ibb.co/PvhzL9vK/mascot.png"}, {"symbol": "TOLLY", "address": "0xbc43ce8dec648ea298c4275559b81d6261c90b67", "price": 0.000103256807884444, "liquidityUsdc": 17617.717062, "volume24": 5477.290393, "change24h": 21.922376492820327, "spark": [9.02368e-05, 9.04257e-05, 9.36857e-05, 9.36857e-05, 9.32772e-05, 9.32772e-05, 9.33021e-05, 9.48405e-05, 9.5128e-05, 9.30882e-05, 9.99588e-05, 9.87157e-05, 0.000103439, 0.000105475, 0.000103585, 0.000103257], "icon": "https://api.tollylabs.com/token-image/0xbc43ce8dec648ea298c4275559b81d6261c90b67.png"}, {"symbol": "SLJ", "address": "0x127f80844ff3d672410ce4b6f4f9ea1a8d6a7ae6", "price": 0.000126655417565479, "liquidityUsdc": 16779.673156, "volume24": 2252.935812, "change24h": -11.205278515095033, "spark": [0.000142638, 0.000141127, 0.000141127, 0.000141127, 0.000141127, 0.000139558, 0.000139558, 0.000139558, 0.000137281, 0.000134513, 0.000134513, 0.000123828, 0.000125749, 0.000125749, 0.000126655], "icon": "https://gateway.pinata.cloud/ipfs/bafkreieyakdzrvwfwkacie7xx4yukzemso57tbrw2wj3jfv3ny4pbfpd3i"}, {"symbol": "COOL", "address": "0xeb64987643db71c76b2a2be7e723decc995e5b37", "price": 9.1231466291204e-05, "liquidityUsdc": 16667.74495, "volume24": 4201.954634, "change24h": 11.417586527498244, "spark": [9.01689e-05, 9.49956e-05, 9.24743e-05, 9.09417e-05, 9.09417e-05, 9.09417e-05, 9.62734e-05, 9.30665e-05, 9.49756e-05, 9.50729e-05, 9.51913e-05, 9.17686e-05, 9.01464e-05, 9.32732e-05, 9.12315e-05, 9.12315e-05], "icon": "https://i.postimg.cc/rsPPW2R3/coologo1.png"}, {"symbol": "Aros", "address": "0x3af1d499cb46cd5504a5a3cb864dcc105b74470d", "price": 6.6255605662725e-05, "liquidityUsdc": 15980.975718, "volume24": 6.357947, "change24h": 0, "spark": [6.62556e-05, 6.62556e-05, 6.62556e-05, 6.62556e-05, 6.62556e-05, 6.62556e-05, 6.62556e-05, 6.62556e-05, 6.62556e-05, 6.62556e-05, 6.62556e-05, 6.62556e-05, 6.62556e-05], "icon": "https://i.ibb.co/3mdvGWhj/74a13d39-6b63-45dc-9b00-acb6a9668c4b.jpg"}, {"symbol": "SHARC", "address": "0xf2627e7566d01f6c8ff2892f4a802fee6d2898af", "price": 8.0384579124579e-05, "liquidityUsdc": 15344.362603, "volume24": 6827.245719, "change24h": -16.209339030202354, "spark": [0.000101128, 0.000103197, 0.000100696, 0.000102487, 9.57861e-05, 9.44658e-05, 9.11989e-05, 9.03093e-05, 8.95949e-05, 8.95949e-05, 8.92668e-05, 8.5722e-05, 7.91799e-05, 8.25815e-05, 8.19604e-05, 8.03846e-05], "icon": "https://i.ibb.co/msNXKKS/sgvb.png"}, {"symbol": "AROS", "address": "0x313c87e367791fe16ae97754554f4871bfe7fcb6", "price": 0.000101942886494717, "liquidityUsdc": 14646.469252, "volume24": 3143.738133, "change24h": 35.754195535640676, "spark": [7.50937e-05, 7.50937e-05, 7.50937e-05, 7.50937e-05, 7.50937e-05, 7.50937e-05, 9.88584e-05, 9.42758e-05, 9.42758e-05, 9.42758e-05, 9.36387e-05, 9.34859e-05, 9.34859e-05, 0.000101943, 0.000101943, 0.000101943], "icon": "https://arc-api-production-ef9c.up.railway.app/api/image/9761634a-2a21-4475-80e9-72ba6c9a774f"}, {"symbol": "Arc House", "address": "0x1fa496cca20d1249972bee850bb3fc612f808cab", "price": 9.6629937331469e-05, "liquidityUsdc": 14376.984155, "volume24": 6613.599552, "change24h": 13.249984615777105, "spark": [9.08481e-05, 0.000110332, 0.000110237, 0.000114834, 0.000109944, 0.000110208, 0.000103826, 9.52411e-05, 9.7686e-05, 9.7686e-05, 9.7686e-05, 9.47039e-05, 9.47039e-05, 8.9836e-05, 9.66299e-05, 9.66299e-05], "icon": "https://arc-api-production-ef9c.up.railway.app/api/image/9081077b-a219-4e4e-815d-da5bb22639d1"}, {"symbol": "peg", "address": "0x2bfe315f219cc9fdc9ce0266e6c115927f0e4c10", "price": 8.8153481596843e-05, "liquidityUsdc": 13359.732812, "volume24": 2651.778916, "change24h": -9.85812368700252, "spark": [9.77941e-05, 0.000100873, 0.000100873, 0.000100873, 0.000100873, 0.000100873, 0.000100873, 0.00010083, 0.000100798, 0.00010289, 0.000104884, 0.000104884, 8.67782e-05, 8.67782e-05, 8.78856e-05, 8.81535e-05], "icon": "https://arc-api-production-ef9c.up.railway.app/api/image/06ecdffc-d1cf-4938-a5e0-c3d55b62a8e6"}];
 const USDC_PRICE = 1;
 
 /* ============ state ============ */
@@ -509,7 +514,7 @@ function buildPoolsFromRadar(list) {
     const spark = Array.isArray(t.spark) && t.spark.length ? t.spark : [1];
     const apr = liq > 0 ? (vol * 0.003 * 0.85 / liq) * 365 * 100 : 0; // estimasi fee APY
     out.push({
-      id: 'USDC-' + sym, a: 'USDC', b: sym, addr: t.address || '',
+      id: 'USDC-' + sym, a: 'USDC', b: sym, addr: t.address || '', icon: t.icon || '',
       reserveA: liq, reserveB: liq / (price || 1),
       tvl: liq, priceB: price, apr: Math.min(240, Math.max(0.1, apr)),
       vol, chg24: t.change24h || 0, spark,
@@ -629,8 +634,12 @@ function renderPositions() {
     const spark = svgCandles(p.spark.map((v,i)=>({o:v,c:v*(1+0.002),h:v*1.004,l:v*0.996})), 120, 30, null);
     return `<div class="pos-card">
       <div class="pos-top">
-        <div class="pool-id"><span class="tk t0">${p.pool.a.slice(0,1)}</span><span class="tk t1">${p.pool.b.slice(0,1)}</span>
-          <div><div class="nm">${p.pool.a} / ${p.pool.b}</div><div class="sub">${p.usd >= 1000 ? fmtUsd(p.usd) : '$'+p.usd.toFixed(0)} · LP#${(p.opened+1)}</div></div></div>
+        <div class="pool-id">
+          <img class="tkimg" src="https://assets.coingecko.com/coins/images/6319/large/usdc.png" alt="USDC" onerror="this.style.display='none'"/>
+          ${p.pool.icon
+            ? `<img class="tkimg tk-img-b" src="${p.pool.icon}" alt="${p.pool.b}" onerror="this.style.display='none'; this.outerHTML='<span class=&quot;tk t1&quot;>${p.pool.b.slice(0,1)}</span>'"/>`
+            : `<span class="tk t1">${p.pool.b.slice(0,1)}</span>`}
+          <div><div class="nm">${p.pool.a} / ${p.pool.b}</div><div class="sub">${p.usd >= 1000 ? fmtUsd(p.usd) : '$'+p.usd.toFixed(0)}</div></div></div>
         <span class="pool-apr ${band}">${p.apr.toFixed(1)}% APR</span>
       </div>
       <div class="pos-detail">
@@ -641,9 +650,9 @@ function renderPositions() {
       </div>
       <div class="share-bar"><i style="width:${Math.min(100, p.share*15000)}%"></i></div>
       <div class="pos-actions">
-        <button class="px-btn orange" data-act="add" data-id="${p.id}">Add</button>
-        <button class="px-btn ghost" data-act="remove" data-id="${p.id}">Remove</button>
-        <button class="px-btn yellow" data-act="claim" data-id="${p.id}">Claim</button>
+        <button class="px-btn pxa" data-act="add" data-id="${p.id}">Add</button>
+        <button class="px-btn pxa" data-act="remove" data-id="${p.id}">Remove</button>
+        <button class="px-btn pxa" data-act="claim" data-id="${p.id}">Claim</button>
       </div>
     </div>`;
   }).join('');
@@ -658,9 +667,13 @@ function currentPool() { return S.pools.find(p=>p.id===S.selected) || S.pools[0]
 function renderAddSide() {
   const p = currentPool();
   $('symA').textContent = p.a; $('symB').textContent = p.b;
-  $('chipA').textContent = p.a.slice(0,1); $('chipB').textContent = p.b.slice(0,1);
-  $('chipA').style.background = token(p.a).color;
-  $('chipB').style.background = token(p.b).color || '#34d399';
+  const tkA = token(p.a), tkB = token(p.b);
+  const iconA = tkA.icon || '';
+  const iconB = p.pool.icon || tkB.icon || '';
+  $('chipA').innerHTML = iconA ? `<img class="tkimg-sm" src="${iconA}" alt="${p.a}" onerror="this.outerHTML='${p.a.slice(0,1)}'"/>` : p.a.slice(0,1);
+  $('chipB').innerHTML = iconB ? `<img class="tkimg-sm" src="${iconB}" alt="${p.b}" onerror="this.outerHTML='${p.b.slice(0,1)}'"/>` : p.b.slice(0,1);
+  $('chipA').style.background = tkA.color;
+  $('chipB').style.background = tkB.color || '#34d399';
   const a = parseFloat($('amtA').value) || 0, b = parseFloat($('amtB').value) || 0;
   $('detailPrice').textContent = '1 ' + p.b + ' = ' + (p.b === 'cirBTC' ? '$' + fmt(p.priceB) : fmt(p.priceB) + ' ' + p.a);
   $('detailReserves').textContent = fmt(p.reserveA) + ' ' + p.a + ' / ' + fmt(p.reserveB) + ' ' + p.b;
@@ -903,15 +916,21 @@ window.addEventListener('resize', drawPortfolioChart);
 
 /* ============ init ============ */
 window.addEventListener('load', async ()=>{
-  // pool data: coba live RadarDex dulu, fallback snapshot real
-  const live = await fetchRadarTop();
-  S.pools = live ? buildPoolsFromRadar(live) : poolsFromSnapshot();
+  // render INSTANT dari snapshot real (no 6s blank), lalu fetch live di background
+  S.pools = poolsFromSnapshot();
   S.selected = S.pools.length ? S.pools[0].id : '';
   const ok = loadDemo();
   if (!ok) { S.positions = genPositions(); saveDemo(); }
   syncWalletUI();
   renderAll();
-  if (!live) toast('Live API blocked — using latest on-chain snapshot', '');
+  const live = await fetchRadarTop();
+  if (live && live.length) {
+    S.pools = buildPoolsFromRadar(live);
+    if (!S.pools.find(p=>p.id===S.selected)) S.selected = S.pools.length ? S.pools[0].id : '';
+    S.positions.forEach(x=>{ x.pool = S.pools.find(p=>p.id===x.id) || x.pool; });
+    renderAll();
+    toast('Live pools refreshed', 'ok');
+  }
 });
 </script>
 </body>
