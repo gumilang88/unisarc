@@ -974,16 +974,30 @@ function syncWalletUI() {
 function deadline() { return Math.floor(Date.now()/1000) + 1800; }
 
 async function sendTx(to, data, value='0x0') {
+  if (!S.address) throw new Error('no wallet');
+  // simulation via our RPC — catch revert reason before burning gas
+  try {
+    await rpc('eth_call', [{ from: S.address, to, data, value }, 'latest']);
+  } catch (e) {
+    let reason = (e && e.message) || 'revert';
+    // extract revert string if present (Error(string))
+    const m = reason.match(/execution reverted[^:]*: ([A-Z_]{2,})/) || reason.match(/reason="([^"]+)"/) || reason.match(/'(.+)'/);
+    if (m && m[1]) reason = m[1];
+    throw new Error('Simulation reverted: ' + reason.slice(0, 200));
+  }
   const hash = await window.ethereum.request({ method: 'eth_sendTransaction', params: [{ from: S.address, to, data, value }] });
   return hash;
 }
 async function waitTx(hash) {
-  for (let i=0;i<60;i++) {
-    await new Promise(r=>setTimeout(r,1500));
+  for (let i=0;i<90;i++) {
+    await new Promise(r=>setTimeout(r,2000));
     try {
       const rc = await ethRpcNode('eth_getTransactionReceipt', [hash]);
       if (rc && rc.status === '0x1') return true;
-      if (rc && rc.status === '0x0') return false;
+      if (rc && rc.status === '0x0') {
+        // try to extract revert reason via trace/call
+        return false;
+      }
     } catch(e) {}
   }
   return false;
@@ -1065,9 +1079,9 @@ async function busy(on){ S.txBusy = on; ['btnAdd','btnClaimAll','rmConfirm','adC
 
 /* ============ Add Liquidity modal (real V3 mint/increaseLiquidity) ============ */
 let addMode = 'mint', addPoolObj = null;
-function encodeIncreaseLiquidity(tokenId, liq, amt0, amt1, deadline) {
+function encodeIncreaseLiquidity(tokenId, amt0, amt1, deadline, min0 = 0, min1 = 0) {
   // increaseLiquidity((tokenId,amount0Desired,amount1Desired,amount0Min,amount1Min,deadline))
-  const inner = uintArg(tokenId) + uintArg(liq) + uintArg(amt0) + uintArg(amt1) + uintArg(0) + uintArg(0) + uintArg(deadline);
+  const inner = uintArg(tokenId) + uintArg(amt0) + uintArg(amt1) + uintArg(min0) + uintArg(min1) + uintArg(deadline);
   const head = uintArg(32) + uintArg(inner.length/2);
   return '0x219f5d17' + head + inner;
 }
@@ -1080,14 +1094,35 @@ function encodeMint(token0, token1, fee, tl, tu, amt0, amt1, recipient, deadline
   const head = uintArg(32) + uintArg(inner.length/2);
   return '0x883bdbfd' + head + inner;
 }
-function ticksForRange(range, currentTick) {
+function ticksForRange(range, currentTick, fee) {
+  const spacing = TICK_SPACING[fee || 3000] || 60;
   if (range === 'full') return { lower: MIN_TICK, upper: MAX_TICK };
   const pct = range === 'wide' ? 0.10 : range === 'medium' ? 0.02 : 0.005;
   const priceNow = Math.pow(1.0001, currentTick);
   const priceL = priceNow * (1 - pct), priceU = priceNow * (1 + pct);
-  const tl = Math.max(MIN_TICK, Math.ceil(Math.log(priceL)/Math.log(1.0001)));
-  const tu = Math.min(MAX_TICK, Math.floor(Math.log(priceU)/Math.log(1.0001)));
+  let tl = Math.max(MIN_TICK, Math.ceil(Math.log(priceL)/Math.log(1.0001)));
+  let tu = Math.min(MAX_TICK, Math.floor(Math.log(priceU)/Math.log(1.0001)));
+  // align to tick spacing (Uniswap requires tickLower % spacing == 0, tickUpper % spacing == 0)
+  tl = tl - (mod(tl, spacing) + spacing) % spacing;
+  tu = tu - mod(tu, spacing);
+  tu = Math.min(MAX_TICK, tu);
+  if (tl >= tu) { tl = Math.max(MIN_TICK, (currentTick - spacing) - (mod(currentTick - spacing, spacing) + spacing) % spacing); tu = currentTick + spacing - mod(currentTick, spacing); }
   return { lower: tl, upper: tu };
+}
+function mod(a, n) { return ((a % n) + n) % n; }
+// return {token0, token1, fee} for a given pool address (read on-chain)
+async function getPoolTokens(poolAddr, wantToken0, wantToken1, feeTier) {
+  try {
+    const t0 = (await ethCall(poolAddr, '0x0dfe1681')).slice(-40).toLowerCase();
+    const t1 = (await ethCall(poolAddr, '0xd21220a7')).slice(-40).toLowerCase();
+    const fee = parseInt(await ethCall(poolAddr, '0xddca3f43'), 16);
+    return { token0: '0x' + t0, token1: '0x' + t1, fee };
+  } catch (e) {
+    // fallback: order by address ascending (Uniswap token ordering) — only if both provided
+    if (!wantToken0 || !wantToken1) throw e;
+    const a = wantToken0.toLowerCase(), b = wantToken1.toLowerCase();
+    return { token0: a < b ? '0x' + a : '0x' + b, token1: a < b ? '0x' + b : '0x' + a, fee: feeTier };
+  }
 }
 function openAddModal() {
   if (!S.address) return toast('Connect wallet first', 'err');
@@ -1128,36 +1163,58 @@ async function confirmAddModal() {
     const p = addPoolObj;
     const existingId = $('adPosSel').value;
     const range = $('adRange').value;
-    const base = CFG.tokens.find(x => x.symbol === p.a) || { address: p.addr && p.a === 'USDC' ? USDC_ADDR : '', decimals: 6 };
-    const baseDec = base.decimals ?? 6;
-    const amt0Wei = BigInt(Math.round(a * 10 ** baseDec));
-    const amt1Wei = BigInt(Math.round(b * 10 ** 6)); // token B assumed USDC-decimals for simplicity
+
+    // Resolve real token addresses + decimals
+    const tokASym = p.tok0, tokBSym = p.tok1;
+    const tok0SymLower = String(tokASym).toLowerCase(), tok1SymLower = String(tokBSym).toLowerCase();
+    let tokAAddr, tokBAddr, decA = 18, decB = 18;
+    const knownA = CFG.tokens.find(x => x.symbol === tokASym);
+    const knownB = CFG.tokens.find(x => x.symbol === tokBSym);
+    if (tokASym === 'USDC' || tokASym.toLowerCase() === 'usdc') { tokAAddr = USDC_ADDR; decA = 6; }
+    else tokAAddr = (knownA && knownA.address) || p.addr || '';
+    if (tokBSym === 'USDC' || tokBSym.toLowerCase() === 'usdc') { tokBAddr = USDC_ADDR; decB = 6; }
+    else tokBAddr = (knownB && knownB.address) || (p.b === 'USDC' ? USDC_ADDR : (CUSTOM_POOL && CUSTOM_POOL.bAddr) || p.addr) || ''; 
+    // read live decimals if we don't know them
+    if (decA === 18 && tokAAddr && tokAAddr !== USDC_ADDR) { try { decA = parseInt(await ethCall(tokAAddr, '0x313ce567'), 16) || 18; } catch(e){} }
+    if (decB === 18 && tokBAddr && tokBAddr !== USDC_ADDR) { try { decB = parseInt(await ethCall(tokBAddr, '0x313ce567'), 16) || 18; } catch(e){} }
+
+    const amt0Wei = BigInt(Math.round(a * 10 ** decA));
+    const amt1Wei = BigInt(Math.round(b * 10 ** decB));
+    if (amt0Wei <= 0n || amt1Wei <= 0n) throw new Error('enter positive amounts');
     const deadline = Math.floor(Date.now()/1000) + 1800;
+
+    // STEP 1 — approve both tokens to NFPM (only real ERC-20s; skip if already allowed)
+    const targets = [];
+    const tok0IsUSDC = (tok0SymLower === 'usdc'), tok1IsUSDC = (tok1SymLower === 'usdc');
+    if (!tok0IsUSDC && tokAAddr) targets.push({ addr: tokAAddr, amt: amt0Wei });
+    if (!tok1IsUSDC && tokBAddr) targets.push({ addr: tokBAddr, amt: amt1Wei });
+    for (const t of targets) await ensureAllowance(t.addr, CFG.nfpm, t.amt);
+    // USDC is the native gas token on Arc but still an ERC-20 mirror — USDC addressed by address; ensure allowance if it's a spendable ERC-20
+    if (tokAAddr === USDC_ADDR || tokBAddr === USDC_ADDR) { /* native USDC uses value gas; no approve needed */ }
+
     let hash;
     if (existingId) {
+      // increaseLiquidity on existing position — amount0Desired/amount1Desired, min 0
       const position = S.positions.find(x => x.tokenId === BigInt(existingId));
-      const incLiq = position ? position.liquidity / 100n : 1n; // increase by ~1% for demo; user can pass real
-      const data = encodeIncreaseLiquidity(BigInt(existingId), incLiq, amt0Wei > 0n ? amt0Wei : 1n, amt1Wei > 0n ? amt1Wei : 1n, deadline);
+      const data = encodeIncreaseLiquidity(BigInt(existingId), amt0Wei, amt1Wei, deadline);
       hash = await sendTx(CFG.nfpm, data);
       toast('Deposited into existing position #' + existingId, 'ok');
     } else {
-      // mint-new: need current tick to compute range ticks
+      // mint-new: need current tick + correct token0/token1 order for the pool
+      if (!p.addr) throw new Error('Pool address not resolved — use Manual Add with a contract to mint a new pool');
+      const ord = await getPoolTokens(p.addr, tokAAddr, tokBAddr, p.fee || 3000);
+      let a0wei = amt0Wei, a1wei = amt1Wei;
+      // map input amounts to pool's token0/token1 order
+      if (ord.token0.toLowerCase() === tokAAddr.toLowerCase() && ord.token1.toLowerCase() === tokBAddr.toLowerCase()) { a0wei = amt0Wei; a1wei = amt1Wei; }
+      else if (ord.token0.toLowerCase() === tokBAddr.toLowerCase() && ord.token1.toLowerCase() === tokAAddr.toLowerCase()) { a0wei = amt1Wei; a1wei = amt0Wei; }
+      else throw new Error('Pair not found in resolved pool');
+      // recompute tick range at pool's current tick
       let curTick = 0;
-      try {
-        const slot = await poolSlot0(p.addr); // may be empty for empty pool
-        curTick = slot && typeof slot.tick === 'number' ? slot.tick : 0;
-      } catch(e) {}
-      const t = ticksForRange(range, curTick);
-      const tok0 = p.tok0 === p.a ? base.address : (p.tok0);
-      const tok1 = p.tok1 === p.b ? (p.b === 'USDC' ? USDC_ADDR : (p.addr)) : (p.tok1);
-      // simpler: token0/token1 from pool order
-      const data = encodeMint(
-        CFG.tokens.find(x=>x.symbol===tok0)?.address || USDC_ADDR,
-        CFG.tokens.find(x=>x.symbol===tok1)?.address || (p.b==='USDC'?USDC_ADDR:p.addr),
-        p.fee || 3000, t.lower, t.upper, amt0Wei > 0n ? amt0Wei : 1n, amt1Wei > 0n ? amt1Wei : 1n, S.address, deadline
-      );
-      hash = await sendTx(CFG.nfpm, data);
+      try { const slot = await poolSlot0(p.addr); curTick = slot && typeof slot.tick === 'number' ? slot.tick : 0; } catch(e) {}
+      const t2 = ticksForRange(range, curTick, ord.fee || p.fee || 3000);
+      const data = encodeMint(ord.token0, ord.token1, ord.fee || p.fee || 3000, t2.lower, t2.upper, a0wei, a1wei, S.address, deadline);
       toast('Position minted', 'ok');
+      hash = await sendTx(CFG.nfpm, data);
     }
     const ok = await waitTx(hash);
     if (!ok) throw new Error('tx failed ' + shortAddr(hash));
@@ -1166,6 +1223,12 @@ async function confirmAddModal() {
     toast('Liquidity added ✓', 'ok');
   } catch (e) { toast('Add failed: ' + e.message, 'err'); }
   busy(false);
+}
+function computeLiquidityFromAmount(usdAmt, aAddr, bAddr, fee, tLower, tUpper) {
+  // crude estimate: assume full-range-ish position. For robustness return a 
+  // liquidity proportional to the USDC amount (approx for UI; on-chain math done by NFPM via desired amounts).
+  const SPACING = TICK_SPACING[fee] || 60;
+  return BigInt(Math.max(1, Math.round(usdAmt * 1e6)));
 }
 
 /* ============ remove modal ============ */
