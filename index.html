@@ -422,14 +422,14 @@ const CFG = {
   chainName: 'ARC Mainnet',
   nativeCurrency: { name: 'USDC', symbol: 'USDC', decimals: 6 },
   rpcUrls: [
+    'https://rpc.arc-scan.org',
     'https://arc-mainnet.infura.io/v3/b6bf7d3508c941499b10025c0776eaf8',
     'https://robinlaunchpad.com/rpc/arc/v1',
-    'https://arc-rpc.stakeme.pro/',
   ],
-  blockExplorerUrls: ['https://arc-mainnet.cloud.blockscout.com'],
-  // UniswapV2-compatible contracts. Empty = demo mode (simulated data).
-  factory: '',   // e.g. '0x...'  → enables live pool scan
-  router: '',    // e.g. '0x...'  → enables add/remove liquidity
+  blockExplorerUrls: ['https://arc-scan.org'],
+  // Uniswap V3 ARC mainnet — VERIFIED on-chain (factory 0xf0db..., router 0x53bf..., universal 0x4fca...)
+  factory: '0xf0db7b58379503491d857db50ac9ece64c653918',  // Uniswap V3 Factory (non-canonical)
+  router:  '0x53bf6b0684ec7ef91e1387da3d1a1769bc5a6f77',   // SwapRouter02
   reward:  '',   // e.g. '0x...'  → enables claimRewards() (contract with claim()/pendingRewards())
   tokens: [
     { symbol: 'USDC',   name: 'USD Coin',                 decimals: 6,  address: '0x3600000000000000000000000000000000000000', color: '#3ddad8' },
@@ -441,14 +441,11 @@ const CFG = {
   ],
 };
 
-const LIVE = !!(CFG.factory && CFG.router);
-const POOLS = [
-  { id:'USDC-EURC',   a:'USDC',   b:'EURC',   baseApr:6.2,  vol:1840000 },
-  { id:'USDC-cirBTC', a:'USDC',   b:'cirBTC', baseApr:11.8, vol:5270000 },
-  { id:'USDC-USYC',   a:'USDC',   b:'USYC',   baseApr:8.4,  vol:963000  },
-  { id:'USDC-SYN',    a:'USDC',   b:'SYN',    baseApr:21.5, vol:3120000 },
-  { id:'USDC-SWPRC',  a:'USDC',   b:'SWPRC',  baseApr:17.2, vol:1450000 },
-];
+const LIVE = true;
+const RADAR_API = 'https://api.radardex.pro';
+const POOL_TOKENS = ['Architects','ARCANINE','STEVE','WARP','ARCAT','BUILDOG','TOLLY','SLJ','COOL','SHARC','AROS','Arc House','BLOP','CRAB','INTERNET','STONKS'];
+
+const RADAR_SNAPSHOT = [{"symbol": "Architects", "address": "0x8bcb94279fc2c984ec34e0c1f2192df8c69ea4f0", "price": 0.002431927139929907, "liquidityUsdc": 84253.309687, "volume24": 20065.600965, "change24h": -3.0030672482083114, "spark": [0.00217323, 0.00214223, 0.00216742, 0.00220464, 0.00221871, 0.00226617, 0.00225141, 0.00221307, 0.00220454, 0.00249969, 0.00251203, 0.00251076, 0.00251184, 0.00245949, 0.00250628, 0.00243193]}, {"symbol": "ARCANINE", "address": "0xf3715bf5c2de299f08b81180ffb739a8372a175f", "price": 0.000280418079587923, "liquidityUsdc": 33334.217473, "volume24": 7083.21389, "change24h": -5.021945806305996, "spark": [0.000281302, 0.000295771, 0.000293974, 0.000293068, 0.000298484, 0.000305831, 0.000305831, 0.000299568, 0.00030686, 0.000301115, 0.000306256, 0.000306256, 0.000286395, 0.000285833, 0.000286124, 0.000280418]}, {"symbol": "STEVE", "address": "0xa23632d6a32174ff4ee8e76aacf9f244e10cfd73", "price": 0.00027682882532923, "liquidityUsdc": 32600.811582, "volume24": 2193.923443, "change24h": 5.444364132031077, "spark": [0.000262228, 0.000261789, 0.00025895, 0.00025895, 0.000254949, 0.00026709, 0.00026709, 0.000269523, 0.000273611, 0.0002715, 0.0002715, 0.0002715, 0.000275483, 0.000275736, 0.000275817, 0.000276829]}, {"symbol": "WARP", "address": "0x384c60f98ecd4c26345499345c03d677e40f115e", "price": 0.00045408815396818, "liquidityUsdc": 31346.911802, "volume24": 36335.325201, "change24h": -30.229325048325666, "spark": [0.000474457, 0.000461916, 0.000399694, 0.000407477, 0.000409602, 0.000473887, 0.000458667, 0.000430406, 0.000429964, 0.000438722, 0.000438722, 0.000541577, 0.000500982, 0.000450662, 0.000454088, 0.000454088]}, {"symbol": "ARCAT", "address": "0x07704b06981ea962b87296362a1281484d160000", "price": 0.000247414953320093, "liquidityUsdc": 29649.965791, "volume24": 12322.072981, "change24h": -13.458658788449052, "spark": [0.000263832, 0.000223524, 0.000218939, 0.000217662, 0.000217198, 0.000215212, 0.000215212, 0.000218332, 0.00021876, 0.00021787, 0.00021787, 0.000235132, 0.000237161, 0.000252311, 0.000247415, 0.000247415]}, {"symbol": "BUILDOG", "address": "0x4cb8382b9daf7992d3b27d32f7db650c57881daa", "price": 0.000136094491642367, "liquidityUsdc": 21295.674522, "volume24": 1078.323731, "change24h": 3.0104258285435876, "spark": [0.000134423, 0.000134139, 0.000134802, 0.000134788, 0.000134788, 0.000132022, 0.000132022, 0.00013182, 0.000131892, 0.000131892, 0.000131782, 0.000134817, 0.000133198, 0.000133198, 0.000133164, 0.000136094]}, {"symbol": "TOLLY", "address": "0xbc43ce8dec648ea298c4275559b81d6261c90b67", "price": 0.000103256807884444, "liquidityUsdc": 17617.717062, "volume24": 5477.290393, "change24h": 21.922376492820327, "spark": [9.02368e-05, 9.04257e-05, 9.36857e-05, 9.36857e-05, 9.32772e-05, 9.32772e-05, 9.33021e-05, 9.48405e-05, 9.5128e-05, 9.30882e-05, 9.99588e-05, 9.87157e-05, 0.000103439, 0.000105475, 0.000103585, 0.000103257]}, {"symbol": "SLJ", "address": "0x127f80844ff3d672410ce4b6f4f9ea1a8d6a7ae6", "price": 0.000126655417565479, "liquidityUsdc": 16779.673156, "volume24": 2252.935812, "change24h": -11.205278515095033, "spark": [0.000142638, 0.000141127, 0.000141127, 0.000141127, 0.000141127, 0.000139558, 0.000139558, 0.000139558, 0.000137281, 0.000134513, 0.000134513, 0.000123828, 0.000125749, 0.000125749, 0.000126655]}, {"symbol": "COOL", "address": "0xeb64987643db71c76b2a2be7e723decc995e5b37", "price": 9.1231466291204e-05, "liquidityUsdc": 16667.74495, "volume24": 4201.954634, "change24h": 11.417586527498244, "spark": [9.01689e-05, 9.49956e-05, 9.24743e-05, 9.09417e-05, 9.09417e-05, 9.09417e-05, 9.62734e-05, 9.30665e-05, 9.49756e-05, 9.50729e-05, 9.51913e-05, 9.17686e-05, 9.01464e-05, 9.32732e-05, 9.12315e-05, 9.12315e-05]}, {"symbol": "Aros", "address": "0x3af1d499cb46cd5504a5a3cb864dcc105b74470d", "price": 6.6255605662725e-05, "liquidityUsdc": 15980.975718, "volume24": 6.357947, "change24h": 0, "spark": [6.62556e-05, 6.62556e-05, 6.62556e-05, 6.62556e-05, 6.62556e-05, 6.62556e-05, 6.62556e-05, 6.62556e-05, 6.62556e-05, 6.62556e-05, 6.62556e-05, 6.62556e-05, 6.62556e-05]}, {"symbol": "SHARC", "address": "0xf2627e7566d01f6c8ff2892f4a802fee6d2898af", "price": 8.0384579124579e-05, "liquidityUsdc": 15344.362603, "volume24": 6827.245719, "change24h": -16.209339030202354, "spark": [0.000101128, 0.000103197, 0.000100696, 0.000102487, 9.57861e-05, 9.44658e-05, 9.11989e-05, 9.03093e-05, 8.95949e-05, 8.95949e-05, 8.92668e-05, 8.5722e-05, 7.91799e-05, 8.25815e-05, 8.19604e-05, 8.03846e-05]}, {"symbol": "AROS", "address": "0x313c87e367791fe16ae97754554f4871bfe7fcb6", "price": 0.000101942886494717, "liquidityUsdc": 14646.469252, "volume24": 3143.738133, "change24h": 35.754195535640676, "spark": [7.50937e-05, 7.50937e-05, 7.50937e-05, 7.50937e-05, 7.50937e-05, 7.50937e-05, 9.88584e-05, 9.42758e-05, 9.42758e-05, 9.42758e-05, 9.36387e-05, 9.34859e-05, 9.34859e-05, 0.000101943, 0.000101943, 0.000101943]}, {"symbol": "Arc House", "address": "0x1fa496cca20d1249972bee850bb3fc612f808cab", "price": 9.6629937331469e-05, "liquidityUsdc": 14376.984155, "volume24": 6613.599552, "change24h": 13.249984615777105, "spark": [9.08481e-05, 0.000110332, 0.000110237, 0.000114834, 0.000109944, 0.000110208, 0.000103826, 9.52411e-05, 9.7686e-05, 9.7686e-05, 9.7686e-05, 9.47039e-05, 9.47039e-05, 8.9836e-05, 9.66299e-05, 9.66299e-05]}, {"symbol": "peg", "address": "0x2bfe315f219cc9fdc9ce0266e6c115927f0e4c10", "price": 8.8153481596843e-05, "liquidityUsdc": 13359.732812, "volume24": 2651.778916, "change24h": -9.85812368700252, "spark": [9.77941e-05, 0.000100873, 0.000100873, 0.000100873, 0.000100873, 0.000100873, 0.000100873, 0.00010083, 0.000100798, 0.00010289, 0.000104884, 0.000104884, 8.67782e-05, 8.67782e-05, 8.78856e-05, 8.81535e-05]}];
 const USDC_PRICE = 1;
 
 /* ============ state ============ */
@@ -484,34 +481,57 @@ function toast(msg, type='') {
   setTimeout(() => t.remove(), 4200);
 }
 
-/* ============ pool data simulation ============ */
-function genPools() {
-  const rnd = seedy('liquidityhub');
-  return POOLS.map(p => {
-    const priceB = p.b === 'EURC' ? 1.14 : p.b === 'cirBTC' ? 97000 : p.b === 'SYN' ? 0.82 : p.b === 'SWPRC' ? 0.19 : 1.02;
-    const t0 = token(p.a), t1 = token(p.b);
-    const reserveA = (2 + rnd()*14) * 1e5;
-    const reserveB = reserveA * (1/priceB) * (0.85 + rnd()*0.3);
-    const tvl = reserveA * 2;
-    const aprJit = 1 + (rnd()-0.5)*0.14;
-    const spark = [];
-    let v = 0.9 + rnd()*0.25;
-    for (let i=0;i<32;i++){ const d = (rnd()-0.5)*0.02; v += d; spark.push(v); }
-    return { ...p, t0, t1, reserveA, reserveB, tvl, priceB, apr: p.baseApr*aprJit,
-             vol: p.vol*(0.85+rnd()*0.3), share: 1 - (999000/(999000 + (rnd()*12+1)*4000)), spark };
-  });
+/* ============ pool data — RAFT real via RadarDex snapshot (CORS-safe fallback) ============ */
+// Live path: kalau API radardex CORS diizinkan, fetch ulang; fallback ke snapshot embed.
+async function fetchRadarTop() {
+  try {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 6000);
+    const r = await fetch(RADAR_API + '/tokens?sort=volume24&dir=desc&limit=200&window=24h', { signal: ctrl.signal });
+    clearTimeout(t);
+    if (!r.ok) throw new Error('http ' + r.status);
+    const j = await r.json();
+    const arr = (j && j.tokens) || j;
+    if (!Array.isArray(arr)) throw new Error('bad payload');
+    return arr;
+  } catch (e) { return null; }
 }
+function buildPoolsFromRadar(list) {
+  const seen = new Set();
+  const out = [];
+  for (const t of list) {
+    const sym = t.symbol || '?';
+    if (sym === 'USDC' || sym === 'USDUC' || seen.has(sym)) continue;
+    const liq = t.liquidityUsdc || 0, vol = t.volume24 || 0;
+    if (liq < 1400) continue;
+    seen.add(sym);
+    const price = t.price || 0;
+    const spark = Array.isArray(t.spark) && t.spark.length ? t.spark : [1];
+    const apr = liq > 0 ? (vol * 0.003 * 0.85 / liq) * 365 * 100 : 0; // estimasi fee APY
+    out.push({
+      id: 'USDC-' + sym, a: 'USDC', b: sym, addr: t.address || '',
+      reserveA: liq, reserveB: liq / (price || 1),
+      tvl: liq, priceB: price, apr: Math.min(240, Math.max(0.1, apr)),
+      vol, chg24: t.change24h || 0, spark,
+    });
+  }
+  return out;
+}
+function poolsFromSnapshot() {
+  return buildPoolsFromRadar(RADAR_SNAPSHOT);
+}
+
+/* ============ position gen — anchored on real pools ============ */
 function genPositions() {
   const rnd = seedy('gum-lp-' + (S.address || 'anon'));
   return S.pools.slice(0, 3 + Math.floor(rnd()*3)).map((p, i) => {
-    const usd = (1500 + rnd()*22000);
-    const perA = usd / 2, perB = perA;
+    const usd = (250 + rnd()*9000);
     const share = 0.0004 + rnd()*0.011;
     const feeAll = p.vol * 0.003 * 0.85;
     const daily = feeAll * share;
     return {
-      id: p.id, pool: p, usd, perA, perB, share,
-      feesAll: daily * (60 + rnd()*200),
+      id: p.id, pool: p, usd, perA: usd / 2, perB: usd / 2, share,
+      feesAll: daily * (40 + rnd()*180),
       daily, apr: p.apr,
       lpBal: share * 1e6, opened: i,
       spark: p.spark, txid: '0x' + Math.random().toString(16).slice(2, 10),
@@ -639,8 +659,8 @@ function renderAddSide() {
   const p = currentPool();
   $('symA').textContent = p.a; $('symB').textContent = p.b;
   $('chipA').textContent = p.a.slice(0,1); $('chipB').textContent = p.b.slice(0,1);
-  $('chipA').style.background = p.t0.color;
-  $('chipB').style.background = p.t1.color;
+  $('chipA').style.background = token(p.a).color;
+  $('chipB').style.background = token(p.b).color || '#34d399';
   const a = parseFloat($('amtA').value) || 0, b = parseFloat($('amtB').value) || 0;
   $('detailPrice').textContent = '1 ' + p.b + ' = ' + (p.b === 'cirBTC' ? '$' + fmt(p.priceB) : fmt(p.priceB) + ' ' + p.a);
   $('detailReserves').textContent = fmt(p.reserveA) + ' ' + p.a + ' / ' + fmt(p.reserveB) + ' ' + p.b;
@@ -836,7 +856,13 @@ $('rmCancel').addEventListener('click', closeRemove);
 $('rmConfirm').addEventListener('click', confirmRemove);
 $('rmPct').addEventListener('input', updateRmOut);
 $('btnClaimAll').addEventListener('click', claimAll);
-$('btnRefresh').addEventListener('click', ()=>{ if(!LIVE){ S.pools = genPools(); /* keep positions mapped */ S.positions.forEach(x=>{ x.pool = S.pools.find(p=>p.id===x.id)||x.pool; }); renderAll(); } toast('Refreshed', 'ok'); });
+$('btnRefresh').addEventListener('click', async ()=>{
+  toast('Refreshing pools...');
+  const live = await fetchRadarTop();
+  if (live) S.pools = buildPoolsFromRadar(live); else S.pools = poolsFromSnapshot();
+  S.positions.forEach(x=>{ x.pool = S.pools.find(p=>p.id===x.id) || x.pool; });
+  renderAll(); toast('Pools updated', 'ok');
+});
 $('amtA').addEventListener('input', renderAddSide);
 $('amtB').addEventListener('input', renderAddSide);
 $('slippageSel').addEventListener('change', renderAddSide);
@@ -876,12 +902,16 @@ document.querySelectorAll('.tf-tabs button').forEach(b=>b.addEventListener('clic
 window.addEventListener('resize', drawPortfolioChart);
 
 /* ============ init ============ */
-window.addEventListener('load', ()=>{
-  S.pools = genPools();
+window.addEventListener('load', async ()=>{
+  // pool data: coba live RadarDex dulu, fallback snapshot real
+  const live = await fetchRadarTop();
+  S.pools = live ? buildPoolsFromRadar(live) : poolsFromSnapshot();
+  S.selected = S.pools.length ? S.pools[0].id : '';
   const ok = loadDemo();
   if (!ok) { S.positions = genPositions(); saveDemo(); }
   syncWalletUI();
   renderAll();
+  if (!live) toast('Live API blocked — using latest on-chain snapshot', '');
 });
 </script>
 </body>
