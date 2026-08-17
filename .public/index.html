@@ -818,7 +818,7 @@ async function resolveManualPool() {
   if (!a1) a1 = USDC_ADDR;
   const fee = parseInt($('manFee').value, 10);
   const st = $('manStatus'); const btn = $('btnResolvePool');
-  if (!/^0x[0-9a-f]{40}$/.test(a0) || !/^0x[0-9a-f]{40}$/.test(a1))
+  if (!/^0x[0-9a-f]{40}$/i.test(a0) || !/^0x[0-9a-f]{40}$/i.test(a1))
     { st.textContent = 'Invalid address — need 0x + 40 hex.'; st.style.color = 'var(--red)'; return; }
   st.textContent = 'Resolving pool on-chain...'; st.style.color = 'var(--cyan)';
   btn.disabled = true;
