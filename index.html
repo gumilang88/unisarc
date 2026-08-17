@@ -462,7 +462,7 @@ main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 5rem}
 
 <main>
   <!-- ============ POSITIONS ============ -->
-  <section class="view active" id="view-positions">
+  <section class="view" id="view-positions">
     <div class="page-head">
       <div><h1 class="text-outline">Your Positions</h1><p>Liquidity you provided, with live value, pool share and accrued fees.</p></div>
     </div>
@@ -1723,6 +1723,9 @@ window.addEventListener('resize', drawPortfolioChart);
 window.addEventListener('load', async ()=>{
   S.pools = poolsFromSnapshot();
   S.selected = S.pools.length ? S.pools[0].id : '';
+  // set the active view from the URL hash EARLY (before renderAll) so a
+  // refresh lands directly on the right tab — no flash/jump to Positions.
+  showView((location.hash || '').slice(1) || 'positions');
   // restore wallet session (eth_accounts is silent — no popup; keeps wallet connected across refresh)
   if (window.ethereum) {
     try {
@@ -1737,8 +1740,6 @@ window.addEventListener('load', async ()=>{
   }
   syncWalletUI();
   renderAll();
-  // restore the tab the user was on (e.g. stayed on #add after a refresh)
-  showView((location.hash || '').slice(1) || 'positions');
   if (S.address) loadPositionsUI();
   const live = await fetchRadarTop();
   if (live && live.length) {
