@@ -1,4 +1,4 @@
-# LiquidHub — LP Dashboard (ARC Mainnet, LIVE on-chain)
+# UNISARC — LP Dashboard (ARC Mainnet, LIVE on-chain)
 
 Liquidity provider dashboard untuk Uniswap V3 ARC Mainnet (chain 5042).
 

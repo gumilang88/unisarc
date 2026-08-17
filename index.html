@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>LiquidHub - LP Dashboard</title>
+<title>UNISARC - LP Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -58,9 +58,7 @@ input{font-family:inherit}
 header{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:1.25rem;
        padding:.7rem 1.5rem;background:var(--pop);border-bottom:4px solid #000}
 .brand{display:flex;align-items:center;gap:.7rem}
-.brand .logo{width:34px;height:34px;border:3px solid #000;box-shadow:3px 3px 0 #000;
-       display:grid;place-items:center;background:linear-gradient(135deg,var(--cyan),var(--yellow));
-       font-family:var(--px);font-size:14px;color:var(--ink)}
+.brand-logo{width:38px;height:38px;border-radius:50%;object-fit:cover;border:3px solid #000;box-shadow:3px 3px 0 #000;image-rendering:auto}
 .brand span{font-family:var(--px);font-size:14px;text-transform:uppercase;color:#fff;text-shadow:3px 3px 0 #000}
 .brand span b{color:var(--cyan)}
 nav{display:flex;gap:.4rem;margin-left:.5rem;flex-wrap:wrap}
@@ -246,7 +244,7 @@ main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 5rem}
 <body>
 
 <header>
-  <div class="brand"><div class="logo">LH</div><span>Liquid<b>Hub</b></span></div>
+  <div class="brand"><img class="brand-logo" src="assets/unisarc-logo.jpg" alt="UNISARC"/><span>Uni<b>Sarc</b></span></div>
   <nav id="nav">
     <a href="#positions" data-v="positions" class="active">Positions</a>
     <a href="#add" data-v="add">Add LP</a>
@@ -393,7 +391,7 @@ main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 5rem}
     <div class="px-card" id="rwList"></div>
   </section>
 
-  <div class="footer">LiquidHub - liquidity provider dashboard</div>
+  <div class="footer">UNISARC - liquidity provider dashboard</div>
 </main>
 
 <!-- ============ REMOVE MODAL ============ -->
@@ -467,7 +465,7 @@ main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 5rem}
 
 <script>"use strict";
 /* ================================================================
-   LiquidHub — Uniswap V3 ARC Mainnet (LIVE on-chain, no demo)
+   UNISARC — Uniswap V3 ARC Mainnet (LIVE on-chain, no demo)
    Factory 0xf0db7b58...  Router 0x53bf6b06...  NFPM 0x39654A85...
    ================================================================ */
 const CFG = {

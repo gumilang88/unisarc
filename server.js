@@ -1,4 +1,4 @@
-// LiquidHub static server + RadarDex API proxy (CORS bypass)
+// UNISARC static server + RadarDex API proxy (CORS bypass)
 // Usage: node server.js  (serves on :3011 by default)
 const http = require('http');
 const fs = require('fs');
@@ -52,4 +52,4 @@ const server = http.createServer((req, res) => {
   });
 });
 
-server.listen(PORT, () => console.log(`LiquidHub on http://localhost:${PORT}  (proxy /api/radar -> ${RADAR})`));
+server.listen(PORT, () => console.log(`UNISARC on http://localhost:${PORT}  (proxy /api/radar -> ${RADAR})`));
