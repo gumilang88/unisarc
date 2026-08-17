@@ -1356,16 +1356,28 @@ window.addEventListener('resize', drawPortfolioChart);
 window.addEventListener('load', async ()=>{
   S.pools = poolsFromSnapshot();
   S.selected = S.pools.length ? S.pools[0].id : '';
+  // restore wallet session (eth_accounts is silent — no popup; keeps wallet connected across refresh)
+  if (window.ethereum) {
+    try {
+      const accs = await window.ethereum.request({ method: 'eth_accounts' });
+      if (accs && accs.length) {
+        S.address = accs[0];
+        S.chainId = await window.ethereum.request({ method: 'eth_chainId' });
+        window.ethereum.on('accountsChanged', a => { S.address = a[0]||null; syncWalletUI(); loadPositionsUI(); });
+        window.ethereum.on('chainChanged', () => window.location.reload());
+      }
+    } catch (e) { /* wallet not accessible */ }
+  }
   syncWalletUI();
   renderAll();
+  if (S.address) loadPositionsUI();
   const live = await fetchRadarTop();
   if (live && live.length) {
     S.pools = buildPoolsFromRadar(live);
     if (!S.pools.find(p=>p.id===S.selected)) S.selected = S.pools.length ? S.pools[0].id : '';
     renderPoolChips(); renderAddSide(); renderMonitor();
+    if (S.address) loadPositionsUI();
   }
-  // auto-reconnect old session if wallet remembers
-  if (window.ethereum && S.address) loadPositionsUI();
 });</script>
 </body>
 </html>
