@@ -1613,24 +1613,28 @@ function openWalletModal(){
 }
 function closeWalletModal(){ $('modalWallet').classList.remove('open'); }
 
-/* ============ events ============ */
-document.querySelectorAll('#nav a').forEach(a=>a.addEventListener('click', e=>{
-  e.preventDefault();
-  const v = a.dataset.v;
-  document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));
-  $('view-'+v).classList.add('active');
-  document.querySelectorAll('#nav a').forEach(x=>x.classList.toggle('active', x===a));
-  if (v==='add') renderAddSide();
-  window.scrollTo({top:0});
-}));
-document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click', ()=>{
-  const v = b.dataset.go;
-  if (b.dataset.pool) S.selected = b.dataset.pool;
+/* ============ view routing (hash-based so refresh keeps the page) ============ */
+function showView(v) {
+  if (!validView(v)) v = 'positions';
   document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));
   $('view-'+v).classList.add('active');
   document.querySelectorAll('#nav a').forEach(x=>x.classList.toggle('active', x.dataset.v===v));
-  if (v==='add') { renderPoolChips(); renderAddSide(); }
+  if (v==='add') renderAddSide();
+  if (history.replaceState) history.replaceState(null, '', '#'+v);
   window.scrollTo({top:0});
+}
+function validView(v){ return ['positions','add','monitor','rewards'].includes(v); }
+
+/* ============ events ============ */
+document.querySelectorAll('#nav a').forEach(a=>a.addEventListener('click', e=>{
+  e.preventDefault();
+  showView(a.dataset.v);
+}));
+window.addEventListener('hashchange', ()=> showView((location.hash||'#positions').slice(1)));
+document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click', ()=>{
+  const v = b.dataset.go;
+  if (b.dataset.pool) S.selected = b.dataset.pool;
+  showView(v);
 }));
 $('walletBtn').addEventListener('click', S.address ? openWalletModal : connect);
 $('wClose').addEventListener('click', closeWalletModal);
@@ -1698,11 +1702,11 @@ $('posGrid').addEventListener('click', e=>{
   const id = btn.dataset.id;
   if (btn.dataset.act==='remove') openRemove(id);
   else if (btn.dataset.act==='claim') claimRewardPos(id);
-  else if (btn.dataset.act==='add') { S.selected = S.pools.find(pp => pp.b === (S.positions.find(x=>x.tokenId===BigInt(id))||{}).meta1?.symbol)?.id || S.selected; document.querySelectorAll('.view').forEach(x=>x.classList.remove('active')); $('view-add').classList.add('active'); renderPoolChips(); renderAddSide(); }
+  else if (btn.dataset.act==='add') { S.selected = S.pools.find(pp => pp.b === (S.positions.find(x=>x.tokenId===BigInt(id))||{}).meta1?.symbol)?.id || S.selected; showView('add'); renderPoolChips(); }
 });
 $('monGrid').addEventListener('click', e=>{
   const btn = e.target.closest('button[data-act],button[data-go]'); if (!btn) return;
-  if (btn.dataset.go === 'add') { if (btn.dataset.pool) S.selected = btn.dataset.pool; document.querySelectorAll('.view').forEach(x=>x.classList.remove('active')); $('view-add').classList.add('active'); renderPoolChips(); renderAddSide(); }
+  if (btn.dataset.go === 'add') { if (btn.dataset.pool) S.selected = btn.dataset.pool; showView('add'); renderPoolChips(); }
 });
 $('rwList').addEventListener('click', e=>{
   const btn = e.target.closest('button[data-act]'); if (!btn) return;
@@ -1733,6 +1737,8 @@ window.addEventListener('load', async ()=>{
   }
   syncWalletUI();
   renderAll();
+  // restore the tab the user was on (e.g. stayed on #add after a refresh)
+  showView((location.hash || '').slice(1) || 'positions');
   if (S.address) loadPositionsUI();
   const live = await fetchRadarTop();
   if (live && live.length) {
