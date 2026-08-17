@@ -969,13 +969,12 @@ function renderAddSide() {
   const isCustom = p.id === '__manual__';
   const iconA = p.iconA || (isCustom ? '' : tkA.icon || '');
   const iconB = p.iconB || p.icon || (isCustom ? '' : tkB.icon || '');
-  const letA = p.a.slice(0,1), letB = p.b.slice(0,1);
   $('chipA').innerHTML = iconA
-    ? `<img class="tkimg-sm" src="${iconA}" alt="${p.a}" onerror="this.outerHTML='<span class=\\"monico-l\\" style=\\"background:${tkA.color||'#3ddad8'}\\">${letA}</span>'"/>`
-    : `<span class="monico-l" style="background:${tkA.color||'#3ddad8'}">${letA}</span>`;
+    ? `<img class="tkimg-sm" src="${iconA}" alt="${p.a}" onerror="this.style.display='none'"/>`
+    : '';
   $('chipB').innerHTML = iconB
-    ? `<img class="tkimg-sm" src="${iconB}" alt="${p.b}" onerror="this.outerHTML='<span class=\\"monico-l\\" style=\\"background:${tkB.color||'#3ddad8'}\\">${letB}</span>'"/>`
-    : `<span class="monico-l" style="background:${tkB.color||'#3ddad8'}">${letB}</span>`;
+    ? `<img class="tkimg-sm" src="${iconB}" alt="${p.b}" onerror="this.style.display='none'"/>`
+    : '';
   $('chipA').style.background = '';  // no box — clean circle logo
   $('chipB').style.background = '';
   const a = parseFloat($('amtA').value) || 0, b = parseFloat($('amtB').value) || 0;
