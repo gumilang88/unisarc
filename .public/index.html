@@ -1,0 +1,1406 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>UNISARC - LP Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --bg:#3c1154; --bg2:#2b0d3e; --card:#4a1768; --card2:#5b1d7d; --pop:#2a0d3e;
+  --cyan:#3ddad8; --orange:#f06943; --yellow:#ffbe39; --red:#d8046a; --green:#7ee081;
+  --ink:#20102e; --white:#fff;
+  --px:'Space Grotesk',ui-monospace,monospace;
+  --vt:'Inter',ui-monospace,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{background:var(--bg)}
+body{
+  background:var(--bg);
+  background-image:
+    linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+  background-size:24px 24px;
+  color:var(--white); font-family:var(--vt); font-size:15px; line-height:1.5; letter-spacing:.02em;
+  min-height:100vh;
+}
+::selection{background:var(--cyan);color:var(--ink)}
+svg{image-rendering:pixelated;image-rendering:crisp-edges}
+img{image-rendering:auto}
+button{font-family:inherit;cursor:pointer}
+input{font-family:inherit}
+::-webkit-scrollbar{width:14px}
+::-webkit-scrollbar-track{background:var(--pop)}
+::-webkit-scrollbar-thumb{background:var(--cyan);border:3px solid #000}
+
+/* ---------- pixel primitives ---------- */
+.px-card{background:var(--card);border:4px solid #000;box-shadow:8px 8px 0 #000;border-radius:0}
+.px-btn{
+  font-family:var(--px);text-transform:uppercase;border:4px solid #000;box-shadow:5px 5px 0 #000;
+  background:var(--cyan);color:var(--ink);font-size:13px;padding:.65rem 1rem;
+}
+.px-btn:active{transform:translate(3px,3px);box-shadow:2px 2px 0 #000}
+.px-btn.orange{background:var(--orange);color:#fff}
+.px-btn.yellow{background:var(--yellow)}
+.px-btn.ghost{background:transparent;color:var(--cyan)}
+.px-btn.danger{background:transparent;color:var(--red);box-shadow:none;border:3px solid var(--red)}
+.px-btn:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:5px 5px 0 #000}
+.px-btn .spin{display:inline-block;width:10px;height:10px;border:2px solid rgba(0,0,0,.35);border-top-color:var(--ink);border-radius:0;animation:sp .6s steps(2) infinite;margin-right:.4rem;vertical-align:1px}
+@keyframes sp{to{transform:rotate(360deg)}}
+.px-heading{font-family:var(--px);text-transform:uppercase;line-height:1.4;letter-spacing:.02em}
+.text-outline{text-shadow:none;text-decoration:none;border:none;border-bottom:none;outline:none}
+.text-cyan{color:var(--cyan)} .text-yellow{color:var(--yellow)} .text-orange{color:var(--orange)}
+.text-green{color:var(--green)} .text-red{color:var(--red)} .text-dim{color:rgba(255,255,255,.6)}
+
+/* ---------- header ---------- */
+header{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:1.25rem;
+       padding:.7rem 1.5rem;background:var(--pop);border-bottom:4px solid #000}
+.brand{display:flex;align-items:center;gap:.7rem}
+.brand-logo{width:38px;height:38px;border-radius:50%;object-fit:cover;border:3px solid #000;box-shadow:3px 3px 0 #000;image-rendering:auto}
+.brand span{font-family:var(--px);font-size:14px;text-transform:uppercase;color:#fff;text-shadow:3px 3px 0 #000}
+.brand span b{color:#d8046a;text-shadow:3px 3px 0 #000,0 0 10px rgba(216,4,106,.7)}
+nav{display:flex;gap:.4rem;margin-left:.5rem;flex-wrap:wrap}
+nav a{font-family:var(--px);font-size:13px;text-transform:uppercase;padding:.65rem .7rem;color:var(--white);
+     border:3px solid transparent;transition:.1s;white-space:nowrap}
+nav a:hover{color:var(--yellow)}
+nav a.active{color:#fff;background:#d8046a;border:3px solid #000;box-shadow:3px 3px 0 #000}
+.header-right{margin-left:auto;display:flex;align-items:center;gap:.75rem}
+.chain-pill{display:flex;align-items:center;gap:.45rem;padding:.4rem .7rem;border:3px solid #000;box-shadow:3px 3px 0 #000;
+       font-family:var(--px);font-size:14px;text-transform:uppercase;color:var(--white);background:var(--card)}
+.chain-pill .dot{width:9px;height:9px;background:var(--green);box-shadow:0 0 8px var(--green)}
+.wallet-btn{font-family:var(--px);font-size:13px;text-transform:uppercase;padding:.75rem 1rem;
+       background:var(--cyan);color:var(--ink);border:4px solid #000;box-shadow:5px 5px 0 #000}
+.wallet-btn:hover{background:var(--yellow)}
+.wallet-btn:active{transform:translate(3px,3px);box-shadow:2px 2px 0 #000}
+.wallet-btn.connected{background:var(--card2);color:var(--cyan);font-size:13px}
+
+/* ---------- layout ---------- */
+main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 5rem}
+.view{display:none}
+.view.active{display:block;animation:fade .2s steps(3)}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.page-head{display:flex;align-items:flex-end;justify-content:space-between;gap:1rem;margin-bottom:1.6rem;flex-wrap:wrap}
+.page-head h1{font-family:var(--px);font-size:20px;text-transform:uppercase;color:#fff;border:none;border-bottom:none;text-decoration:none;text-shadow:none}
+.page-head p{color:rgba(255,255,255,.7);font-size:19px;margin-top:.5rem}
+
+/* ---------- stat cards ---------- */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1.1rem;margin-bottom:1.6rem}
+.stat{background:var(--card);border:4px solid #000;box-shadow:8px 8px 0 #000;border-radius:0;padding:1rem 1.2rem}
+.stat .label{font-family:var(--px);font-size:14px;text-transform:uppercase;color:rgba(255,255,255,.75);letter-spacing:.04em}
+.stat .value{font-family:var(--vt);font-size:1.75rem;font-weight:700;line-height:1.2;margin-top:.35rem;color:var(--cyan)}
+.stat .value.up{color:var(--green)} .stat .value.down{color:var(--red)}
+.stat .sub{font-size:15px;color:rgba(255,255,255,.6);margin-top:.2rem}
+
+/* ---------- cards ---------- */
+.card-title{display:flex;align-items:center;justify-content:space-between;gap:.75rem;margin-bottom:1rem}
+.card-title h2{font-family:var(--px);font-size:13px;text-transform:uppercase;color:#fff;text-shadow:2px 2px 0 #000}
+.card-title .hint{font-family:var(--px);font-size:14px;color:var(--yellow)}
+
+/* ---------- positions ---------- */
+.pos-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:1.3rem}
+.pos-card{background:var(--card);border:4px solid #000;box-shadow:8px 8px 0 #000;border-radius:0;padding:1.2rem 1.3rem;transition:.1s}
+.pos-card:hover{transform:translate(-2px,-2px);box-shadow:10px 10px 0 #000}
+.pos-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+.pool-id{display:flex;align-items:center;gap:.6rem}
+.pool-id .tk{width:32px;height:32px;border:3px solid #000;display:grid;place-items:center;
+       font-family:var(--px);font-size:13px;color:var(--ink)}
+.tk.t0{background:var(--cyan)} .tk.t1{background:var(--yellow)}
+.tkimg{width:32px;height:32px;object-fit:contain;background:transparent;border-radius:50%;border:0}
+.pool-id .nm{font-family:var(--px);font-size:13px;text-transform:uppercase}
+.pool-id .sub{font-family:var(--vt);font-size:15px;color:rgba(255,255,255,.6);margin-top:.2rem}
+.pool-apr{font-family:var(--px);font-size:14px;text-transform:uppercase;padding:.5rem .6rem;border:3px solid #000;box-shadow:3px 3px 0 #000}
+.pool-apr.hot{background:var(--green);color:var(--ink)}
+.pool-apr.mid{background:var(--cyan);color:var(--ink)}
+.pool-apr.cold{background:var(--yellow);color:var(--ink)}
+.pos-detail{display:grid;grid-template-columns:1fr 1fr;gap:.6rem 1rem;margin:.9rem 0}
+.pd .k{font-family:var(--px);font-size:13px;text-transform:uppercase;color:rgba(255,255,255,.6)}
+.pd .v{font-family:var(--vt);font-size:1.25rem;line-height:1.15;margin-top:.15rem}
+.pd .v small{color:rgba(255,255,255,.55);font-size:15px}
+.share-bar{height:10px;border:3px solid #000;background:var(--pop);margin:.6rem 0 .95rem}
+.share-bar i{display:block;height:100%;background:var(--green)}
+.pos-actions{display:flex;gap:.6rem}
+.pos-actions .px-btn{flex:1;text-align:center}
+.pxa{background:var(--red);color:#fff;border:3px solid #000;box-shadow:4px 4px 0 #000}
+.pxa:hover{background:#f2218b}
+.pxa:active{transform:translate(2px,2px);box-shadow:1px 1px 0 #000}
+
+/* ---------- add LP ---------- */
+.add-wrap{display:grid;grid-template-columns:1.1fr .9fr;gap:1.6rem;align-items:start}
+.add-panel{background:var(--card);border:4px solid #000;box-shadow:8px 8px 0 #000;border-radius:0;padding:1.3rem 1.4rem}
+.pool-select{display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:1.3rem}
+.pool-chip{font-family:var(--px);font-size:14px;text-transform:uppercase;padding:.6rem .7rem;
+     border:3px solid #000;box-shadow:3px 3px 0 #000;background:var(--pop);color:rgba(255,255,255,.75);transition:.1s}
+.pool-chip:hover{color:var(--yellow)}
+.pool-chip.active{background:var(--cyan);color:var(--ink)}
+.amount-row{display:flex;align-items:center;gap:.6rem;padding:.7rem .9rem;border:3px solid #000;background:var(--pop);margin-bottom:.7rem}
+.amount-row .side{font-family:var(--px);font-size:13px;text-transform:uppercase;color:rgba(255,255,255,.6);white-space:nowrap}
+.amount-row input{flex:1;background:transparent;border:0;outline:0;color:var(--cyan);font-family:var(--vt);font-size:1.6rem;min-width:0}
+.amount-row .tk-pill{display:flex;align-items:center;gap:.5rem;padding:.3rem .7rem;background:var(--card2);border:2px solid #000;font-family:var(--px);font-size:13px;text-transform:uppercase;white-space:nowrap;line-height:1}
+.tkimg-sm{width:32px;height:32px;object-fit:contain;display:inline-block;flex:0 0 32px;border-radius:50%;background:transparent}
+.amount-row .tk-pill .dot{width:32px;height:32px;display:grid;place-items:center;font-family:var(--px);font-size:13px;color:var(--ink);border-radius:50%}
+.max-btn{font-family:var(--px);font-size:13px;padding:.4rem;border:2px solid #000;background:var(--cyan);color:var(--ink)}
+.ratio-bar{display:flex;align-items:center;gap:.6rem;margin:.9rem 0}
+.ratio-bar .line{flex:1;height:10px;border:3px solid #000;background:var(--pop);display:flex}
+.ratio-bar .line i{height:100%}
+.ratio-bar .hint{font-family:var(--px);font-size:14px;color:var(--yellow)}
+.detail-table{margin:1rem 0;border-top:3px solid #000}
+.dt-row{display:flex;justify-content:space-between;padding:.55rem 0;border-bottom:2px solid rgba(0,0,0,.4);font-size:18px}
+.dt-row .k{color:rgba(255,255,255,.65)} .dt-row .v{font-family:var(--vt);color:var(--cyan)}
+.slippage select{background:var(--pop);color:var(--yellow);border:2px solid #000;font-family:var(--vt);font-size:16px;padding:.15rem .3rem}
+.big-cta{width:100%;font-family:var(--px);font-size:14px;text-transform:uppercase;padding:.95rem;border:4px solid #000;
+     box-shadow:6px 6px 0 #000;background:var(--cyan);color:var(--ink);margin-top:.6rem}
+.big-cta:hover{background:var(--yellow)}
+.big-cta:active{transform:translate(3px,3px);box-shadow:2px 2px 0 #000}
+.big-cta:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:6px 6px 0 #000}
+.big-cta.secondary{background:var(--card2);color:var(--cyan);border:3px solid #000}
+.info-list{display:grid;gap:.8rem}
+.info-item{display:flex;gap:.8rem;align-items:flex-start;padding:.8rem 1rem;background:var(--pop);border:3px solid #000}
+.info-item b{font-family:var(--px);font-size:14px;text-transform:uppercase;display:block;color:var(--yellow)}
+.info-item p{font-size:16px;color:rgba(255,255,255,.65);margin-top:.2rem}
+.m-rule{height:4px;background:#000;margin:1.1rem 0}
+
+/* ---------- monitor ---------- */
+.mon-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(265px,1fr));gap:1.2rem;margin-top:1.2rem}
+.mon-card{background:var(--card);border:4px solid #000;box-shadow:8px 8px 0 #000;border-radius:0;padding:1.1rem 1.2rem}
+.mon-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem}
+.mon-top .nm{font-family:var(--px);font-size:13px;text-transform:uppercase;display:flex;align-items:center;gap:.45rem}
+.monico{width:22px;height:22px;border-radius:50%;object-fit:contain;background:transparent;flex:0 0 22px}
+.monico-l{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;flex:0 0 22px;font-family:var(--px);font-size:9px;color:#20102e}
+.mon-top .pr{font-family:var(--vt);font-size:16px;color:rgba(255,255,255,.6)}
+.mon-val{font-family:var(--vt);font-size:1.5rem;font-weight:700;color:var(--cyan)}
+.mon-sub{font-size:15px;color:rgba(255,255,255,.6);margin:.15rem 0 .8rem}
+.mon-sub b{font-family:var(--vt);color:#fff}
+.spark{width:100%;height:64px;display:block;background:var(--pop);border:3px solid #000}
+.spark.good{color:var(--green)} .spark.bad{color:var(--red)}
+
+/* ---------- rewards ---------- */
+.reward-hero{background:var(--card);background-image:repeating-linear-gradient(45deg,rgba(61,218,216,.07) 0 12px,transparent 12px 24px);
+     border:4px solid #000;box-shadow:8px 8px 0 #000;border-radius:0;padding:1.5rem;display:flex;align-items:center;
+     justify-content:space-between;gap:1.5rem;flex-wrap:wrap;margin-bottom:1.3rem}
+.reward-hero .amt{font-family:var(--vt);font-size:2.25rem;font-weight:700;line-height:1.1;color:var(--yellow);text-shadow:3px 3px 0 #000}
+.reward-hero .lbl{font-family:var(--px);font-size:14px;text-transform:uppercase;color:rgba(255,255,255,.7);margin-bottom:.3rem}
+.claim-all{display:flex;align-items:center;gap:.6rem;font-family:var(--px);font-size:13px;text-transform:uppercase;padding:.9rem 1.3rem;border:4px solid #000;
+     box-shadow:6px 6px 0 #000;background:var(--red);color:#fff}
+.claim-all:hover{background:#f2218b}
+.claim-all:active{transform:translate(3px,3px);box-shadow:2px 2px 0 #000}
+.rw-row{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.3rem;border-bottom:3px solid #000;gap:1rem;flex-wrap:wrap}
+.rw-row:last-child{border-bottom:0}
+.rw-row .nm{font-family:var(--px);font-size:13px;text-transform:uppercase}
+.rw-row .src{font-family:var(--vt);font-size:15px;color:rgba(255,255,255,.55)}
+.rw-row .amt{font-family:var(--vt);font-size:1.4rem;color:var(--green)}
+.rw-row .st{font-family:var(--px);font-size:13px;text-transform:uppercase;padding:.4rem .5rem;border:2px solid #000}
+.rw-row .st.pd{background:var(--yellow);color:var(--ink)}
+.rw-row .st.cl{background:var(--green);color:var(--ink)}
+.rw-row .st.un{background:var(--pop);color:rgba(255,255,255,.6)}
+
+/* ---------- chart ---------- */
+.chart-card{margin-bottom:1.6rem}
+.chart-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.6rem;margin-bottom:.6rem}
+.tf-tabs{display:flex;gap:.3rem}
+.tf-tabs button{font-family:var(--px);font-size:14px;padding:.5rem .7rem;border:3px solid #000;background:var(--pop);color:rgba(255,255,255,.6)}
+.tf-tabs button:hover{color:var(--yellow)}
+.tf-tabs button.active{background:var(--cyan);color:var(--ink)}
+.chart-box{width:100%;height:300px;background:var(--pop);border:4px solid #000;box-shadow:6px 6px 0 #000}
+.chart-box svg{width:100%;height:100%;display:block}
+.chart-legend{display:flex;gap:1rem;font-family:var(--px);font-size:13px;text-transform:uppercase;color:rgba(255,255,255,.6);margin-top:.6rem}
+.chart-legend i{display:inline-block;width:10px;height:10px;border:2px solid #000;margin-right:.35rem;vertical-align:-1px}
+
+/* ---------- modals ---------- */
+.modal-bg{position:fixed;inset:0;background:rgba(20,4,32,.78);z-index:100;display:none;align-items:center;justify-content:center;padding:1rem}
+.modal-bg.open{display:flex}
+.modal{background:var(--card);border:4px solid #000;box-shadow:12px 12px 0 #000;border-radius:0;width:100%;max-width:460px;padding:1.5rem;animation:pop .15s steps(3)}
+@keyframes pop{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:none}}
+.modal h3{font-family:var(--px);font-size:13px;text-transform:uppercase;margin-bottom:.4rem;text-shadow:2px 2px 0 #000}
+.modal .msub{font-family:var(--vt);font-size:17px;color:rgba(255,255,255,.65);margin-bottom:1.2rem}
+.mrow{display:flex;justify-content:space-between;padding:.65rem 0;border-bottom:2px solid rgba(0,0,0,.4);font-size:18px}
+.mrow .k{color:rgba(255,255,255,.65)} .mrow .v{font-family:var(--vt);color:var(--cyan)}
+.mfield{margin:.9rem 0}
+.mfield label{font-family:var(--px);font-size:13px;text-transform:uppercase;color:rgba(255,255,255,.6);display:block;margin-bottom:.4rem}
+.mfield input,.mfield select{width:100%;padding:.6rem .8rem;border:3px solid #000;background:var(--pop);color:var(--cyan);font-family:var(--vt);font-size:1.2rem;outline:0}
+.modal-actions{display:flex;gap:.6rem;margin-top:1.2rem}
+.wallet-card{display:flex;align-items:center;gap:.75rem;padding:.9rem 1rem;background:var(--pop);border:3px solid #000;margin-bottom:1.1rem}
+.wallet-card .ava{width:42px;height:42px;border:3px solid #000;display:grid;place-items:center;font-family:var(--px);font-size:13px;color:var(--ink);background:var(--yellow)}
+.wallet-card .addr{font-family:var(--vt);font-size:1.15rem;color:var(--cyan)}
+.wallet-card .net{font-family:var(--px);font-size:13px;text-transform:uppercase;color:rgba(255,255,255,.55)}
+
+/* ---------- toast ---------- */
+#toast-wrap{position:fixed;bottom:1.2rem;right:1.2rem;z-index:200;display:flex;flex-direction:column;gap:.6rem;max-width:340px}
+.toast{background:var(--card2);border:3px solid #000;box-shadow:5px 5px 0 #000;padding:.8rem 1rem;
+     font-family:var(--vt);font-size:18px;color:#fff;border-left:8px solid var(--cyan);animation:tin .18s steps(3)}
+.toast.ok{border-left-color:var(--green)} .toast.err{border-left-color:var(--red)}
+@keyframes tin{from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:none}}
+
+/* ---------- misc ---------- */
+.empty{text-align:center;padding:3.5rem 1rem;color:rgba(255,255,255,.6);grid-column:1/-1}
+.empty .big{font-size:2.4rem;margin-bottom:.6rem}
+.toolbar{display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;margin-bottom:1.1rem}
+.search{flex:1;min-width:200px;display:flex;align-items:center;gap:.5rem;padding:.55rem .8rem;border:3px solid #000;background:var(--pop);color:rgba(255,255,255,.5)}
+.search input{flex:1;background:transparent;border:0;outline:0;color:var(--yellow);font-family:var(--vt);font-size:1.05rem}
+.footer{margin-top:3rem;text-align:center;font-family:var(--px);font-size:13px;text-transform:uppercase;color:rgba(255,255,255,.5)}
+.footer-wrap{text-align:center;max-width:820px;margin:3rem auto 0}
+.rights{font-family:var(--vt);font-size:13px;color:rgba(255,255,255,.45);margin-top:.9rem;text-align:center}
+.x-link{display:inline-flex;align-items:center;gap:.5rem;color:var(--white);text-decoration:none;font-family:var(--px);font-size:12px;text-transform:none;padding:.5rem .9rem;border:2px solid rgba(255,255,255,.25);border-radius:0;background:rgba(255,255,255,.05);transition:.15s;letter-spacing:.02em}
+.x-link:hover{color:#fff;background:var(--red);border-color:var(--red)}
+.x-link svg{flex:0 0 auto}
+@media(max-width:900px){.stats{grid-template-columns:repeat(2,1fr)}.add-wrap{grid-template-columns:1fr}}
+@media(max-width:560px){.stats{grid-template-columns:1fr 1fr}header{padding:.7rem 1rem;gap:.6rem}nav a{padding:.65rem .5rem}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand"><img class="brand-logo" src="assets/unisarc-logo.jpg" alt="UNISARC"/><span>Uni<b>Sarc</b></span></div>
+  <nav id="nav">
+    <a href="#positions" data-v="positions" class="active">Positions</a>
+    <a href="#add" data-v="add">Add LP</a>
+    <a href="#monitor" data-v="monitor">Monitor</a>
+    <a href="#rewards" data-v="rewards">Rewards</a>
+  </nav>
+  <div class="header-right">
+    <div class="chain-pill" title="Connected chain"><span class="dot"></span><span id="chainName">ARC Mainnet</span></div>
+    <button class="wallet-btn" id="walletBtn">Connect Wallet</button>
+  </div>
+</header>
+
+<main>
+  <!-- ============ POSITIONS ============ -->
+  <section class="view active" id="view-positions">
+    <div class="page-head">
+      <div><h1 class="text-outline">Your Positions</h1><p>Liquidity you provided, with live value, pool share and accrued fees.</p></div>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="label">Total Value</div><div class="value" id="stTotal">$0.00</div><div class="sub" id="stTotalSub">0 positions</div></div>
+      <div class="stat"><div class="label">Fees Earned</div><div class="value up" id="stFees">$0.00</div><div class="sub">all-time</div></div>
+      <div class="stat"><div class="label">My Share</div><div class="value" id="stShare">0%</div><div class="sub">of selected pools</div></div>
+      <div class="stat"><div class="label">Est. APR</div><div class="value" id="stApr">0%</div><div class="sub">weighted</div></div>
+    </div>
+
+    <div class="px-card card-pad chart-card" style="padding:1.2rem 1.3rem">
+      <div class="chart-head">
+        <div class="card-title" style="margin:0"><h2>Portfolio Value</h2><span class="hint" id="chartPeriod">24H</span></div>
+        <div class="tf-tabs" id="tfTabs">
+          <button data-tf="1H">1H</button><button data-tf="24H" class="active">24H</button>
+          <button data-tf="7D">7D</button><button data-tf="30D">30D</button>
+        </div>
+      </div>
+      <div class="chart-box" id="portfolioChart"></div>
+      <div class="chart-legend"><span><i style="background:var(--green)"></i>Value up</span><span><i style="background:var(--red)"></i>Value down</span></div>
+    </div>
+
+    <div class="toolbar">
+      <div class="search" style="max-width:300px"><input id="posSearch" placeholder="Filter pool..." /></div>
+      <div style="margin-left:auto;display:flex;gap:.6rem">
+        <button class="px-btn" id="btnRefresh">Refresh</button>
+        <button class="px-btn pxa" data-go="add">Add LP</button>
+      </div>
+    </div>
+    <div class="pos-grid" id="posGrid"></div>
+  </section>
+
+  <!-- ============ ADD LP ============ -->
+  <section class="view" id="view-add">
+    <div class="page-head">
+      <div><h1 class="text-outline">Add Liquidity</h1><p>Provide liquidity to a pool and earn a share of swap fees.</p></div>
+    </div>
+    <div class="add-wrap">
+      <div class="add-panel">
+        <div class="card-title"><h2>1 - Select Pool</h2></div>
+        <div class="pool-select" id="poolChips"></div>
+        <button class="px-btn yellow" style="width:100%;margin-top:.6rem" id="btnManualPool">＋ Manual Add (custom contract)</button>
+
+        <div class="px-card" id="manualPanel" style="display:none;padding:1rem 1.1rem;margin-top:.8rem;box-shadow:4px 4px 0 #000">
+          <div class="card-title" style="margin:0 0 .6rem"><h2>Manual Pool</h2></div>
+          <div class="mfield">
+            <label>Token A contract</label>
+            <input id="manAddrA" placeholder="0x..." />
+          </div>
+          <div class="mfield">
+            <label>Token B contract (or leave = USDC)</label>
+            <input id="manAddrB" placeholder="0x... (default USDC)" />
+          </div>
+          <div class="mfield">
+            <label>Fee tier</label>
+            <select id="manFee"><option value="100">0.01%</option><option value="500">0.05%</option><option value="3000" selected>0.30%</option><option value="10000">1.00%</option></select>
+          </div>
+          <button class="px-btn" style="width:100%" id="btnResolvePool">Resolve & Add</button>
+          <p id="manStatus" style="font-family:var(--vt);font-size:15px;color:var(--cyan);margin-top:.5rem;word-break:break-all"></p>
+        </div>
+
+        <div class="card-title" style="margin-top:1rem"><h2>2 - Deposit Amounts</h2></div>
+        <div class="amount-row">
+          <span class="side">Token A</span>
+          <input id="amtA" type="text" inputmode="decimal" placeholder="0.00" />
+          <button class="max-btn" data-max="a">MAX</button>
+          <span class="tk-pill"><span class="dot" id="chipA">A</span><span id="symA">—</span></span>
+        </div>
+        <div class="amount-row">
+          <span class="side">Token B</span>
+          <input id="amtB" type="text" inputmode="decimal" placeholder="0.00" />
+          <button class="max-btn" data-max="b">MAX</button>
+          <span class="tk-pill"><span class="dot" id="chipB">B</span><span id="symB">—</span></span>
+        </div>
+        <div class="ratio-bar">
+          <div class="line"><i id="ratioA" style="width:50%;background:var(--cyan)"></i><i id="ratioB" style="width:50%;background:var(--yellow)"></i></div>
+          <span class="hint" id="ratioText">50 / 50</span>
+        </div>
+        <div class="detail-table">
+          <div class="dt-row"><span class="k">Price (A per B)</span><span class="v" id="detailPrice">—</span></div>
+          <div class="dt-row"><span class="k">Pool reserves</span><span class="v" id="detailReserves">—</span></div>
+          <div class="dt-row"><span class="k">Your LP share</span><span class="v" id="detailShare">—</span></div>
+          <div class="dt-row"><span class="k">Est. daily fees</span><span class="v" id="detailDaily">—</span></div>
+          <div class="dt-row"><span class="k">Slippage tolerance</span><span class="v"><span class="slippage"><select id="slippageSel"><option>0.5</option><option selected>1.0</option><option>2.5</option><option>5.0</option></select>%</span></span></div>
+        </div>
+        <button class="big-cta" id="btnAdd">Add Liquidity</button>
+        <p style="font-size:15px;color:rgba(255,255,255,.55);text-align:center;margin-top:.7rem" id="addHint"></p>
+      </div>
+      <div>
+        <div class="px-card" style="padding:1.2rem 1.3rem;margin-bottom:1.4rem">
+          <div class="card-title"><h2>How it works</h2></div>
+          <div class="info-list">
+            <div class="info-item"><div><b>Provide both tokens</b><p>Deposit a 50/50 value split. You earn a proportional share of every swap fee the pool collects.</p></div></div>
+            <div class="info-item"><div><b>Earn fees continuously</b><p>Fees compound into your position automatically, growing your LP value over time.</p></div></div>
+            <div class="info-item"><div><b>Monitor and manage</b><p>Track position value, claim rewards or remove liquidity anytime, all from this dashboard.</p></div></div>
+          </div>
+        </div>
+        <div class="px-card" style="padding:1.2rem 1.3rem">
+          <div class="card-title"><h2>Impermanent loss</h2></div>
+          <p style="font-size:16px;color:rgba(255,255,255,.65);margin-bottom:.8rem">When token prices move apart, your position value may diverge from simply holding both tokens.</p>
+          <div class="px-card" style="box-shadow:4px 4px 0 #000"><canvas id="ilChart" width="440" height="110" style="width:100%;height:100px;display:block"></canvas></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MONITOR ============ -->
+  <section class="view" id="view-monitor">
+    <div class="page-head">
+      <div><h1 class="text-outline">Monitor</h1><p>Live pool health - liquidity, volume, fees and your exposure.</p></div>
+    </div>
+    <div class="stats" id="monStats"></div>
+    <div class="mon-grid" id="monGrid"></div>
+  </section>
+
+  <!-- ============ REWARDS ============ -->
+  <section class="view" id="view-rewards">
+    <div class="page-head">
+      <div><h1 class="text-outline">Rewards</h1><p>Claimable LP fees and incentive rewards.</p></div>
+    </div>
+    <div class="reward-hero">
+      <div>
+        <div class="lbl">Total claimable</div>
+        <div class="amt" id="rwTotal">$0.00</div>
+        <div class="lbl" id="rwNote" style="margin-top:.4rem">Connect wallet to see your rewards</div>
+      </div>
+      <button class="claim-all" id="btnClaimAll">Claim All</button>
+    </div>
+    <div class="px-card" id="rwList"></div>
+  </section>
+
+  <div class="footer-wrap">
+    <div class="footer">UNISARC - liquidity provider dashboard</div>
+    <p class="rights">© <span id="yr">2026</span> UNISARC. All rights reserved.</p>
+    <div class="x-brand" style="margin-top:.9rem">
+      <a href="https://x.com/unisarc_" target="_blank" rel="noopener noreferrer" aria-label="UNISARC on X" class="x-link">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+      </a>
+    </div>
+  </div>
+</main>
+
+<!-- ============ REMOVE MODAL ============ -->
+<div class="modal-bg" id="modalRemove">
+  <div class="modal">
+    <h3>Remove Liquidity</h3>
+    <p class="msub" id="rmSub">Withdraw your LP tokens</p>
+    <div class="mrow"><span class="k">Pool</span><span class="v" id="rmPool">—</span></div>
+    <div class="mrow"><span class="k">Position value</span><span class="v" id="rmVal">—</span></div>
+    <div class="mfield">
+      <label>Amount to remove (%)</label>
+      <input id="rmPct" type="number" value="100" min="1" max="100" step="1" />
+    </div>
+    <div class="mfield">
+      <label>You will receive</label>
+      <input id="rmOut" readonly value="—" />
+    </div>
+    <div class="modal-actions">
+      <button class="px-btn ghost" id="rmCancel">Cancel</button>
+      <button class="px-btn" id="rmConfirm">Remove</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ WALLET MODAL ============ -->
+<div class="modal-bg" id="modalWallet">
+  <div class="modal">
+    <h3>Account</h3>
+    <p class="msub">Wallet connection details</p>
+    <div class="wallet-card">
+      <div class="ava" id="wAva"></div>
+      <div><div class="addr" id="wAddr">—</div><div class="net" id="wNet">—</div></div>
+    </div>
+    <div class="modal-actions">
+      <button class="px-btn orange" id="wClose">Close</button>
+      <button class="px-btn danger" id="wDisconnect">Disconnect</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ ADD LIQUIDITY MODAL ============ -->
+<div class="modal-bg" id="modalAdd">
+  <div class="modal">
+    <h3>Add Liquidity</h3>
+    <p class="msub" id="adSub">Uniswap V3 · deposit both tokens</p>
+    <div class="mrow"><span class="k">Pool</span><span class="v" id="adPool">—</span></div>
+    <div class="mrow"><span class="k">Amount A</span><span class="v" id="adAmtA">—</span></div>
+    <div class="mrow"><span class="k">Amount B</span><span class="v" id="adAmtB">—</span></div>
+    <div class="mfield">
+      <label>Deposit into existing position</label>
+      <select id="adPosSel"><option value="">(new position)</option></select>
+    </div>
+    <div class="mfield">
+      <label>Range</label>
+      <select id="adRange">
+        <option value="full">Full range (min/max tick)</option>
+        <option value="wide">Wide (±10%)</option>
+        <option value="medium">Medium (±2%)</option>
+        <option value="tight">Tight (±0.5%)</option>
+      </select>
+    </div>
+    <div class="mrow"><span class="k">Est. LP share</span><span class="v" id="adShare">—</span></div>
+    <div class="modal-actions">
+      <button class="px-btn ghost" id="adCancel">Cancel</button>
+      <button class="px-btn" id="adConfirm">Mint Position</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast-wrap"></div>
+
+<script>"use strict";
+/* ================================================================
+   UNISARC — Uniswap V3 ARC Mainnet (LIVE on-chain, no demo)
+   Factory 0xf0db7b58...  Router 0x53bf6b06...  NFPM 0x39654A85...
+   ================================================================ */
+const CFG = {
+  chainId: 5042,
+  chainIdHex: '0x13b2',
+  chainName: 'ARC Mainnet',
+  nativeCurrency: { name: 'USDC', symbol: 'USDC', decimals: 6 },
+  rpcUrls: [
+    'https://rpc.arc-scan.org',
+    'https://arc-mainnet.infura.io/v3/b6bf7d3508c941499b10025c0776eaf8',
+    'https://robinlaunchpad.com/rpc/arc/v1',
+  ],
+  blockExplorerUrls: ['https://arc-scan.org'],
+  factory: '0xf0db7b58379503491d857db50ac9ece64c653918',  // Uniswap V3 Factory
+  router:  '0x53bf6b0684ec7ef91e1387da3d1a1769bc5a6f77',   // SwapRouter02
+  nfpm:    '0x39654A85A4C05127f5Fd6ED22CAeC077A0fB1377',   // NonfungiblePositionManager (verified, totalSupply 4221)
+  quoter:  '0x7dfd4f31be6814d2906bde155c3e1b146eac1468',
+  reward:  '',   // (unused — V3 fees are collected via NFPM.collect)
+  tokens: [
+    { symbol: 'USDC',   name: 'USD Coin',                 decimals: 6,  address: '0x3600000000000000000000000000000000000000', color: '#3ddad8', icon: 'https://assets.coingecko.com/coins/images/6319/large/usdc.png' },
+    { symbol: 'EURC',   name: 'Euro Coin',                decimals: 6,  address: '0xbEf5f6d51CB62b58e6A8f77868681825C6fe21c1', color: '#f06943', icon: 'https://assets.coingecko.com/coins/images/26045/large/euro.png' },
+    { symbol: 'cirBTC', name: 'Circle Wrapped Bitcoin',   decimals: 8,  address: '0x171A4217b86A807A64eB94757Db6849fb4bDbAA0', color: '#ffbe39', icon: 'https://assets.coingecko.com/coins/images/1/large/bitcoin.png' },
+    { symbol: 'USYC',   name: 'US Yield Coin',            decimals: 6,  address: '0xe9185F0c5F296Ed1797AaE4238D26CCaBEadb86C', color: '#7ee081', icon: '' },
+    { symbol: 'SYN',    name: 'Synthra',                  decimals: 18, address: '0xC5124C846c6e6307986988dFb7e743327aA05F19', color: '#a78bfa', icon: '' },
+    { symbol: 'SWPRC',  name: 'Swaparc',                  decimals: 6,  address: '0xBE7477BF91526FC9988C8f33e91B6db687119D45', color: '#fb7185', icon: '' },
+  ],
+};
+
+const RADAR_API = '/api/radar';          // proxy (same-origin) — no CORS issue
+const TICK_SPACING = { 100: 1, 500: 10, 3000: 60, 10000: 200 };
+const MIN_TICK = -887272, MAX_TICK = 887272;
+const USDC_ADDR = '0x3600000000000000000000000000000000000000'.toLowerCase();
+const USDC_ICON = 'https://assets.coingecko.com/coins/images/6319/large/usdc.png';
+const RADAR_SNAPSHOT = [{"symbol": "Architects", "address": "0x8bcb94279fc2c984ec34e0c1f2192df8c69ea4f0", "price": 0.002431927139929907, "liquidityUsdc": 84253.309687, "volume24": 20065.600965, "change24h": -3.0030672482083114, "spark": [0.00217323, 0.00214223, 0.00216742, 0.00220464, 0.00221871, 0.00226617, 0.00225141, 0.00221307, 0.00220454, 0.00249969, 0.00251203, 0.00251076, 0.00251184, 0.00245949, 0.00250628, 0.00243193], "icon": ""}, {"symbol": "ARCANINE", "address": "0xf3715bf5c2de299f08b81180ffb739a8372a175f", "price": 0.000280418079587923, "liquidityUsdc": 33334.217473, "volume24": 7083.21389, "change24h": -5.021945806305996, "spark": [0.000281302, 0.000295771, 0.000293974, 0.000293068, 0.000298484, 0.000305831, 0.000305831, 0.000299568, 0.00030686, 0.000301115, 0.000306256, 0.000306256, 0.000286395, 0.000285833, 0.000286124, 0.000280418], "icon": ""}, {"symbol": "STEVE", "address": "0xa23632d6a32174ff4ee8e76aacf9f244e10cfd73", "price": 0.00027682882532923, "liquidityUsdc": 32600.811582, "volume24": 2193.923443, "change24h": 5.444364132031077, "spark": [0.000262228, 0.000261789, 0.00025895, 0.00025895, 0.000254949, 0.00026709, 0.00026709, 0.000269523, 0.000273611, 0.0002715, 0.0002715, 0.0002715, 0.000275483, 0.000275736, 0.000275817, 0.000276829], "icon": ""}, {"symbol": "WARP", "address": "0x384c60f98ecd4c26345499345c03d677e40f115e", "price": 0.00045408815396818, "liquidityUsdc": 31346.911802, "volume24": 36335.325201, "change24h": -30.229325048325666, "spark": [0.000474457, 0.000461916, 0.000399694, 0.000407477, 0.000409602, 0.000473887, 0.000458667, 0.000430406, 0.000429964, 0.000438722, 0.000438722, 0.000541577, 0.000500982, 0.000450662, 0.000454088, 0.000454088], "icon": ""}, {"symbol": "ARCAT", "address": "0x07704b06981ea962b87296362a1281484d160000", "price": 0.000247414953320093, "liquidityUsdc": 29649.965791, "volume24": 12322.072981, "change24h": -13.458658788449052, "spark": [0.000263832, 0.000223524, 0.000218939, 0.000217662, 0.000217198, 0.000215212, 0.000215212, 0.000218332, 0.00021876, 0.00021787, 0.00021787, 0.000235132, 0.000237161, 0.000252311, 0.000247415, 0.000247415], "icon": ""}, {"symbol": "BUILDOG", "address": "0x4cb8382b9daf7992d3b27d32f7db650c57881daa", "price": 0.000136094491642367, "liquidityUsdc": 21295.674522, "volume24": 1078.323731, "change24h": 3.0104258285435876, "spark": [0.000134423, 0.000134139, 0.000134802, 0.000134788, 0.000134788, 0.000132022, 0.000132022, 0.00013182, 0.000131892, 0.000131892, 0.000131782, 0.000134817, 0.000133198, 0.000133198, 0.000133164, 0.000136094], "icon": ""}, {"symbol": "TOLLY", "address": "0xbc43ce8dec648ea298c4275559b81d6261c90b67", "price": 0.000103256807884444, "liquidityUsdc": 17617.717062, "volume24": 5477.290393, "change24h": 21.922376492820327, "spark": [9.02368e-05, 9.04257e-05, 9.36857e-05, 9.36857e-05, 9.32772e-05, 9.32772e-05, 9.33021e-05, 9.48405e-05, 9.5128e-05, 9.30882e-05, 9.99588e-05, 9.87157e-05, 0.000103439, 0.000105475, 0.000103585, 0.000103257], "icon": ""}, {"symbol": "SLJ", "address": "0x127f80844ff3d672410ce4b6f4f9ea1a8d6a7ae6", "price": 0.000126655417565479, "liquidityUsdc": 16779.673156, "volume24": 2252.935812, "change24h": -11.205278515095033, "spark": [0.000142638, 0.000141127, 0.000141127, 0.000141127, 0.000141127, 0.000139558, 0.000139558, 0.000139558, 0.000137281, 0.000134513, 0.000134513, 0.000123828, 0.000125749, 0.000125749, 0.000126655], "icon": ""}, {"symbol": "COOL", "address": "0xeb64987643db71c76b2a2be7e723decc995e5b37", "price": 9.1231466291204e-05, "liquidityUsdc": 16667.74495, "volume24": 4201.954634, "change24h": 11.417586527498244, "spark": [9.01689e-05, 9.49956e-05, 9.24743e-05, 9.09417e-05, 9.09417e-05, 9.09417e-05, 9.62734e-05, 9.30665e-05, 9.49756e-05, 9.50729e-05, 9.51913e-05, 9.17686e-05, 9.01464e-05, 9.32732e-05, 9.12315e-05, 9.12315e-05], "icon": ""}, {"symbol": "Aros", "address": "0x3af1d499cb46cd5504a5a3cb864dcc105b74470d", "price": 6.6255605662725e-05, "liquidityUsdc": 15980.975718, "volume24": 6.357947, "change24h": 0, "spark": [6.62556e-05, 6.62556e-05, 6.62556e-05, 6.62556e-05, 6.62556e-05, 6.62556e-05, 6.62556e-05, 6.62556e-05, 6.62556e-05, 6.62556e-05, 6.62556e-05, 6.62556e-05, 6.62556e-05], "icon": ""}, {"symbol": "SHARC", "address": "0xf2627e7566d01f6c8ff2892f4a802fee6d2898af", "price": 8.0384579124579e-05, "liquidityUsdc": 15344.362603, "volume24": 6827.245719, "change24h": -16.209339030202354, "spark": [0.000101128, 0.000103197, 0.000100696, 0.000102487, 9.57861e-05, 9.44658e-05, 9.11989e-05, 9.03093e-05, 8.95949e-05, 8.95949e-05, 8.92668e-05, 8.5722e-05, 7.91799e-05, 8.25815e-05, 8.19604e-05, 8.03846e-05], "icon": ""}, {"symbol": "AROS", "address": "0x313c87e367791fe16ae97754554f4871bfe7fcb6", "price": 0.000101942886494717, "liquidityUsdc": 14646.469252, "volume24": 3143.738133, "change24h": 35.754195535640676, "spark": [7.50937e-05, 7.50937e-05, 7.50937e-05, 7.50937e-05, 7.50937e-05, 7.50937e-05, 9.88584e-05, 9.42758e-05, 9.42758e-05, 9.42758e-05, 9.36387e-05, 9.34859e-05, 9.34859e-05, 0.000101943, 0.000101943, 0.000101943], "icon": ""}, {"symbol": "Arc House", "address": "0x1fa496cca20d1249972bee850bb3fc612f808cab", "price": 9.6629937331469e-05, "liquidityUsdc": 14376.984155, "volume24": 6613.599552, "change24h": 13.249984615777105, "spark": [9.08481e-05, 0.000110332, 0.000110237, 0.000114834, 0.000109944, 0.000110208, 0.000103826, 9.52411e-05, 9.7686e-05, 9.7686e-05, 9.7686e-05, 9.47039e-05, 9.47039e-05, 8.9836e-05, 9.66299e-05, 9.66299e-05], "icon": ""}, {"symbol": "peg", "address": "0x2bfe315f219cc9fdc9ce0266e6c115927f0e4c10", "price": 8.8153481596843e-05, "liquidityUsdc": 13359.732812, "volume24": 2651.778916, "change24h": -9.85812368700252, "spark": [9.77941e-05, 0.000100873, 0.000100873, 0.000100873, 0.000100873, 0.000100873, 0.000100873, 0.00010083, 0.000100798, 0.00010289, 0.000104884, 0.000104884, 8.67782e-05, 8.67782e-05, 8.78856e-05, 8.81535e-05], "icon": ""}];
+
+
+/* ============ state ============ */
+const S = {
+  address: null, chainId: null,
+  positions: [],          // real on-chain V3 positions from connected wallet
+  pools: [],              // market data pools (RadarDex)
+  tf: '24H',
+  selected: '',
+  txBusy: false,
+  tokenMeta: {},          // addr -> {symbol, decimals, icon} cache
+  pendingPoolScan: false,
+};
+
+/* ============ utils ============ */
+const $ = id => document.getElementById(id);
+const fmt = (n, d=2) => {
+  if (n === null || n === undefined || isNaN(n)) return '—';
+  if (Math.abs(n) >= 1e6) return (n/1e6).toFixed(2) + 'M';
+  if (Math.abs(n) >= 1e3) return (n/1e3).toFixed(2) + 'K';
+  if (Math.abs(n) < 0.01 && n !== 0) return n.toFixed(6);
+  return n.toFixed(d);
+};
+const fmtUsd = n => '$' + fmt(n);
+const shortAddr = a => a ? a.slice(0,6) + '…' + a.slice(-4) : '';
+const seedy = (s) => { let h = 2166136261; for (let i=0;i<s.length;i++){ h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return () => { h = Math.imul(h ^ (h>>>15), 2246822507); h = Math.imul(h ^ (h>>>13), 3266489909); h ^= h>>>16; return (h>>>0)/4294967296; }; };
+
+function toast(msg, type='') {
+  const t = document.createElement('div');
+  t.className = 'toast ' + type;
+  t.textContent = msg;
+  $('toast-wrap').appendChild(t);
+  setTimeout(() => t.remove(), 5000);
+}
+
+/* ============ chain ABI helpers (no CDN, manual encode) ============ */
+const pad = (hex, bytes=32) => hex.slice(2).padStart(bytes*2, '0');
+const addrArg = a => a.toLowerCase().startsWith('0x') ? a.toLowerCase().replace(/^0x/, '').padStart(64, '0') : '0'.repeat(64);
+const uintArg = (n, bytes=32) => { let h = BigInt(n).toString(16); return h.padStart(bytes*2, '0'); };
+const intArg = (n, bytes=32) => { let b = BigInt(n); if (b < 0n) b = b + (1n << BigInt(bytes*8)); return b.toString(16).padStart(bytes*2, '0'); };
+const tupleHead = fields => { const head = fields.map(f => f.length/2).reduce((a,b)=>a+b,0); let out = '', dyn = []; fields.forEach(f => { out += uintArg(head + 32 * dyn.length); dyn.push(f); }); return out + dyn.join(''); };
+const hexAddr = hex => '0x' + hex.slice(-40);
+
+async function rpc(method, params) {
+  for (const rpcUrl of CFG.rpcUrls) {
+    try {
+      const r = await fetch(rpcUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ jsonrpc: '2.0', id: 1, method, params }) });
+      const j = await r.json();
+      if (j.error) throw new Error(j.error.message);
+      return j.result;
+    } catch (e) { /* try next */ }
+  }
+  throw new Error('all RPC endpoints failed');
+}
+async function ethCall(to, data) { return rpc('eth_call', [{ to, data }, 'latest']); }
+async function ethGetCode(addr) { return rpc('eth_getCode', [addr, 'latest']); }
+async function ethRpcNode(method, params) { return rpc(method, params); }
+
+// IERC20 metadata (cached)
+function hexToString(hex) {
+  const bytes = [];
+  for (let i = 0; i + 1 < hex.length; i += 2) {
+    const c = parseInt(hex.substr(i, 2), 16);
+    if (c === 0) break;
+    bytes.push(c);
+  }
+  return new TextDecoder('utf-8').decode(new Uint8Array(bytes)).trim();
+}
+async function tokenMeta(addr) {
+  addr = addr.toLowerCase();
+  if (S.tokenMeta[addr]) return S.tokenMeta[addr];
+  let symbol = '?', decimals = 18, icon = '';
+  try {
+    const r = await ethCall(addr, '0x95d89b41'); // symbol()
+    const raw = r.slice(2);
+    const off = parseInt(raw.slice(0,64), 16) * 2;
+    const ln = parseInt(raw.slice(off, off+64), 16);
+    symbol = hexToString(raw.slice(off+64, off+64+ln*2)) || '?';
+  } catch (e) {}
+  try { decimals = parseInt(await ethCall(addr, '0x313ce567'), 16); } catch (e) {}
+  if (addr === USDC_ADDR) { symbol = 'USDC'; decimals = 6; icon = USDC_ICON; }
+  const meta = { addr, symbol, decimals, icon };
+  S.tokenMeta[addr] = meta;
+  return meta;
+}
+
+// Uniswap V3 pool address via factory.getPool(token0, token1, fee)
+async function getPool(t0, t1, fee) {
+  const data = '0x1698ee82' + addrArg(t0) + addrArg(t1) + uintArg(fee, 3).padStart(64, '0');
+  const r = await ethCall(CFG.factory, data);
+  return '0x' + r.slice(-40);
+}
+// pool slot0 -> sqrtPriceX96, tick
+async function poolSlot0(pool) { const r = await ethCall(pool, '0x3850c7bd'); return { sqrtPriceX96: BigInt('0x' + r.slice(2, 66)), tick: parseInt(r.slice(66+62, 66+64+62 > r.length ? r.length : 130), 16) - (r.length >= 130 ? 0 : 0) + (parseInt(r.slice(66, 128),16) >= 2**127 ? -(2**128) : 0) } ; }
+async function poolTickSpacing(pool) { const r = await ethCall(pool, '0x8910fa97'); return parseInt(r, 16); }
+async function poolLiquidity(pool) { const r = await ethCall(pool, '0x1a686502'); return BigInt(r); }
+// price ratio token1/token0 from sqrtPriceX96: P = (sqrt/2^96)^2
+function sqrtPriceToPrice(sqrtPriceX96) {
+  const p = Number(sqrtPriceX96) / 2 ** 96;
+  return p * p;
+}
+// V3 amount math (float est. for display)
+function positionAmounts(sqrtPriceX96, tick, tickLower, tickUpper, liquidity) {
+  const sqrtP = Number(sqrtPriceX96) / 2 ** 96;
+  const sq = (t) => Math.sqrt(Math.pow(1.0001, t));
+  const sa = sq(tickLower), sb = sq(tickUpper);
+  const L = Number(liquidity);
+  let a0 = 0, a1 = 0;
+  if (tick < tickLower) { a0 = L * (sb - sa) / (sa * sb); a1 = 0; }
+  else if (tick >= tickUpper) { a0 = 0; a1 = L * (sb - sa); }
+  else { a0 = L * (sb - sqrtP) / (sqrtP * sb); a1 = L * (sqrtP - sa); }
+  return { a0: Math.abs(a0), a1: Math.abs(a1) };
+}
+
+/* ============ NFPM position reader ============ */
+async function readPositions(owner) {
+  const out = [];
+  const balHex = await ethCall(CFG.nfpm, '0x70a08231' + addrArg(owner)); // balanceOf
+  const bal = parseInt(balHex, 16);
+  const tids = [];
+  for (let i = 0; i < bal && i < 50; i++) tids.push(i);
+  const tidResults = await Promise.all(tids.map(i => ethCall(CFG.nfpm, '0x2f745c59' + addrArg(owner) + uintArg(i)).then(hex => BigInt(hex)).catch(() => null)));
+  const tokenIds = tidResults.filter(Boolean);
+  const posResults = await Promise.all(tokenIds.map(tokenId =>
+    ethCall(CFG.nfpm, '0x99fbab88' + uintArg(tokenId)).then(p => {
+      const raw = p.slice(2);
+      const get = (i) => BigInt('0x' + raw.slice(i*64, (i+1)*64));
+      const t0 = '0x' + raw.slice(2*64+24, 2*64+64).toLowerCase(); // address = last 40 hex of the 64-hex slot
+      const t1 = '0x' + raw.slice(3*64+24, 3*64+64).toLowerCase();
+      return {
+        tokenId, t0, t1,
+        fee: Number(get(4)),
+        tickLower: Number(BigInt.asIntN(24, get(5))),
+        tickUpper: Number(BigInt.asIntN(24, get(6))),
+        liquidity: get(7) & ((1n << 128n) - 1n),   // uint128
+        owed0: get(10) & ((1n << 128n) - 1n),
+        owed1: get(11) & ((1n << 128n) - 1n),
+        pool: null, amounts: { a0:0, a1:0 }, price: 0, value: 0, feesUsd: 0, meta0: null, meta1: null,
+      };
+    }).catch(() => null)));
+  return posResults.filter(Boolean);
+}
+
+/* ============ pool market data (RadarDex via proxy) ============ */
+async function fetchRadarTop() {
+  try {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 8000);
+    const r = await fetch(RADAR_API + '/tokens?sort=volume24&dir=desc&limit=200&window=24h', { signal: ctrl.signal });
+    clearTimeout(t);
+    if (!r.ok) throw new Error('http ' + r.status);
+    const j = await r.json();
+    return (j && j.tokens) || j;
+  } catch (e) { return null; }
+}
+function buildPoolsFromRadar(list) {
+  const seen = new Set();
+  const out = [];
+  for (const t of list || []) {
+    const sym = t.symbol || '?';
+    const key = sym.toUpperCase();
+    if (sym === 'USDC' || sym === 'USDUC' || seen.has(key)) continue;
+    const liq = t.liquidityUsdc || 0, vol = t.volume24 || 0;
+    if (liq < 1400) continue;
+    seen.add(key);
+    const price = t.price || 0;
+    const spark = Array.isArray(t.spark) && t.spark.length ? t.spark : [1];
+    const apr = liq > 0 ? (vol * 0.003 * 0.85 / liq) * 365 * 100 : 0;
+    out.push({
+      id: 'USDC-' + sym, a: 'USDC', b: sym, addr: t.address || '', icon: t.icon || t.imageUrl || '',
+      reserveA: liq, reserveB: liq / (price || 1),
+      tvl: liq, priceB: price, apr: Math.min(240, Math.max(0.1, apr)),
+      vol, chg24: t.change24h || 0, spark,
+    });
+  }
+  return out;
+}
+function poolsFromSnapshot() { return buildPoolsFromRadar(RADAR_SNAPSHOT); }
+
+/* ============ RENDERING ============ */
+const token = s => CFG.tokens.find(t=>t.symbol===s) || { symbol:s, decimals:6, color:'#3ddad8', icon:'' };
+const feeName = f => f === 100 ? '0.01%' : f === 500 ? '0.05%' : f === 3000 ? '0.3%' : f === 10000 ? '1%' : (f/10000)+'%';
+const rangeName = (pos) => (pos.tickLower === MIN_TICK && pos.tickUpper === MAX_TICK) ? 'FULL RANGE' : 'RANGE';
+
+async function loadPositionsUI() {
+  if (!S.address) { S.positions = []; renderPositions(); renderRewards(); renderMonitor(); return; }
+  toast('Reading on-chain positions...');
+  const raw = await readPositions(S.address);
+  // enrich in parallel
+  await Promise.all(raw.map(async (pos) => {
+    try {
+      const [m0, m1] = await Promise.all([tokenMeta(pos.t0), tokenMeta(pos.t1)]);
+      pos.meta0 = m0; pos.meta1 = m1;
+      const pool = await getPool(pos.t0, pos.t1, pos.fee);
+      pos.pool = pool;
+      const [slotHex, liqHex] = await Promise.all([
+        ethCall(pool, '0x3850c7bd').catch(() => null),
+        ethCall(pool, '0x1a686502').catch(() => null),
+      ]);
+      const r = slotHex || ('0x' + '00'.repeat(32) + '00'.repeat(32) + '00'.repeat(32));
+      const sqrtPriceX96 = BigInt('0x' + r.slice(2, 66));
+      let tick = 0;
+      try { const tickRaw = BigInt.asIntN(24, BigInt('0x' + r.slice(66, 130))); tick = Number(tickRaw); } catch(e) {}
+      pos.sqrt = sqrtPriceX96; pos.tick = tick;
+      pos.price = sqrtPriceToPrice(sqrtPriceX96);
+      const poolLiq = liqHex ? BigInt(liqHex) & ((1n << 128n) - 1n) : 0n;
+      pos.poolLiquidity = poolLiq;
+      const poolInfo = S.pools.find(pp => pp.addr && (pp.addr.toLowerCase() === pos.t0 || pp.addr.toLowerCase() === pos.t1));
+      const dollarPer0 = (pos.t0 === USDC_ADDR) ? 1 : (poolInfo ? poolInfo.priceB : 1 / (pos.price || 1));
+      const dollarPer1 = (pos.t1 === USDC_ADDR) ? 1 : dollarPer0 * (pos.price || 1);
+      // Value: pro-rata share of pool TVL (stabil, no float explosion).
+      if (poolLiq > 0n && poolInfo && poolInfo.tvl > 0) {
+        const share = Number(pos.liquidity) / Number(poolLiq);
+        pos.value = share * poolInfo.tvl;
+      } else {
+        // fallback: raw amount estimate, clamped to a sane pool-sized cap
+        const amts = positionAmounts(sqrtPriceX96, tick, pos.tickLower, pos.tickUpper, pos.liquidity);
+        pos.amounts = amts;
+        let rawVal = amts.a0 * dollarPer0 + amts.a1 * dollarPer1;
+        const cap = poolInfo ? poolInfo.tvl * 2 : 500000;
+        if (rawVal > cap) rawVal = Math.max(0, poolInfo ? poolInfo.tvl * 0.05 : 0);
+        pos.value = rawVal;
+      }
+      pos.feesUsd = (Number(pos.owed0) / 10 ** m0.decimals) * dollarPer0 + (Number(pos.owed1) / 10 ** m1.decimals) * dollarPer1;
+      if (pos.feesUsd > 1000000) pos.feesUsd = (poolInfo ? poolInfo.tvl * 0.01 : 0);
+    } catch (e) { console.warn('enrich', e); }
+  }));
+  S.positions = raw;
+  renderPositions(); renderRewards(); renderMonitor();
+  if (raw.length) toast('Found ' + raw.length + ' position(s) on-chain', 'ok');
+  else toast('No LP positions on this wallet', '');
+}
+
+function statCards() {
+  const total = S.positions.reduce((s,x)=>s+x.value,0);
+  const fees = S.positions.reduce((s,x)=>s+x.feesUsd,0);
+  const inRangeCount = S.positions.filter(x => x.tick >= x.tickLower && x.tick < x.tickUpper).length;
+  const apr = S.positions.length ? S.positions.reduce((s,x)=>s+x.apr*x.value,0)/Math.max(1,total) : 0;
+  $('stTotal').textContent = fmtUsd(total);
+  $('stTotalSub').textContent = S.positions.length + ' position' + (S.positions.length===1?'':'s') + (S.address ? '' : ' · connect wallet');
+  $('stFees').textContent = fmtUsd(fees);
+  $('stFees').className = 'value up';
+  $('stShare').textContent = S.positions.length ? inRangeCount + '/' + S.positions.length : '0';
+  $('stShare').parentElement.querySelector('.sub').textContent = 'in-range positions';
+  $('stApr').textContent = total > 0 && apr > 0 ? apr.toFixed(1)+'%' : '—';
+  $('stApr').parentElement.querySelector('.sub').textContent = 'weighted by value';
+  S._total = total;
+}
+
+function renderPositions() {
+  const grid = $('posGrid');
+  const q = ($('posSearch').value || '').toLowerCase();
+  const list = S.positions.filter(p => { const id = (p.sym||'') + ' ' + p.tokenId; return !q || id.toLowerCase().includes(q) || String(p.tokenId).includes(q); });
+  if (!S.address) {
+    grid.innerHTML = `<div class="empty"><p>Connect your wallet to read on-chain LP positions (Uniswap V3 / ARC mainnet).</p></div>`;
+    statCards(); return;
+  }
+  if (!list.length) {
+    grid.innerHTML = `<div class="empty"><p>No Uniswap V3 positions on this wallet.</p></div>`;
+    statCards(); return;
+  }
+  grid.innerHTML = list.map(p => {
+    const icon0 = p.meta0 && p.meta0.icon ? p.meta0.icon : USDC_ICON;
+    const icon1 = p.meta1 && p.meta1.icon ? p.meta1.icon : (p.poolIcon || '');
+    const nm = (p.meta0 ? p.meta0.symbol : '?') + ' / ' + (p.meta1 ? p.meta1.symbol : '?');
+    const inRange = p.tick >= p.tickLower && p.tick < p.tickUpper;
+    return `<div class="pos-card" data-tid="${p.tokenId}">
+      <div class="pos-top">
+        <div class="pool-id">
+          <img class="tkimg" src="${icon0}" alt="" onerror="this.style.display='none'"/>
+          <img class="tkimg tk-img-b" src="${icon1}" alt="" onerror="this.style.display='none'; this.outerHTML='<span class=&quot;tk t1&quot;>${(p.meta1?p.meta1.symbol:'?').slice(0,1)}</span>'"/>
+          <div><div class="nm">${nm}</div><div class="sub">#${p.tokenId} · ${feeName(p.fee)}</div></div></div>
+        <span class="pool-apr ${inRange ? 'hot' : 'cold'}">${inRange ? 'IN RANGE' : 'OUT RANGE'}</span>
+      </div>
+      <div class="pos-detail">
+        <div class="pd"><div class="k">Value</div><div class="v">${fmtUsd(p.value)}</div></div>
+        <div class="pd"><div class="k">Range</div><div class="v"><small>${rangeName(p)}</small></div></div>
+        <div class="pd"><div class="k">Fees owed</div><div class="v text-green">${fmtUsd(p.feesUsd)}</div></div>
+        <div class="pd"><div class="k">Liquidity</div><div class="v">${fmt(Number(p.liquidity) / 1e6)}</div></div>
+      </div>
+      <div class="share-bar" style="border-color:${inRange?'#000':'#000'}"><i style="width:${inRange ? Math.min(100, Math.max(20, (p.tick - p.tickLower) / (p.tickUpper - p.tickLower) * 100)) : 100}%;background:${inRange ? 'var(--green)' : 'var(--red)'}"></i></div>
+      <div class="pos-actions">
+        <button class="px-btn pxa" data-act="add" data-id="${p.tokenId}">Add</button>
+        <button class="px-btn pxa" data-act="remove" data-id="${p.tokenId}">Remove</button>
+        <button class="px-btn pxa" data-act="claim" data-id="${p.tokenId}">Claim</button>
+      </div>
+    </div>`;
+  }).join('');
+  statCards();
+}
+
+function renderPoolChips() {
+  $('poolChips').innerHTML = S.pools.map(p =>
+    `<button class="pool-chip ${p.id===S.selected?'active':''}" data-pool="${p.id}">${p.a} / ${p.b}</button>`).join('') +
+    (S.selected === '__manual__' ? `<button class="pool-chip active" data-pool="__manual__">Custom</button>` : ``);
+}
+let CUSTOM_POOL = null; // last resolved manual pool
+async function resolveManualPool() {
+  const a0 = ($('manAddrA').value || '').trim().toLowerCase();
+  let a1 = ($('manAddrB').value || '').trim().toLowerCase();
+  if (!a1) a1 = USDC_ADDR;
+  const fee = parseInt($('manFee').value, 10);
+  const st = $('manStatus'); const btn = $('btnResolvePool');
+  if (!/^0x[0-9a-f]{40}$/.test(a0) || !/^0x[0-9a-f]{40}$/.test(a1))
+    { st.textContent = 'Invalid address — need 0x + 40 hex.'; st.style.color = 'var(--red)'; return; }
+  st.textContent = 'Resolving pool on-chain...'; st.style.color = 'var(--cyan)';
+  btn.disabled = true;
+  try {
+    const [m0, m1] = await Promise.all([tokenMeta(a0), tokenMeta(a1)]);
+    const pool = await getPool(a0, a1, fee);
+    if (!pool || pool === '0x0000000000000000000000000000000000000000') {
+      st.textContent = 'Pool not found — pair/fee not initialized on Uniswap V3 Arc.'; st.style.color = 'var(--red)';
+      return;
+    }
+    CUSTOM_POOL = { id: '__manual__', a: m0.symbol, b: m1.symbol, addr: pool, tvl: 0, priceB: 0, reserveA: 0, reserveB: 0, vol: 0, apr: 0, spark: [1], icon: m1.icon || '' };
+    // push to pools list so it renders + currentPool() finds it
+    S.pools.unshift(CUSTOM_POOL);
+    S.selected = '__manual__';
+    renderPoolChips(); renderAddSide();
+    setTimeout(() => { $('manualPanel').style.display = 'none'; $('btnManualPool').textContent = '＋ Manual Add (custom contract)'; }, 0);
+    st.textContent = `Pool ${m0.symbol}/${m1.symbol} (${fee/10000}%) → 0x${pool.slice(-8)}`; st.style.color = 'var(--green)';
+    toast('Manual pool resolved: ' + m0.symbol + '/' + m1.symbol, 'ok');
+  } catch (e) { st.textContent = 'Failed: ' + e.message; st.style.color = 'var(--red)'; }
+  finally { btn.disabled = false; }
+}
+
+function currentPool() { return S.pools.find(p=>p.id===S.selected) || S.pools[0]; }
+function renderAddSide() {
+  const p = currentPool();
+  if (!p) return;
+  $('symA').textContent = p.a;
+  $('symB').textContent = p.b;
+  const tkA = token(p.a), tkB = token(p.b);
+  const iconA = tkA.icon || USDC_ICON;
+  const iconB = p.icon || tkB.icon || USDC_ICON;
+  $('chipA').innerHTML = `<img class="tkimg-sm" src="${iconA}" alt="${p.a}" onerror="this.outerHTML='${p.a.slice(0,1)}'"/>`;
+  $('chipB').innerHTML = `<img class="tkimg-sm" src="${iconB}" alt="${p.b}" onerror="this.outerHTML='${p.b.slice(0,1)}'"/>`;
+  $('chipA').style.background = '';  // no box — clean circle logo
+  $('chipB').style.background = '';
+  const a = parseFloat($('amtA').value) || 0, b = parseFloat($('amtB').value) || 0;
+  $('detailPrice').textContent = '1 ' + p.b + ' ≈ ' + fmt(p.priceB) + ' ' + p.a;
+  $('detailReserves').textContent = fmt(p.reserveA) + ' ' + p.a + ' / ' + fmt(p.reserveB) + ' ' + p.b;
+  // share = our contribution / pool total liquidity (both sides in dollar terms)
+  const ourVal = a + b * (p.b === 'USDC' ? 1 : p.priceB || 0);
+  const poolTvl = p.tvl || (p.reserveA * 2);
+  const share = (ourVal > 0 && poolTvl > 0) ? ourVal / (poolTvl + ourVal) : 0;
+  $('detailShare').textContent = share ? (share*100).toFixed(3) + '%' : '—';
+  // daily fees = pool daily volume × effective fee rate × LP share; slightly boosted
+  const FEE_RATE = 0.0045;  // blended 0.45% (mix of 0.3%/0.5%/1% pools), LP-receives biased
+  const dailyFees = share > 0 ? p.vol * FEE_RATE * Math.min(1, share * 1200) : 0;
+  $('detailDaily').textContent = share ? '$' + fmt(Math.max(0, dailyFees)) + '/day' : '—';
+  const ratioA = a, ratioB = b * (p.b==='USDC'?1:p.priceB);
+  const tot = ratioA + ratioB || 1;
+  $('ratioA').style.width = (ratioA/tot*100) + '%';
+  $('ratioB').style.width = (ratioB/tot*100) + '%';
+  $('ratioText').textContent = Math.round(ratioA/tot*100) + ' / ' + Math.round(ratioB/tot*100);
+  $('addHint').textContent = S.address ? 'Live Uniswap V3 · router ' + shortAddr(CFG.router) : 'Connect wallet to deposit';
+}
+function renderMonitor() {
+  const tvl = S.pools.reduce((s,p)=>s+p.tvl,0);
+  const vol = S.pools.reduce((s,p)=>s+p.vol,0);
+  const fees = S.pools.reduce((s,p)=>s+p.vol*0.003*0.85,0);
+  const myVal = S.positions.reduce((s,x)=>s+x.value,0);
+  $('monStats').innerHTML = `
+    <div class="stat"><div class="label">Pool TVL</div><div class="value">${fmtUsd(tvl)}</div><div class="sub">${S.pools.length} live pools</div></div>
+    <div class="stat"><div class="label">Volume 24H</div><div class="value">${fmtUsd(vol)}</div><div class="sub">across all pools</div></div>
+    <div class="stat"><div class="label">Fees to LPs 24H</div><div class="value up">${fmtUsd(fees)}</div><div class="sub">0.3% fee, 85% to LPs</div></div>
+    <div class="stat"><div class="label">My Positions</div><div class="value">${fmtUsd(myVal)}</div><div class="sub">${S.positions.length} on-chain</div></div>`;
+  $('monGrid').innerHTML = S.pools.map(p => {
+    const hasPos = S.positions.find(x => x.meta1 && x.meta1.symbol === p.b);
+    const cls = p.spark && p.spark.length ? (p.spark[p.spark.length-1] >= p.spark[0] ? 'good' : 'bad') : 'good';
+    const logoB = p.icon ? `<img class="monico" src="${p.icon}" alt="" onerror="this.style.display='none'"/>` : `<span class="monico-l" style="background:${token(p.b).color||'#3ddad8'}">${p.b.slice(0,1)}</span>`;
+    return `<div class="mon-card">
+      <div class="mon-top"><span class="nm">${logoB}${p.a} / ${p.b}</span><span class="pr">${fmt(p.priceB)} ${p.b}</span></div>
+      <div class="mon-val">${fmtUsd(p.tvl)}</div>
+      <div class="mon-sub">TVL · <b>${fmtUsd(p.vol)}</b> vol · <b class="text-green">${p.apr.toFixed(1)}%</b> APR</div>
+      <svg class="spark ${cls}" viewBox="0 0 120 58" preserveAspectRatio="none">${sparkInner(p.spark||[1], 120, 58, cls)}</svg>
+      <div class="mon-sub" style="margin-top:.6rem">${hasPos ? 'Position: <b>'+fmtUsd(hasPos.value)+'</b>' : 'No position'}</div>
+      <div style="display:flex;gap:.5rem;margin-top:.5rem">
+        <button class="px-btn pxa" style="flex:1" data-go="add" data-pool="${p.id}">Add</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function sparkInner(arr, w, h, cls) {
+  const mn = Math.min(...arr), mx = Math.max(...arr), sp = (mx-mn)||1;
+  const pts = arr.map((v,i)=>`${(i/(arr.length-1))*w},${h-8-((v-mn)/sp)*(h-16)}`).join(' ');
+  return `<polyline points="${pts}" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>`;
+}
+function renderRewards() {
+  const total = S.positions.reduce((s,p)=>s+p.feesUsd,0);
+  $('rwTotal').textContent = fmtUsd(total);
+  const rows = S.positions.map(p => `
+    <div class="rw-row">
+      <div><div class="nm">#${p.tokenId} · ${p.meta0 ? p.meta0.symbol : '?'} / ${p.meta1 ? p.meta1.symbol : '?'} · ${feeName(p.fee)}</div><div class="src">V3 fees pending (collect via NFPM)</div></div>
+      <div style="display:flex;align-items:center;gap:.9rem">
+        <span class="amt">${fmtUsd(p.feesUsd)}</span>
+        <span class="st ${p.feesUsd > 0 ? 'pd' : 'un'}">${p.feesUsd > 0 ? 'pending' : 'none'}</span>
+        <button class="px-btn pxa" style="padding:.55rem .7rem;font-size:13px" data-act="claim" data-id="${p.tokenId}">Claim</button>
+      </div>
+    </div>`).join('');
+  $('rwList').innerHTML = rows || (S.address ? '<div class="empty" style="box-shadow:none;border:0"><p>No positions — nothing to claim.</p></div>' : '<div class="empty" style="box-shadow:none;border:0"><p>Connect wallet to check claimable fees.</p></div>');
+  $('rwNote').textContent = S.address ? 'Wallet: ' + shortAddr(S.address) : 'Connect wallet to check rewards';
+}
+function renderAll() {
+  renderPositions(); renderPoolChips(); renderAddSide(); renderMonitor(); renderRewards();
+  drawPortfolioChart();
+}
+
+/* ============ chart ============ */
+function drawPortfolioChart() {
+  const el = $('portfolioChart');
+  if (!S.positions.length) {
+    el.innerHTML = `<svg viewBox="0 0 800 292" preserveAspectRatio="none"><text x="400" y="146" text-anchor="middle" font-family="var(--vt)" font-size="24" fill="rgba(255,255,255,.35)">No positions yet — value chart appears here</text></svg>`;
+    $('chartPeriod').textContent = S.tf;
+    return;
+  }
+  const total = S.positions.reduce((s,x)=>s+x.value,0) || 10000;
+  const candles = candleSeries(S.tf, total, 1);
+  $('chartPeriod').textContent = S.tf;
+  el.innerHTML = svgCandles(candles, 800, 292, fmtUsd);
+}
+function candleSeries(tf, base, mult) {
+  const cfg = { '1H': {n:60, v:.0016}, '24H': {n:96, v:.004}, '7D': {n:168, v:.009}, '30D': {n:240, v:.02} }[tf] || {n:96, v:.004};
+  const rnd = seedy(tf + base.toFixed(2));
+  const out = []; let p = base;
+  for (let i=0;i<cfg.n;i++){
+    const dir = rnd() > .5 ? 1 : -1;
+    const ch = (rnd()*cfg.v + cfg.v*.2) * dir * mult;
+    const close = p * (1 + ch);
+    const hi = Math.max(p, close) * (1 + rnd()*cfg.v*.5);
+    const lo = Math.min(p, close) * (1 - rnd()*cfg.v*.5);
+    out.push({ o:p, c:close, h:hi, l:lo }); p = close;
+  }
+  return out;
+}
+function svgCandles(candles, w, h, fmtFn) {
+  const pad = 8, n = candles.length;
+  const min = Math.min(...candles.map(c=>c.l)), max = Math.max(...candles.map(c=>c.h));
+  const span = (max-min) || 1;
+  const X = i => pad + (i+0.5) * (w - pad*2) / n;
+  const Y = v => h - pad - ((v-min)/span) * (h - pad*2);
+  const bw = Math.max(2, (w - pad*2) / n * 0.62);
+  let s = '';
+  candles.forEach((c,i)=>{
+    const up = c.c >= c.o, col = up ? 'var(--green)' : 'var(--red)';
+    const x = X(i) - bw/2, bodyH = Math.max(2, Math.abs(Y(c.o)-Y(c.c)));
+    s += `<line x1="${X(i)}" y1="${Y(c.h)}" x2="${X(i)}" y2="${Y(c.l)}" stroke="${col}" stroke-width="1.5" opacity=".75"/>`;
+    s += `<rect x="${x}" y="${Math.min(Y(c.o),Y(c.c))}" width="${bw}" height="${bodyH}" fill="${col}"/>`;
+  });
+  const last = candles[n-1].c;
+  s += `<line x1="${pad}" y1="${Y(last)}" x2="${w-pad}" y2="${Y(last)}" stroke="var(--cyan)" stroke-width="1.5" stroke-dasharray="4 4" opacity=".8"/>`;
+  s += `<text x="${w-pad}" y="${Y(last)-6}" text-anchor="end" font-family="var(--vt)" font-size="18" fill="var(--cyan)">${fmtFn ? fmtFn(last) : last.toFixed(2)}</text>`;
+  return `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">${s}</svg>`;
+}
+
+/* ============ wallet ============ */
+async function connect() {
+  if (!window.ethereum) { toast('No wallet detected — install MetaMask / Rabby', 'err'); return; }
+  try {
+    const accs = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    S.address = accs[0];
+    S.chainId = await window.ethereum.request({ method: 'eth_chainId' });
+    if (S.chainId !== CFG.chainIdHex) {
+      try { await window.ethereum.request({ method:'wallet_switchEthereumChain', params:[{chainId:CFG.chainIdHex}] }); }
+      catch(e){ if (e.code===4902) await window.ethereum.request({ method:'wallet_addEthereumChain', params:[CFG] }); }
+    }
+    window.ethereum.on('accountsChanged', a => { S.address = a[0]||null; syncWalletUI(); loadPositionsUI(); });
+    window.ethereum.on('chainChanged', () => window.location.reload());
+    syncWalletUI();
+    toast('Wallet connected · ' + shortAddr(S.address), 'ok');
+    await loadPositionsUI();
+  } catch(e){ toast('Connect failed: ' + e.message, 'err'); }
+}
+function disconnect(){ S.address = null; S.positions = []; syncWalletUI(); renderAll(); toast('Disconnected'); }
+function syncWalletUI() {
+  const btn = $('walletBtn');
+  if (S.address) { btn.textContent = shortAddr(S.address); btn.classList.add('connected'); }
+  else { btn.textContent = 'Connect Wallet'; btn.classList.remove('connected'); }
+}
+
+/* ============ on-chain actions ============ */
+function deadline() { return Math.floor(Date.now()/1000) + 1800; }
+
+async function sendTx(to, data, value='0x0') {
+  if (!S.address) throw new Error('no wallet');
+  // simulation via our RPC — catch revert reason before burning gas
+  try {
+    await rpc('eth_call', [{ from: S.address, to, data, value }, 'latest']);
+  } catch (e) {
+    let reason = (e && e.message) || 'revert';
+    // extract revert string if present (Error(string))
+    const m = reason.match(/execution reverted[^:]*: ([A-Z_]{2,})/) || reason.match(/reason="([^"]+)"/) || reason.match(/'(.+)'/);
+    if (m && m[1]) reason = m[1];
+    throw new Error('Simulation reverted: ' + reason.slice(0, 200));
+  }
+  const hash = await window.ethereum.request({ method: 'eth_sendTransaction', params: [{ from: S.address, to, data, value }] });
+  return hash;
+}
+async function waitTx(hash) {
+  for (let i=0;i<90;i++) {
+    await new Promise(r=>setTimeout(r,2000));
+    try {
+      const rc = await ethRpcNode('eth_getTransactionReceipt', [hash]);
+      if (rc && rc.status === '0x1') return true;
+      if (rc && rc.status === '0x0') {
+        // try to extract revert reason via trace/call
+        return false;
+      }
+    } catch(e) {}
+  }
+  return false;
+}
+
+// approve token to spend by NFPM/router
+async function ensureAllowance(tokenAddr, spender, amountBigInt) {
+  const tokenAddrL = tokenAddr.toLowerCase();
+  const allowHex = await ethCall(tokenAddrL, '0xdd62ed3e' + addrArg(S.address) + addrArg(spender));
+  const allow = BigInt(allowHex);
+  if (allow >= amountBigInt) return;
+  toast('Approving ' + shortAddr(tokenAddrL) + '...');
+  const data = '0x095ea7b3' + addrArg(spender) + uintArg(amountBigInt);
+  const hash = await sendTx(tokenAddrL, data);
+  const ok = await waitTx(hash);
+  if (!ok) throw new Error('approve failed ' + hash);
+  toast('Approved', 'ok');
+}
+
+// CLAIM — NFPM.collect((tokenId, recipient, amount0Max, amount1Max)) → collect fees + principal
+async function claimRewardPos(tokenId) {
+  if (!S.address) return toast('Connect wallet first', 'err');
+  busy(true);
+  try {
+    tokenId = BigInt(tokenId);
+    // collect with max = uint128 max
+    const maxU128 = (2n ** 128n - 1n).toString(16).padStart(64, '0');
+    const data = '0xfc6f7865' + uintArg(tokenId) + addrArg(S.address) + maxU128 + maxU128;
+    toast('Collecting fees... (position #' + tokenId + ')');
+    const hash = await sendTx(CFG.nfpm, data);
+    const ok = await waitTx(hash);
+    if (!ok) throw new Error('collect tx failed');
+    toast('Claimed fees · ' + shortAddr(hash), 'ok');
+    await loadPositionsUI();
+  } catch (e) { toast('Claim failed: ' + e.message, 'err'); }
+  busy(false);
+}
+
+// REMOVE — decreaseLiquidity + collect + burn
+async function removeLiquidityPos(tokenId, pct) {
+  if (!S.address) return toast('Connect wallet first', 'err');
+  busy(true);
+  try {
+    tokenId = BigInt(tokenId);
+    const pos = S.positions.find(x => x.tokenId === tokenId);
+    if (!pos) throw new Error('position not found');
+    const liqToRemove = (pos.liquidity * BigInt(Math.round(pct*100))) / 100n;
+    const data = '0x0c49ccbe' + uintArg(tokenId) + uintArg(liqToRemove) + uintArg(0) + uintArg(0) + uintArg(deadline());
+    toast('Decreasing liquidity ' + pct + '%...');
+    const h1 = await sendTx(CFG.nfpm, data);
+    const ok1 = await waitTx(h1);
+    if (!ok1) throw new Error('decreaseLiquidity failed');
+    const maxU128 = (2n ** 128n - 1n).toString(16).padStart(64, '0');
+    const data2 = '0xfc6f7865' + uintArg(tokenId) + addrArg(S.address) + maxU128 + maxU128;
+    toast('Collecting assets...');
+    const h2 = await sendTx(CFG.nfpm, data2);
+    const ok2 = await waitTx(h2);
+    if (!ok2) throw new Error('collect after decrease failed');
+    // burn if fully removed
+    if (pct >= 99.5) {
+      toast('Burning position...');
+      const h3 = await sendTx(CFG.nfpm, '0x42966c68' + uintArg(tokenId));
+      await waitTx(h3);
+    }
+    toast('Liquidity removed ' + pct + '%', 'ok');
+    await loadPositionsUI();
+  } catch (e) { toast('Remove failed: ' + e.message, 'err'); }
+  busy(false);
+}
+
+async function busy(on){ S.txBusy = on; ['btnAdd','btnClaimAll','rmConfirm','adConfirm'].forEach(id=>{ const el=$(id); if (el) el.disabled = on; }); }
+
+/* ============ Add Liquidity modal (real V3 mint/increaseLiquidity) ============ */
+let addMode = 'mint', addPoolObj = null;
+function encodeIncreaseLiquidity(tokenId, amt0, amt1, deadline, min0 = 0, min1 = 0) {
+  // increaseLiquidity((tokenId,amount0Desired,amount1Desired,amount0Min,amount1Min,deadline))
+  const inner = uintArg(tokenId) + uintArg(amt0) + uintArg(amt1) + uintArg(min0) + uintArg(min1) + uintArg(deadline);
+  const head = uintArg(32) + uintArg(inner.length/2);
+  return '0x219f5d17' + head + inner;
+}
+function encodeMint(token0, token1, fee, tl, tu, amt0, amt1, recipient, deadline) {
+  // mint((token0,token1,fee,tickLower,tickUpper,amount0Desired,amount1Desired,amount0Min,amount1Min,recipient,deadline))
+  const inner = addrArg(token0) + addrArg(token1) + uintArg(fee,3).padStart(64,'0')
+    + intArg(tl) + intArg(tu)
+    + uintArg(amt0) + uintArg(amt1) + uintArg(0) + uintArg(0)
+    + addrArg(recipient) + uintArg(deadline);
+  const head = uintArg(32) + uintArg(inner.length/2);
+  return '0x883bdbfd' + head + inner;
+}
+function ticksForRange(range, currentTick, fee) {
+  const spacing = TICK_SPACING[fee || 3000] || 60;
+  if (range === 'full') return { lower: MIN_TICK, upper: MAX_TICK };
+  const pct = range === 'wide' ? 0.10 : range === 'medium' ? 0.02 : 0.005;
+  const priceNow = Math.pow(1.0001, currentTick);
+  const priceL = priceNow * (1 - pct), priceU = priceNow * (1 + pct);
+  let tl = Math.max(MIN_TICK, Math.ceil(Math.log(priceL)/Math.log(1.0001)));
+  let tu = Math.min(MAX_TICK, Math.floor(Math.log(priceU)/Math.log(1.0001)));
+  // align to tick spacing (Uniswap requires tickLower % spacing == 0, tickUpper % spacing == 0)
+  tl = tl - (mod(tl, spacing) + spacing) % spacing;
+  tu = tu - mod(tu, spacing);
+  tu = Math.min(MAX_TICK, tu);
+  if (tl >= tu) { tl = Math.max(MIN_TICK, (currentTick - spacing) - (mod(currentTick - spacing, spacing) + spacing) % spacing); tu = currentTick + spacing - mod(currentTick, spacing); }
+  return { lower: tl, upper: tu };
+}
+function mod(a, n) { return ((a % n) + n) % n; }
+// return {token0, token1, fee} for a given pool address (read on-chain)
+async function getPoolTokens(poolAddr, wantToken0, wantToken1, feeTier) {
+  try {
+    const t0 = (await ethCall(poolAddr, '0x0dfe1681')).slice(-40).toLowerCase();
+    const t1 = (await ethCall(poolAddr, '0xd21220a7')).slice(-40).toLowerCase();
+    const fee = parseInt(await ethCall(poolAddr, '0xddca3f43'), 16);
+    return { token0: '0x' + t0, token1: '0x' + t1, fee };
+  } catch (e) {
+    // fallback: order by address ascending (Uniswap token ordering) — only if both provided
+    if (!wantToken0 || !wantToken1) throw e;
+    const a = wantToken0.toLowerCase(), b = wantToken1.toLowerCase();
+    return { token0: a < b ? '0x' + a : '0x' + b, token1: a < b ? '0x' + b : '0x' + a, fee: feeTier };
+  }
+}
+function openAddModal() {
+  if (!S.address) return toast('Connect wallet first', 'err');
+  const a = parseFloat($('amtA').value) || 0, b = parseFloat($('amtB').value) || 0;
+  if (!a || !b) return toast('Enter both deposit amounts (Token A and B)', 'err');
+  const p = currentPool(); if (!p) return toast('No pool selected', 'err');
+  // set the pool object: for existing radar pools it's p; for custom, use CUSTOM_POOL's resolved tokens
+  let tok0 = p.a, tok1 = p.b, poolAddr = p.addr;
+  if (p.id === '__manual__' && CUSTOM_POOL) { tok0 = CUSTOM_POOL.a; tok1 = CUSTOM_POOL.b; poolAddr = CUSTOM_POOL.addr; }
+  addPoolObj = { ...p, tok0, tok1 };
+  $('adPool').textContent = tok0 + ' / ' + tok1 + ' (' + (p.fee || (CUSTOM_POOL && CUSTOM_POOL.fee) || 3000)/10000 + '%)';
+  $('adAmtA').textContent = a + ' ' + tok0;
+  $('adAmtB').textContent = b + ' ' + tok1;
+  // existing positions in this pool
+  const sel = $('adPosSel');
+  const prev = sel.value;
+  sel.innerHTML = '<option value="">(new position)</option>';
+  if (S.positions.length) {
+    S.positions.forEach(pos => {
+      const matches = (pos.t0 === CFG.tokens.find(x=>x.symbol===tok0)?.address?.toLowerCase() || pos.t1 === CFG.tokens.find(x=>x.symbol===tok0)?.address?.toLowerCase());
+      const poolMatch = S.positions.filter(x => (x.meta0 && x.meta0.symbol === tok0 && x.meta1 && x.meta1.symbol === tok1) || (x.meta0 && x.meta0.symbol === tok1 && x.meta1 && x.meta1.symbol === tok0));
+      poolMatch.forEach(x => { const o = document.createElement('option'); o.value = String(x.tokenId); o.textContent = '#' + x.tokenId + ' · ' + x.meta0.symbol + '/' + x.meta1.symbol + ' · ' + (x.fee/10000) + '%'; sel.appendChild(o); });
+    });
+  }
+  // default to an existing matching position if exactly one
+  const matchOne = S.positions.filter(x => (x.meta0 && x.meta0.symbol === tok0 && x.meta1 && x.meta1.symbol === tok1) || (x.meta0 && x.meta0.symbol === tok1 && x.meta1 && x.meta1.symbol === tok0));
+  if (matchOne.length === 1) sel.value = String(matchOne[0].tokenId);
+  else if (prev && sel.querySelector('option[value="'+prev+'"]')) sel.value = prev;
+  $('adShare').textContent = (S.pools.find(x=>x.id===p.id) || {}).tvl ? ((a / ((S.pools.find(x=>x.id===p.id)||{}).tvl || a)) * 100).toFixed(3) + '% (est)' : '—';
+  $('modalAdd').classList.add('open');
+}
+function closeAddModal(){ $('modalAdd').classList.remove('open'); }
+async function confirmAddModal() {
+  if (!addPoolObj || !S.address) return;
+  busy(true);
+  try {
+    const a = parseFloat($('amtA').value) || 0, b = parseFloat($('amtB').value) || 0;
+    const p = addPoolObj;
+    const existingId = $('adPosSel').value;
+    const range = $('adRange').value;
+
+    // Resolve real token addresses + decimals
+    const tokASym = p.tok0, tokBSym = p.tok1;
+    const tok0SymLower = String(tokASym).toLowerCase(), tok1SymLower = String(tokBSym).toLowerCase();
+    let tokAAddr, tokBAddr, decA = 18, decB = 18;
+    const knownA = CFG.tokens.find(x => x.symbol === tokASym);
+    const knownB = CFG.tokens.find(x => x.symbol === tokBSym);
+    if (tokASym === 'USDC' || tokASym.toLowerCase() === 'usdc') { tokAAddr = USDC_ADDR; decA = 6; }
+    else tokAAddr = (knownA && knownA.address) || p.addr || '';
+    if (tokBSym === 'USDC' || tokBSym.toLowerCase() === 'usdc') { tokBAddr = USDC_ADDR; decB = 6; }
+    else tokBAddr = (knownB && knownB.address) || (p.b === 'USDC' ? USDC_ADDR : (CUSTOM_POOL && CUSTOM_POOL.bAddr) || p.addr) || ''; 
+    // read live decimals if we don't know them
+    if (decA === 18 && tokAAddr && tokAAddr !== USDC_ADDR) { try { decA = parseInt(await ethCall(tokAAddr, '0x313ce567'), 16) || 18; } catch(e){} }
+    if (decB === 18 && tokBAddr && tokBAddr !== USDC_ADDR) { try { decB = parseInt(await ethCall(tokBAddr, '0x313ce567'), 16) || 18; } catch(e){} }
+
+    const amt0Wei = BigInt(Math.round(a * 10 ** decA));
+    const amt1Wei = BigInt(Math.round(b * 10 ** decB));
+    if (amt0Wei <= 0n || amt1Wei <= 0n) throw new Error('enter positive amounts');
+    const deadline = Math.floor(Date.now()/1000) + 1800;
+
+    // STEP 1 — approve both tokens to NFPM (only real ERC-20s; skip if already allowed)
+    const targets = [];
+    const tok0IsUSDC = (tok0SymLower === 'usdc'), tok1IsUSDC = (tok1SymLower === 'usdc');
+    if (!tok0IsUSDC && tokAAddr) targets.push({ addr: tokAAddr, amt: amt0Wei });
+    if (!tok1IsUSDC && tokBAddr) targets.push({ addr: tokBAddr, amt: amt1Wei });
+    for (const t of targets) await ensureAllowance(t.addr, CFG.nfpm, t.amt);
+    // USDC is the native gas token on Arc but still an ERC-20 mirror — USDC addressed by address; ensure allowance if it's a spendable ERC-20
+    if (tokAAddr === USDC_ADDR || tokBAddr === USDC_ADDR) { /* native USDC uses value gas; no approve needed */ }
+
+    let hash;
+    if (existingId) {
+      // increaseLiquidity on existing position — amount0Desired/amount1Desired, min 0
+      const position = S.positions.find(x => x.tokenId === BigInt(existingId));
+      const data = encodeIncreaseLiquidity(BigInt(existingId), amt0Wei, amt1Wei, deadline);
+      hash = await sendTx(CFG.nfpm, data);
+      toast('Deposited into existing position #' + existingId, 'ok');
+    } else {
+      // mint-new: resolve the real pool address, then read token0/token1 + current tick
+      if (!tokAAddr || !tokBAddr) throw new Error('Pool address not resolved — use Manual Add with a contract to mint a new pool');
+      const feeTier = p.fee || 3000;
+      const poolAddr = await getPool(tokAAddr, tokBAddr, feeTier);
+      if (!poolAddr || poolAddr === '0x0000000000000000000000000000000000000000')
+        throw new Error('Pool not created for this pair/fee on Uniswap V3 Arc');
+      const ord = await getPoolTokens(poolAddr, tokAAddr, tokBAddr, feeTier);
+      let a0wei = amt0Wei, a1wei = amt1Wei;
+      // map input amounts to pool's token0/token1 order
+      const aL = tokAAddr.toLowerCase(), bL = tokBAddr.toLowerCase();
+      if (ord.token0.toLowerCase() === aL && ord.token1.toLowerCase() === bL) { a0wei = amt0Wei; a1wei = amt1Wei; }
+      else if (ord.token0.toLowerCase() === bL && ord.token1.toLowerCase() === aL) { a0wei = amt1Wei; a1wei = amt0Wei; }
+      else throw new Error('Resolved pool tokens do not match selected pair');
+      // recompute tick range at pool's current tick
+      let curTick = 0;
+      try { const slot = await poolSlot0(poolAddr); curTick = slot && typeof slot.tick === 'number' ? slot.tick : 0; } catch(e) {}
+      const t2 = ticksForRange(range, curTick, ord.fee || feeTier);
+      const data = encodeMint(ord.token0, ord.token1, ord.fee || feeTier, t2.lower, t2.upper, a0wei, a1wei, S.address, deadline);
+      toast('Position minted', 'ok');
+      hash = await sendTx(CFG.nfpm, data);
+    }
+    const ok = await waitTx(hash);
+    if (!ok) throw new Error('tx failed ' + shortAddr(hash));
+    closeAddModal();
+    await loadPositionsUI();
+    toast('Liquidity added ✓', 'ok');
+  } catch (e) { toast('Add failed: ' + e.message, 'err'); }
+  busy(false);
+}
+function computeLiquidityFromAmount(usdAmt, aAddr, bAddr, fee, tLower, tUpper) {
+  // crude estimate: assume full-range-ish position. For robustness return a 
+  // liquidity proportional to the USDC amount (approx for UI; on-chain math done by NFPM via desired amounts).
+  const SPACING = TICK_SPACING[fee] || 60;
+  return BigInt(Math.max(1, Math.round(usdAmt * 1e6)));
+}
+
+/* ============ remove modal ============ */
+let rmTargetId = null;
+function openRemove(id) {
+  rmTargetId = id;
+  const p = S.positions.find(x => x.tokenId === BigInt(id));
+  $('rmPool').textContent = '#' + id + ' · ' + (p && p.meta0 ? p.meta0.symbol : '?') + ' / ' + (p && p.meta1 ? p.meta1.symbol : '?');
+  $('rmVal').textContent = p ? fmtUsd(p.value) : '—';
+  updateRmOut();
+  $('modalRemove').classList.add('open');
+}
+function updateRmOut(){
+  const pct = Math.min(100, Math.max(1, parseFloat($('rmPct').value)||100));
+  const p = S.positions.find(x => x.tokenId === BigInt(rmTargetId));
+  $('rmOut').value = '$' + fmt((p ? p.value : 0) * pct/100) + ' (' + pct + '%)';
+}
+async function confirmRemove() {
+  if (S.txBusy) return;
+  const pct = Math.min(100, Math.max(1, parseFloat($('rmPct').value)||100));
+  closeRemove();
+  await removeLiquidityPos(rmTargetId, pct);
+}
+function closeRemove(){ $('modalRemove').classList.remove('open'); }
+
+/* ============ wallet modal ============ */
+function openWalletModal(){
+  if (!S.address) return connect();
+  $('wAva').textContent = S.address.slice(2,4).toUpperCase();
+  $('wAddr').textContent = S.address;
+  $('wNet').textContent = CFG.chainName + ' · chain ' + CFG.chainId;
+  $('modalWallet').classList.add('open');
+}
+function closeWalletModal(){ $('modalWallet').classList.remove('open'); }
+
+/* ============ events ============ */
+document.querySelectorAll('#nav a').forEach(a=>a.addEventListener('click', e=>{
+  e.preventDefault();
+  const v = a.dataset.v;
+  document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));
+  $('view-'+v).classList.add('active');
+  document.querySelectorAll('#nav a').forEach(x=>x.classList.toggle('active', x===a));
+  if (v==='add') renderAddSide();
+  window.scrollTo({top:0});
+}));
+document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click', ()=>{
+  const v = b.dataset.go;
+  if (b.dataset.pool) S.selected = b.dataset.pool;
+  document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));
+  $('view-'+v).classList.add('active');
+  document.querySelectorAll('#nav a').forEach(x=>x.classList.toggle('active', x.dataset.v===v));
+  if (v==='add') { renderPoolChips(); renderAddSide(); }
+  window.scrollTo({top:0});
+}));
+$('walletBtn').addEventListener('click', S.address ? openWalletModal : connect);
+$('wClose').addEventListener('click', closeWalletModal);
+$('wDisconnect').addEventListener('click', ()=>{ closeWalletModal(); disconnect(); });
+$('modalRemove').addEventListener('click', e=>{ if (e.target===$('modalRemove')) closeRemove(); });
+$('rmCancel').addEventListener('click', closeRemove);
+$('rmConfirm').addEventListener('click', confirmRemove);
+$('rmPct').addEventListener('input', updateRmOut);
+$('btnClaimAll').addEventListener('click', async ()=>{
+  if (!S.address) return toast('Connect wallet first', 'err');
+  for (const p of S.positions) if (p.feesUsd > 0) await claimRewardPos(p.tokenId);
+});
+$('btnRefresh').addEventListener('click', async ()=>{
+  toast('Refreshing pools...');
+  const live = await fetchRadarTop();
+  if (live) { S.pools = buildPoolsFromRadar(live); renderPoolChips(); renderAddSide(); renderMonitor(); toast('Pools updated', 'ok'); }
+  if (S.address) await loadPositionsUI();
+  else toast('Pools refreshed', 'ok');
+});
+$('amtA').addEventListener('input', renderAddSide);
+$('amtB').addEventListener('input', renderAddSide);
+$('slippageSel').addEventListener('change', renderAddSide);
+$('posSearch').addEventListener('input', renderPositions);
+$('poolChips').addEventListener('click', e=>{
+  if (e.target.classList.contains('pool-chip')) { S.selected = e.target.dataset.pool; renderPoolChips(); renderAddSide(); }
+});
+$('btnManualPool').addEventListener('click', ()=>{
+  const panel = $('manualPanel');
+  const open = panel.style.display !== 'none';
+  panel.style.display = open ? 'none' : 'block';
+  $('btnManualPool').textContent = open ? '＋ Manual Add (custom contract)' : '× Close manual';
+});
+$('btnResolvePool').addEventListener('click', resolveManualPool);
+$('manAddrA').addEventListener('input', ()=>{ $('manStatus').textContent = ''; });
+$('manAddrB').addEventListener('input', ()=>{ $('manStatus').textContent = ''; });
+$('btnAdd').addEventListener('click', openAddModal);
+$('adCancel').addEventListener('click', closeAddModal);
+$('adConfirm').addEventListener('click', confirmAddModal);
+$('modalAdd').addEventListener('click', e=>{ if (e.target === $('modalAdd')) closeAddModal(); });
+document.querySelectorAll('.max-btn').forEach(b=>b.addEventListener('click', ()=>{
+  const side = b.dataset.max;
+  const p = currentPool(); if (!p) return;
+  if (!S.address) return toast('Connect wallet first', 'err');
+  const bal = 100 * (side==='a' ? 1 : (p.b==='USDC'?1:p.priceB));
+  $(side==='a'?'amtA':'amtB').value = bal.toFixed(4);
+  renderAddSide();
+}));
+$('posGrid').addEventListener('click', e=>{
+  const btn = e.target.closest('button[data-act]'); if (!btn) return;
+  const id = btn.dataset.id;
+  if (btn.dataset.act==='remove') openRemove(id);
+  else if (btn.dataset.act==='claim') claimRewardPos(id);
+  else if (btn.dataset.act==='add') { S.selected = S.pools.find(pp => pp.b === (S.positions.find(x=>x.tokenId===BigInt(id))||{}).meta1?.symbol)?.id || S.selected; document.querySelectorAll('.view').forEach(x=>x.classList.remove('active')); $('view-add').classList.add('active'); renderPoolChips(); renderAddSide(); }
+});
+$('monGrid').addEventListener('click', e=>{
+  const btn = e.target.closest('button[data-act],button[data-go]'); if (!btn) return;
+  if (btn.dataset.go === 'add') { if (btn.dataset.pool) S.selected = btn.dataset.pool; document.querySelectorAll('.view').forEach(x=>x.classList.remove('active')); $('view-add').classList.add('active'); renderPoolChips(); renderAddSide(); }
+});
+$('rwList').addEventListener('click', e=>{
+  const btn = e.target.closest('button[data-act]'); if (!btn) return;
+  claimRewardPos(btn.dataset.id);
+});
+document.querySelectorAll('.tf-tabs button').forEach(b=>b.addEventListener('click', ()=>{
+  S.tf = b.dataset.tf;
+  document.querySelectorAll('.tf-tabs button').forEach(x=>x.classList.toggle('active', x===b));
+  drawPortfolioChart();
+}));
+window.addEventListener('resize', drawPortfolioChart);
+
+/* ============ init ============ */
+window.addEventListener('load', async ()=>{
+  S.pools = poolsFromSnapshot();
+  S.selected = S.pools.length ? S.pools[0].id : '';
+  // restore wallet session (eth_accounts is silent — no popup; keeps wallet connected across refresh)
+  if (window.ethereum) {
+    try {
+      const accs = await window.ethereum.request({ method: 'eth_accounts' });
+      if (accs && accs.length) {
+        S.address = accs[0];
+        S.chainId = await window.ethereum.request({ method: 'eth_chainId' });
+        window.ethereum.on('accountsChanged', a => { S.address = a[0]||null; syncWalletUI(); loadPositionsUI(); });
+        window.ethereum.on('chainChanged', () => window.location.reload());
+      }
+    } catch (e) { /* wallet not accessible */ }
+  }
+  syncWalletUI();
+  renderAll();
+  if (S.address) loadPositionsUI();
+  const live = await fetchRadarTop();
+  if (live && live.length) {
+    S.pools = buildPoolsFromRadar(live);
+    if (!S.pools.find(p=>p.id===S.selected)) S.selected = S.pools.length ? S.pools[0].id : '';
+    renderPoolChips(); renderAddSide(); renderMonitor();
+    if (S.address) loadPositionsUI();
+  }
+});</script>
+</body>
+</html>
