@@ -145,6 +145,10 @@ main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 5rem}
 .tkimg-sm{width:28px;height:28px;object-fit:contain;display:inline-block;flex:0 0 28px;border-radius:4px;background:transparent}
 .amount-row .tk-pill .dot{width:28px;height:28px;display:grid;place-items:center;font-family:var(--px);font-size:12px;color:#fff;background:#5b1d7d;border-radius:4px}
 .max-btn{font-family:var(--px);font-size:9px;padding:.25rem .4rem;border:2px solid #000;background:var(--cyan);color:var(--ink)}
+.tk-stack{display:flex;flex-direction:column;align-items:flex-end;gap:.15rem;flex:0 0 auto}
+.tk-stack .bal{font-family:var(--vt);font-size:11px;color:var(--green);white-space:nowrap;line-height:1.1}
+.tk-stack .bal-usd{font-family:var(--vt);font-size:10px;color:rgba(255,255,255,.55);white-space:nowrap;line-height:1.1}
+.tk-stack .tk-pill{display:flex;align-items:center;gap:.5rem;padding:0;background:transparent;border:0;font-family:var(--px);font-size:13px;text-transform:uppercase;white-space:nowrap;line-height:1}
 .ratio-bar{display:flex;align-items:center;gap:.6rem;margin:.9rem 0}
 .ratio-bar .line{flex:1;height:10px;border:3px solid #000;background:var(--pop);display:flex}
 .ratio-bar .line i{height:100%}
@@ -529,12 +533,20 @@ main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 5rem}
         <div class="amount-row">
           <input id="amtA" type="text" inputmode="decimal" placeholder="0.00" />
           <button class="max-btn" data-max="a">MAX</button>
-          <span class="tk-pill"><span class="dot" id="chipA">A</span><span id="symA">—</span></span>
+          <span class="tk-stack">
+            <span class="bal" id="balA">0 USDC</span>
+            <span class="bal-usd" id="balUsdA">≈ $0.00</span>
+            <span class="tk-pill"><span class="dot" id="chipA">A</span><span id="symA">—</span></span>
+          </span>
         </div>
         <div class="amount-row">
           <input id="amtB" type="text" inputmode="decimal" placeholder="0.00" />
           <button class="max-btn" data-max="b">MAX</button>
-          <span class="tk-pill"><span class="dot" id="chipB">B</span><span id="symB">—</span></span>
+          <span class="tk-stack">
+            <span class="bal" id="balB">0 TOKEN</span>
+            <span class="bal-usd" id="balUsdB">≈ $0.00</span>
+            <span class="tk-pill"><span class="dot" id="chipB">B</span><span id="symB">—</span></span>
+          </span>
         </div>
         <div class="ratio-bar">
           <div class="line"><i id="ratioA" style="width:50%;background:var(--cyan)"></i><i id="ratioB" style="width:50%;background:var(--yellow)"></i></div>
@@ -811,6 +823,52 @@ async function tokenMeta(addr) {
   const meta = { addr, symbol, decimals, icon };
   S.tokenMeta[addr] = meta;
   return meta;
+}
+
+/* ---------- real wallet token balance ---------- */
+function fmtCoin(n, d) {
+  if (n === null || n === undefined || isNaN(n)) return '0';
+  if (n >= 1e6) return (n / 1e6).toFixed(2) + 'M';
+  if (n >= 1e3) return (n / 1e3).toFixed(2) + 'K';
+  if (n === 0) return '0';
+  // use token decimals for significant display, capped
+  const dec = Math.min(d || 6, 6);
+  return Number(n.toFixed(dec)).toString();
+}
+async function tokenBalanceOf(addr, decimals) {
+  // ERC20 balanceOf(owner) = 0x70a08231
+  try {
+    const hex = await ethCall(addr, '0x70a08231' + addrArg(S.address));
+    const raw = BigInt(hex);
+    return Number(raw) / (10 ** (decimals || 18));
+  } catch (e) { return 0; }
+}
+
+let _balReq = 0;
+async function renderBalances(p) {
+  const req = ++_balReq;
+  const symA = p.a || 'USDC', symB = p.b || '?';
+  const usdA = $('balUsdA'), usdB = $('balUsdB'), bA = $('balA'), bB = $('balB');
+  if (!S.address) {
+    bA.textContent = '0 ' + symA; usdA.textContent = '≈ $0.00';
+    bB.textContent = '0 ' + symB; usdB.textContent = '≈ $0.00';
+    return;
+  }
+  // token A = USDC (price 1); token B = quote token at priceB
+  const addrA = USDC_ADDR, addrB = p.addr || '';
+  const decA = 6;
+  let decB = 18;
+  try { if (addrB) decB = (await tokenMeta(addrB)).decimals || 18; } catch (e) {}
+  const [balA, balB] = await Promise.all([
+    tokenBalanceOf(addrA, decA),
+    addrB ? tokenBalanceOf(addrB, decB) : 0,
+  ]);
+  if (req !== _balReq) return;            // stale — a newer call superseded us
+  const priceB = p.priceB || 0, valA = balA, valB = balB * priceB;
+  bA.textContent = fmtCoin(balA, decA) + ' ' + symA;
+  usdA.textContent = '≈ $' + fmt(valA);
+  bB.textContent = fmtCoin(balB, decB) + ' ' + symB;
+  usdB.textContent = '≈ $' + fmt(valB);
 }
 
 // Uniswap V3 pool address via factory.getPool(token0, token1, fee)
@@ -1120,6 +1178,7 @@ function renderAddSide() {
   $('chipA').style.background = '';  // no box — clean circle logo
   $('chipB').style.background = '';
   const a = parseFloat($('amtA').value) || 0, b = parseFloat($('amtB').value) || 0;
+  renderBalances(p);   // async: real wallet balance under each token logo
   $('detailPrice').textContent = '1 ' + p.b + ' ≈ ' + fmt(p.priceB) + ' ' + p.a;
   $('detailReserves').textContent = fmt(p.reserveA) + ' ' + p.a + ' / ' + fmt(p.reserveB) + ' ' + p.b;
   // share = our contribution / pool total liquidity (both sides in dollar terms)
