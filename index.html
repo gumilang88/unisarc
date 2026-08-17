@@ -246,6 +246,106 @@ main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 5rem}
 .x-link svg{flex:0 0 auto}
 @media(max-width:900px){.stats{grid-template-columns:repeat(2,1fr)}.add-wrap{grid-template-columns:1fr}}
 @media(max-width:560px){.stats{grid-template-columns:1fr 1fr}header{padding:.7rem 1rem;gap:.6rem}nav a{padding:.65rem .5rem}}
+
+/* ============ MOBILE RESPONSIVE (does not touch desktop) ============ */
+@media(max-width:640px){
+  html{ -webkit-text-size-adjust:100% }
+  body{ font-size:14px; overflow-x:hidden }
+  main{ padding:1rem .9rem 3.5rem; max-width:100% }
+
+  /* header: stack brand + wallet, nav full-width scrollable */
+  header{ flex-wrap:wrap; padding:.6rem .8rem; gap:.5rem; row-gap:.5rem }
+  .brand{ flex:1 1 auto; gap:.55rem }
+  .brand-logo{ width:32px; height:32px; border-width:3px; box-shadow:3px 3px 0 #000 }
+  .brand span{ font-size:12px }
+  .header-right{ margin-left:0; gap:.5rem; flex-wrap:wrap }
+  .chain-pill{ font-size:11px; padding:.3rem .5rem; border-width:2px; box-shadow:2px 2px 0 #000; gap:.3rem }
+  .chain-pill .dot{ width:7px; height:7px }
+  .wallet-btn{ font-size:11px; padding:.55rem .7rem; border-width:3px; box-shadow:3px 3px 0 #000 }
+
+  /* nav scroll-list */
+  nav{ order:3; flex:1 1 100%; margin-left:0; gap:.3rem; flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch; padding-bottom:.15rem; scrollbar-width:none }
+  nav::-webkit-scrollbar{ display:none }
+  nav a{ font-size:11px; padding:.5rem .6rem; border-width:2px; white-space:nowrap; flex:0 0 auto }
+  nav a.active{ box-shadow:2px 2px 0 #000 }
+
+  /* page head */
+  .page-head{ gap:.6rem; margin-bottom:1rem }
+  .page-head h1{ font-size:17px }
+  .page-head p{ font-size:16px }
+
+  /* stats grid: 2 col, tighter shadows */
+  .stats{ grid-template-columns:repeat(2,1fr); gap:.7rem; margin-bottom:1rem }
+  .stat{ padding:.7rem .8rem; border-width:3px; box-shadow:4px 4px 0 #000 }
+  .stat .label{ font-size:11px }
+  .stat .value{ font-size:1.3rem }
+  .stat .sub{ font-size:12px }
+
+  /* generic pixel cards: reduce heavy shadow/border */
+  .px-card{ box-shadow:4px 4px 0 #000; border-width:3px }
+  .px-btn{ font-size:11px; padding:.55rem .8rem; border-width:3px; box-shadow:3px 3px 0 #000 }
+  .big-cta{ font-size:13px; box-shadow:3px 3px 0 #000; border-width:3px }
+  .px-card:hover{ transform:none; box-shadow:4px 4px 0 #000 }
+
+  /* chart */
+  .chart-card{ padding:.8rem .8rem !important }
+  .chart-head{ gap:.4rem }
+  .chart-box{ height:200px; border-width:3px; box-shadow:3px 3px 0 #000 }
+  .tf-tabs button{ font-size:12px; padding:.4rem .6rem; border-width:2px }
+  .chart-legend{ flex-wrap:wrap; gap:.5rem }
+
+  /* toolbar */
+  .toolbar{ gap:.5rem }
+  .search{ width:100%; max-width:none !important; flex:1 1 100% }
+  .toolbar > div{ margin-left:0 !important; width:100%; flex-wrap:wrap }
+  .toolbar .px-btn{ flex:1 }
+
+  /* positions grid: single column */
+  .pos-grid{ grid-template-columns:1fr; gap:.8rem }
+  .pos-card{ padding:.9rem .9rem; border-width:3px; box-shadow:4px 4px 0 #000 }
+  .pos-detail{ gap:.4rem .7rem }
+  .pd .v{ font-size:1.05rem }
+  .pool-id .tk, .tkimg{ width:28px; height:28px }
+  .pool-apr{ font-size:11px; padding:.35rem .45rem; box-shadow:2px 2px 0 #000 }
+
+  /* amount row */
+  .amount-row{ padding:.55rem .65rem; border-width:2px }
+  .amount-row .side{ font-size:11px }
+  .amount-row input{ font-size:1.2rem }
+  .amount-row .tk-pill{ font-size:11px; padding:.25rem .5rem; border-width:2px }
+  .tkimg-sm, .amount-row .tk-pill .dot{ width:24px; height:24px; flex-basis:24px }
+  .max-btn{ font-size:11px }
+
+  /* detail table */
+  .dt-row{ font-size:15px }
+  .pool-chip{ font-size:12px; padding:.5rem .6rem; border-width:2px; box-shadow:2px 2px 0 #000 }
+  .info-item{ padding:.7rem .8rem }
+  .info-item p{ font-size:14px }
+
+  /* monitor grid: single column */
+  .mon-grid{ grid-template-columns:1fr; gap:.8rem }
+  .mon-card{ padding:.85rem .9rem; border-width:3px; box-shadow:4px 4px 0 #000 }
+  .mon-val{ font-size:1.25rem }
+
+  /* rewards */
+  .reward-hero{ padding:1rem; gap:1rem; box-shadow:4px 4px 0 #000; border-width:3px }
+  .reward-hero .amt{ font-size:1.7rem }
+  .claim-all{ font-size:11px; padding:.7rem 1rem; border-width:3px; box-shadow:3px 3px 0 #000 }
+  .rw-row{ padding:.8rem .9rem; gap:.7rem }
+  .rw-row .amt{ font-size:1.15rem }
+
+  /* modals: full width, reduce shadow */
+  .modal-bg{ padding:.7rem }
+  .modal{ padding:1rem 1.1rem; border-width:3px; box-shadow:6px 6px 0 #000 }
+  .mrow{ font-size:15px }
+  .mfield input, .mfield select{ font-size:1rem }
+  .wallet-card .addr{ font-size:.98rem; word-break:break-all }
+
+  /* toast */
+  #toast-wrap{ left:.8rem; right:.8rem; max-width:none; bottom:.9rem }
+  .toast{ font-size:15px; padding:.7rem .85rem; box-shadow:3px 3px 0 #000 }
+}
+
 </style>
 </head>
 <body>
