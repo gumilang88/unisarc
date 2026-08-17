@@ -1129,9 +1129,10 @@ function renderAddSide() {
   const poolTvl = p.tvl || (p.reserveA * 2);
   const share = (ourVal > 0 && poolTvl > 0) ? ourVal / (poolTvl + ourVal) : 0;
   $('detailShare').textContent = share ? (share*100).toFixed(3) + '%' : '—';
-  // daily fees = pool daily volume × effective fee rate × LP share; slightly boosted
-  const FEE_RATE = 0.0045;  // blended 0.45% (mix of 0.3%/0.5%/1% pools), LP-receives biased
-  const dailyFees = share > 0 ? p.vol * FEE_RATE * Math.min(1, share * 1200) : 0;
+  // daily fees = pool 24h volume × pool fee rate × our share of the pool.
+  // (No artificial boost — the old `share * 1200` inflated the number ~800x.)
+  const feeBps = (p.fee != null) ? (p.fee / 10000) : 0.003; // default 0.3% (3000 tier)
+  const dailyFees = share > 0 ? p.vol * feeBps * share : 0;
   $('detailDaily').textContent = share ? '$' + fmt(Math.max(0, dailyFees)) + '/day' : '—';
   const ratioA = a, ratioB = b * (p.b==='USDC'?1:p.priceB);
   const tot = ratioA + ratioB || 1;
