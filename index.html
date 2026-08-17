@@ -4,6 +4,8 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>UNISARC - LP Dashboard</title>
+<!-- Hidden until the active view is set from the URL hash — avoids any flash/jump to Positions on refresh -->
+<style>html{visibility:hidden}</style>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -1723,9 +1725,11 @@ window.addEventListener('resize', drawPortfolioChart);
 window.addEventListener('load', async ()=>{
   S.pools = poolsFromSnapshot();
   S.selected = S.pools.length ? S.pools[0].id : '';
-  // set the active view from the URL hash EARLY (before renderAll) so a
-  // refresh lands directly on the right tab — no flash/jump to Positions.
+  // set the active view from the URL hash EARLY and render, then reveal —
+  // so the page appears directly on the right tab with NO flash/jump to Positions.
   showView((location.hash || '').slice(1) || 'positions');
+  renderAll();
+  document.documentElement.style.visibility = 'visible';
   // restore wallet session (eth_accounts is silent — no popup; keeps wallet connected across refresh)
   if (window.ethereum) {
     try {
@@ -1739,8 +1743,7 @@ window.addEventListener('load', async ()=>{
     } catch (e) { /* wallet not accessible */ }
   }
   syncWalletUI();
-  renderAll();
-  if (S.address) loadPositionsUI();
+  if (S.address) { if (currentPool) renderAddSide(); loadPositionsUI(); }
   const live = await fetchRadarTop();
   if (live && live.length) {
     S.pools = buildPoolsFromRadar(live);
