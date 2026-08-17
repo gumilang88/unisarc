@@ -2,6 +2,15 @@
 
 Liquidity provider dashboard untuk Uniswap V3 ARC Mainnet (chain 5042).
 
+## Git & Deploy (LIVE)
+- **Repo GitHub**: `https://github.com/gumilang88/unisarc` (public, auto-push)
+- **Live Cloudflare Pages**: `https://unisarc.pages.dev`
+- **Auto-deploy**: tiap `git push origin main` → GH Actions (`.github/workflows/deploy.yml`) → `wrangler pages deploy .public --project-name=unisarc` → otomatis update di Pages.
+- **Folder `.public`** = folder deploy bersih (cuma index.html + assets). JANGAN deploy folder root (server.js ke-upload dan kepake).
+- **Update web + CF ikut update**: edit file → `git add -A && git commit -m "..." && git push origin main`. Tinggal push, CF auto-update.
+- **CF deploy**: pake token + account id yang udah ada di GitHub secrets `CLOUDFLARE_API_TOKEN` + `CLOUDFLARE_ACCOUNT_ID` (jangan taruh token di file repo public).
+- **Catatan CF Pages static-only**: proxy `/api/radar` (server.js) TIDAK ada di Pages, jadi Monitor pakai `RADAR_SNAPSHOT` embedded sebagai fallback. Positions/claim/remove on-chain jalan normal (langsung RPC).
+
 ## Cara jalanin
 ```bash
 cd /home/gumilang/lp-dashboard-arc-mainnet
