@@ -1676,13 +1676,22 @@ $('btnAdd').addEventListener('click', openAddModal);
 $('adCancel').addEventListener('click', closeAddModal);
 $('adConfirm').addEventListener('click', confirmAddModal);
 $('modalAdd').addEventListener('click', e=>{ if (e.target === $('modalAdd')) closeAddModal(); });
-document.querySelectorAll('.max-btn').forEach(b=>b.addEventListener('click', ()=>{
+document.querySelectorAll('.max-btn').forEach(b=>b.addEventListener('click', async ()=>{
   const side = b.dataset.max;
   const p = currentPool(); if (!p) return;
   if (!S.address) return toast('Connect wallet first', 'err');
-  const bal = 100 * (side==='a' ? 1 : (p.b==='USDC'?1:p.priceB));
-  $(side==='a'?'amtA':'amtB').value = bal.toFixed(4);
-  renderAddSide();
+  try {
+    // real wallet balance for the selected token
+    const isA = side === 'a';
+    const addr = isA ? USDC_ADDR : (p.addr || '');
+    let dec = 6;
+    if (!isA && addr) { try { dec = (await tokenMeta(addr)).decimals || 18; } catch(e) { dec = 18; } }
+    if (!addr) return toast('No contract for token', 'err');
+    toast(isA ? 'Fetching USDC balance...' : 'Fetching ' + (p.b||'token') + ' balance...');
+    const bal = await tokenBalanceOf(addr, dec);
+    $(isA ? 'amtA' : 'amtB').value = bal > 0 ? Number(bal.toFixed(isA ? 6 : Math.min(dec, 8))) : '';
+    renderAddSide();
+  } catch (e) { toast('Failed to fetch balance: ' + (e.message||e), 'err'); }
 }));
 $('posGrid').addEventListener('click', e=>{
   const btn = e.target.closest('button[data-act]'); if (!btn) return;
