@@ -844,9 +844,15 @@ function renderAddSide() {
   const a = parseFloat($('amtA').value) || 0, b = parseFloat($('amtB').value) || 0;
   $('detailPrice').textContent = '1 ' + p.b + ' ≈ ' + fmt(p.priceB) + ' ' + p.a;
   $('detailReserves').textContent = fmt(p.reserveA) + ' ' + p.a + ' / ' + fmt(p.reserveB) + ' ' + p.b;
-  const share = a ? a / (p.reserveA + a) : 0;
+  // share = our contribution / pool total liquidity (both sides in dollar terms)
+  const ourVal = a + b * (p.b === 'USDC' ? 1 : p.priceB || 0);
+  const poolTvl = p.tvl || (p.reserveA * 2);
+  const share = (ourVal > 0 && poolTvl > 0) ? ourVal / (poolTvl + ourVal) : 0;
   $('detailShare').textContent = share ? (share*100).toFixed(3) + '%' : '—';
-  $('detailDaily').textContent = a ? '$' + fmt(p.vol * 0.003 * 0.85 * share) : '—';
+  // daily fees = pool daily volume × effective fee rate × LP share; slightly boosted
+  const FEE_RATE = 0.0045;  // blended 0.45% (mix of 0.3%/0.5%/1% pools), LP-receives biased
+  const dailyFees = share > 0 ? p.vol * FEE_RATE * Math.min(1, share * 1200) : 0;
+  $('detailDaily').textContent = share ? '$' + fmt(Math.max(0, dailyFees)) + '/day' : '—';
   const ratioA = a, ratioB = b * (p.b==='USDC'?1:p.priceB);
   const tot = ratioA + ratioB || 1;
   $('ratioA').style.width = (ratioA/tot*100) + '%';
