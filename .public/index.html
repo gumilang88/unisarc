@@ -436,13 +436,13 @@ main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 5rem}
           <span class="side">Token A</span>
           <input id="amtA" type="text" inputmode="decimal" placeholder="0.00" />
           <button class="max-btn" data-max="a">MAX</button>
-          <span class="tk-pill"><span class="dot" id="chipA">A</span><span id="symA">—</span></span>
+          <span class="tk-pill"><span class="dot" id="chipA">A</span></span>
         </div>
         <div class="amount-row">
           <span class="side">Token B</span>
           <input id="amtB" type="text" inputmode="decimal" placeholder="0.00" />
           <button class="max-btn" data-max="b">MAX</button>
-          <span class="tk-pill"><span class="dot" id="chipB">B</span><span id="symB">—</span></span>
+          <span class="tk-pill"><span class="dot" id="chipB">B</span></span>
         </div>
         <div class="ratio-bar">
           <div class="line"><i id="ratioA" style="width:50%;background:var(--cyan)"></i><i id="ratioB" style="width:50%;background:var(--yellow)"></i></div>
@@ -962,8 +962,6 @@ function currentPool() { return S.pools.find(p=>p.id===S.selected) || S.pools[0]
 function renderAddSide() {
   const p = currentPool();
   if (!p) return;
-  $('symA').textContent = p.a;
-  $('symB').textContent = p.b;
   const tkA = token(p.a), tkB = token(p.b);
   // custom/manual pools: use resolved icon if any, else letter fallback (not USDC)
   const isCustom = p.id === '__manual__';
