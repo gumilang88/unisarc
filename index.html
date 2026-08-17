@@ -131,6 +131,7 @@ main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 5rem}
 
 /* ---------- add LP ---------- */
 .add-wrap{display:grid;grid-template-columns:1.1fr .9fr;gap:1.6rem;align-items:start}
+.add-wrap > *{min-width:0}
 .add-panel{background:var(--card);border:4px solid #000;box-shadow:8px 8px 0 #000;border-radius:0;padding:1.3rem 1.4rem}
 .pool-select{display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:1.3rem}
 .pool-chip{font-family:var(--px);font-size:14px;text-transform:uppercase;padding:.6rem .7rem;
@@ -364,6 +365,78 @@ main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 5rem}
   .rw-row .amt{ font-size:1.2rem }
 }
 
+/* ============ SELECT POOL TRIGGER ============ */
+.pool-trigger{
+  width:100%;display:flex;align-items:center;gap:.75rem;cursor:pointer;
+  font-family:var(--px);text-transform:uppercase;color:#fff;text-align:left;
+  padding:.8rem 1rem;background:var(--card);border:4px solid #000;
+  box-shadow:6px 6px 0 #000;transition:.12s;letter-spacing:.02em;
+}
+.pool-trigger:hover{ transform:translate(-1px,-1px); box-shadow:7px 7px 0 #000; background:var(--card2) }
+.pool-trigger:active{ transform:translate(2px,2px); box-shadow:3px 3px 0 #000 }
+.pool-trigger .pt-ico{ width:30px;height:30px;flex:0 0 30px;display:grid;place-items:center;
+  border:3px solid #000;background:var(--pop);border-radius:6px;overflow:hidden }
+.pool-trigger .pt-ico img{ width:100%;height:100%;object-fit:contain;background:transparent }
+.pool-trigger .pt-ico .pt-letter{ font-family:var(--px);font-size:13px;color:#fff }
+.pool-trigger .pt-txt{ flex:1;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap }
+.pool-trigger .pt-chev{ font-size:16px;color:var(--yellow);transition:.2s }
+
+/* ============ SELECT POOL OVERLAY ============ */
+.pool-modal{ position:fixed;inset:0;z-index:300;display:none }
+.pool-modal.open{ display:block }
+.pool-modal-bg{ position:absolute;inset:0;background:rgba(18,4,30,.72);backdrop-filter:blur(3px);
+  animation:pmFade .18s ease-out }
+.pool-sheet{ position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:min(480px,92vw);max-height:82vh;display:flex;flex-direction:column;
+  background:var(--card);border:4px solid #000;box-shadow:12px 12px 0 #000;
+  animation:pmPop .22s cubic-bezier(.2,1.4,.4,1) }
+@keyframes pmFade{ from{opacity:0} to{opacity:1} }
+@keyframes pmPop{ from{opacity:0;transform:translate(-50%,-46%) scale(.94)} to{opacity:1;transform:translate(-50%,-50%) scale(1)} }
+
+.pm-head{ display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;
+  padding:1.1rem 1.2rem;border-bottom:3px solid #000;background:var(--pop) }
+.pm-head h3{ font-family:var(--px);font-size:15px;text-transform:uppercase;text-shadow:2px 2px 0 #000 }
+.pm-sub{ font-family:var(--vt);font-size:14px;color:rgba(255,255,255,.6);margin-top:.2rem }
+.pm-close{ width:34px;height:34px;flex:0 0 34px;cursor:pointer;background:transparent;border:3px solid #000;
+  color:var(--white);font-size:15px;line-height:1;background:var(--red);transition:.12s }
+.pm-close:hover{ background:#f2218b }
+
+.pm-search{ display:flex;align-items:center;gap:.5rem;margin:.9rem 1.2rem;
+  padding:.6rem .8rem;border:3px solid #000;background:var(--pop);color:rgba(255,255,255,.5) }
+.pm-search-ico{ font-size:16px }
+.pm-search input{ flex:1;background:transparent;border:0;outline:0;color:var(--yellow);
+  font-family:var(--vt);font-size:1.05rem }
+
+.pm-list{ flex:1;overflow-y:auto;padding:.2rem 1.2rem 1rem;min-height:120px }
+.pool-opt{ display:flex;align-items:center;gap:.8rem;width:100%;cursor:pointer;text-align:left;
+  background:transparent;border:3px solid transparent;padding:.6rem .6rem;margin-bottom:.4rem;
+  transition:.12s;border-radius:0 }
+.pool-opt:hover{ background:var(--pop);border-color:#000;box-shadow:3px 3px 0 #000;transform:translate(-1px,-1px) }
+.pool-opt.active{ background:var(--red);border-color:#000 }
+.pool-opt .po-ico{ width:38px;height:38px;flex:0 0 38px;display:grid;place-items:center;
+  border:3px solid #000;background:var(--pop);border-radius:6px;overflow:hidden }
+.pool-opt .po-ico img{ width:100%;height:100%;object-fit:contain;background:transparent }
+.pool-opt .po-ico .po-letter{ font-family:var(--px);font-size:14px;color:#fff }
+.pool-opt .po-main{ flex:1;min-width:0 }
+.pool-opt .po-sym{ font-family:var(--px);font-size:14px;text-transform:uppercase;color:#fff }
+.pool-opt .po-a{ font-size:12px;color:rgba(255,255,255,.55);margin-top:.1rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap }
+.pool-opt .po-right{ text-align:right;flex:0 0 auto }
+.pool-opt .po-tvl{ font-family:var(--vt);font-size:14px;color:var(--cyan) }
+.pool-opt .po-apr{ font-family:var(--px);font-size:11px;text-transform:uppercase;padding:.15rem .4rem;
+  border:2px solid #000;display:inline-block;margin-top:.2rem }
+.pool-opt .po-apr.hot{ background:var(--green);color:var(--ink) }
+.pool-opt .po-apr.cold{ background:var(--pop);color:rgba(255,255,255,.6) }
+
+.pm-manual{ margin:0 1.2rem 1.2rem;padding:.8rem;cursor:pointer;font-family:var(--px);
+  font-size:13px;text-transform:uppercase;background:var(--yellow);color:var(--ink);
+  border:4px solid #000;box-shadow:4px 4px 0 #000;transition:.12s }
+.pm-manual:hover{ background:var(--orange);color:#fff }
+
+@media(max-width:640px){
+  .pool-sheet{ width:94vw;max-height:86vh }
+  .pool-trigger{ padding:.65rem .8rem }
+  .pool-opt{ padding:.5rem .5rem }
+}
 
 </style>
 </head>
@@ -426,7 +499,12 @@ main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 5rem}
     <div class="add-wrap">
       <div class="add-panel">
         <div class="card-title"><h2>1 - Select Pool</h2></div>
-        <div class="pool-select" id="poolChips"></div>
+        <button class="pool-trigger" id="poolTrigger" type="button">
+          <span class="pt-ico" id="ptIco"></span>
+          <span class="pt-txt" id="ptTxt">USDC / ARCHITECTS</span>
+          <span class="pt-chev">▾</span>
+        </button>
+        <div style="display:none" id="poolChips"></div>
         <button class="px-btn yellow" style="width:100%;margin-top:.6rem" id="btnManualPool">＋ Manual Add (custom contract)</button>
 
         <div class="px-card" id="manualPanel" style="display:none;padding:1rem 1.1rem;margin-top:.8rem;box-shadow:4px 4px 0 #000">
@@ -592,6 +670,23 @@ main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 5rem}
       <button class="px-btn ghost" id="adCancel">Cancel</button>
       <button class="px-btn" id="adConfirm">Mint Position</button>
     </div>
+  </div>
+</div>
+
+<!-- ============ SELECT POOL OVERLAY ============ -->
+<div class="pool-modal" id="poolModal">
+  <div class="pool-modal-bg"></div>
+  <div class="pool-sheet">
+    <div class="pm-head">
+      <div>
+        <h3>Select Pool</h3>
+        <p class="pm-sub">Pick a USDC pair to provide liquidity</p>
+      </div>
+      <button class="pm-close" id="pmClose" aria-label="Close">✕</button>
+    </div>
+    <div class="pm-search"><span class="pm-search-ico">⌕</span><input id="pmSearch" placeholder="Search token..." /></div>
+    <div class="pm-list" id="pmList"></div>
+    <button class="pm-manual" id="pmManual">＋ Manual Add (custom contract)</button>
   </div>
 </div>
 
@@ -925,10 +1020,43 @@ function renderPositions() {
   statCards();
 }
 
+function poolIconHtml(p, size) {
+  const s = size || 'po-ico';
+  const letS = size ? 'pt-letter' : 'po-letter';
+  // use token B icon (the quote token) as the pool representative, fallback letter
+  const icon = (p.icon && p.icon !== '/') ? p.icon : '';
+  if (icon) return `<span class="${s}"><img src="${icon}" alt="" onerror="this.outerHTML='<span class=&quot;${letS}&quot;>${(p.b||'?').slice(0,1)}</span>'"/></span>`;
+  return `<span class="${s}"><span class="${letS}">${(p.b||'?').slice(0,1)}</span></span>`;
+}
 function renderPoolChips() {
-  $('poolChips').innerHTML = S.pools.map(p =>
-    `<button class="pool-chip ${p.id===S.selected?'active':''}" data-pool="${p.id}">${p.a} / ${p.b}</button>`).join('') +
-    (S.selected === '__manual__' ? `<button class="pool-chip active" data-pool="__manual__">Custom</button>` : ``);
+  const p = currentPool();
+  // update the trigger button with the current selected pool
+  if (p) {
+    $('ptTxt').textContent = (p.a || '?') + ' / ' + (p.b || '?');
+    $('ptIco').innerHTML = p.b === 'USDC' ? '' : poolIconHtml(p, 'pt-ico');
+  }
+  // render overlay list
+  $('pmList').innerHTML = S.pools.map(pp => `
+    <button class="pool-opt ${pp.id===S.selected?'active':''}" data-pool="${pp.id}" type="button">
+      ${poolIconHtml(pp, 'po-ico')}
+      <span class="po-main">
+        <span class="po-sym">${(pp.a||'?')} / ${(pp.b||'?')}</span>
+        <span class="po-a">${(pp.addr||'').slice(0,6)}…${(pp.addr||'').slice(-4)}</span>
+      </span>
+      <span class="po-right">
+        <span class="po-tvl">$${fmt(pp.tvl||0)}</span>
+        <span class="po-apr ${(pp.apr||0)>=20?'hot':'cold'}">${fmt(pp.apr||0,1)}% APR</span>
+      </span>
+    </button>`).join('') || '<div class="empty" style="grid-column:1/-1">No pools found</div>';
+}
+function openPoolModal() { $('poolModal').classList.add('open'); renderPoolChips(); $('pmSearch').value=''; filterPoolOptions(''); }
+function closePoolModal() { $('poolModal').classList.remove('open'); }
+function filterPoolOptions(q) {
+  q = (q||'').trim().toLowerCase();
+  document.querySelectorAll('.pool-opt').forEach(el => {
+    const ok = !q || el.textContent.toLowerCase().includes(q);
+    el.style.display = ok ? '' : 'none';
+  });
 }
 let CUSTOM_POOL = null; // last resolved manual pool
 async function resolveManualPool() {
@@ -1468,9 +1596,15 @@ $('amtA').addEventListener('input', renderAddSide);
 $('amtB').addEventListener('input', renderAddSide);
 $('slippageSel').addEventListener('change', renderAddSide);
 $('posSearch').addEventListener('input', renderPositions);
-$('poolChips').addEventListener('click', e=>{
-  if (e.target.classList.contains('pool-chip')) { S.selected = e.target.dataset.pool; renderPoolChips(); renderAddSide(); }
+$('poolTrigger').addEventListener('click', openPoolModal);
+$('pmClose').addEventListener('click', closePoolModal);
+$('poolModal').addEventListener('click', e=>{ if (e.target.classList.contains('pool-modal-bg')) closePoolModal(); });
+$('pmList').addEventListener('click', e=>{
+  const opt = e.target.closest('.pool-opt');
+  if (opt) { S.selected = opt.dataset.pool; renderPoolChips(); renderAddSide(); closePoolModal(); }
 });
+$('pmSearch').addEventListener('input', e=> filterPoolOptions(e.target.value));
+$('pmManual').addEventListener('click', ()=>{ closePoolModal(); $('manualPanel').style.display='block'; $('btnManualPool').textContent='× Close manual'; });
 $('btnManualPool').addEventListener('click', ()=>{
   const panel = $('manualPanel');
   const open = panel.style.display !== 'none';
