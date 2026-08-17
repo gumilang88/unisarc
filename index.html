@@ -1200,19 +1200,24 @@ async function confirmAddModal() {
       hash = await sendTx(CFG.nfpm, data);
       toast('Deposited into existing position #' + existingId, 'ok');
     } else {
-      // mint-new: need current tick + correct token0/token1 order for the pool
-      if (!p.addr) throw new Error('Pool address not resolved — use Manual Add with a contract to mint a new pool');
-      const ord = await getPoolTokens(p.addr, tokAAddr, tokBAddr, p.fee || 3000);
+      // mint-new: resolve the real pool address, then read token0/token1 + current tick
+      if (!tokAAddr || !tokBAddr) throw new Error('Pool address not resolved — use Manual Add with a contract to mint a new pool');
+      const feeTier = p.fee || 3000;
+      const poolAddr = await getPool(tokAAddr, tokBAddr, feeTier);
+      if (!poolAddr || poolAddr === '0x0000000000000000000000000000000000000000')
+        throw new Error('Pool not created for this pair/fee on Uniswap V3 Arc');
+      const ord = await getPoolTokens(poolAddr, tokAAddr, tokBAddr, feeTier);
       let a0wei = amt0Wei, a1wei = amt1Wei;
       // map input amounts to pool's token0/token1 order
-      if (ord.token0.toLowerCase() === tokAAddr.toLowerCase() && ord.token1.toLowerCase() === tokBAddr.toLowerCase()) { a0wei = amt0Wei; a1wei = amt1Wei; }
-      else if (ord.token0.toLowerCase() === tokBAddr.toLowerCase() && ord.token1.toLowerCase() === tokAAddr.toLowerCase()) { a0wei = amt1Wei; a1wei = amt0Wei; }
-      else throw new Error('Pair not found in resolved pool');
+      const aL = tokAAddr.toLowerCase(), bL = tokBAddr.toLowerCase();
+      if (ord.token0.toLowerCase() === aL && ord.token1.toLowerCase() === bL) { a0wei = amt0Wei; a1wei = amt1Wei; }
+      else if (ord.token0.toLowerCase() === bL && ord.token1.toLowerCase() === aL) { a0wei = amt1Wei; a1wei = amt0Wei; }
+      else throw new Error('Resolved pool tokens do not match selected pair');
       // recompute tick range at pool's current tick
       let curTick = 0;
-      try { const slot = await poolSlot0(p.addr); curTick = slot && typeof slot.tick === 'number' ? slot.tick : 0; } catch(e) {}
-      const t2 = ticksForRange(range, curTick, ord.fee || p.fee || 3000);
-      const data = encodeMint(ord.token0, ord.token1, ord.fee || p.fee || 3000, t2.lower, t2.upper, a0wei, a1wei, S.address, deadline);
+      try { const slot = await poolSlot0(poolAddr); curTick = slot && typeof slot.tick === 'number' ? slot.tick : 0; } catch(e) {}
+      const t2 = ticksForRange(range, curTick, ord.fee || feeTier);
+      const data = encodeMint(ord.token0, ord.token1, ord.fee || feeTier, t2.lower, t2.upper, a0wei, a1wei, S.address, deadline);
       toast('Position minted', 'ok');
       hash = await sendTx(CFG.nfpm, data);
     }
