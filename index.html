@@ -824,19 +824,28 @@ async function resolveManualPool() {
   btn.disabled = true;
   try {
     const [m0, m1] = await Promise.all([tokenMeta(a0), tokenMeta(a1)]);
-    const pool = await getPool(a0, a1, fee);
+    let pool = await getPool(a0, a1, fee);
+    let usedFee = fee;
     if (!pool || pool === '0x0000000000000000000000000000000000000000') {
-      st.textContent = 'Pool not found — pair/fee not initialized on Uniswap V3 Arc.'; st.style.color = 'var(--red)';
+      // auto-scan other fee tiers so the user finds where the pool actually lives
+      const alt = [100, 500, 3000, 10000].filter(f => f !== fee);
+      for (const f of alt) {
+        const p = await getPool(a0, a1, f);
+        if (p && p !== '0x0000000000000000000000000000000000000000') { pool = p; usedFee = f; break; }
+      }
+    }
+    if (!pool || pool === '0x0000000000000000000000000000000000000000') {
+      st.textContent = 'Pool not found — no Uniswap V3 pool for this pair on any fee tier (0.01/0.05/0.3/1%) on ARC. Check the token address & that it has USDC liquidity.'; st.style.color = 'var(--red)';
       return;
     }
-    CUSTOM_POOL = { id: '__manual__', a: m0.symbol, b: m1.symbol, addr: pool, tvl: 0, priceB: 0, reserveA: 0, reserveB: 0, vol: 0, apr: 0, spark: [1], icon: m1.icon || '' };
+    CUSTOM_POOL = { id: '__manual__', a: m0.symbol, b: m1.symbol, addr: pool, tvl: 0, priceB: 0, reserveA: 0, reserveB: 0, vol: 0, apr: 0, spark: [1], icon: m1.icon || '', fee: usedFee };
     // push to pools list so it renders + currentPool() finds it
     S.pools.unshift(CUSTOM_POOL);
     S.selected = '__manual__';
     renderPoolChips(); renderAddSide();
     setTimeout(() => { $('manualPanel').style.display = 'none'; $('btnManualPool').textContent = '＋ Manual Add (custom contract)'; }, 0);
-    st.textContent = `Pool ${m0.symbol}/${m1.symbol} (${fee/10000}%) → 0x${pool.slice(-8)}`; st.style.color = 'var(--green)';
-    toast('Manual pool resolved: ' + m0.symbol + '/' + m1.symbol, 'ok');
+    st.textContent = `Pool ${m0.symbol}/${m1.symbol} (${usedFee/10000}%) → 0x${pool.slice(-8)}`; st.style.color = 'var(--green)';
+    toast('Manual pool resolved: ' + m0.symbol + '/' + m1.symbol + ' (' + usedFee/10000 + '%)', 'ok');
   } catch (e) { st.textContent = 'Failed: ' + e.message; st.style.color = 'var(--red)'; }
   finally { btn.disabled = false; }
 }
