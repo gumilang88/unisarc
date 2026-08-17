@@ -165,7 +165,9 @@ main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 5rem}
 .mon-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(265px,1fr));gap:1.2rem;margin-top:1.2rem}
 .mon-card{background:var(--card);border:4px solid #000;box-shadow:8px 8px 0 #000;border-radius:0;padding:1.1rem 1.2rem}
 .mon-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem}
-.mon-top .nm{font-family:var(--px);font-size:13px;text-transform:uppercase}
+.mon-top .nm{font-family:var(--px);font-size:13px;text-transform:uppercase;display:flex;align-items:center;gap:.45rem}
+.monico{width:22px;height:22px;border-radius:50%;object-fit:contain;background:transparent;flex:0 0 22px}
+.monico-l{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;flex:0 0 22px;font-family:var(--px);font-size:9px;color:#20102e}
 .mon-top .pr{font-family:var(--vt);font-size:16px;color:rgba(255,255,255,.6)}
 .mon-val{font-family:var(--vt);font-size:1.5rem;font-weight:700;color:var(--cyan)}
 .mon-sub{font-size:15px;color:rgba(255,255,255,.6);margin:.15rem 0 .8rem}
@@ -660,10 +662,11 @@ function buildPoolsFromRadar(list) {
   const out = [];
   for (const t of list || []) {
     const sym = t.symbol || '?';
-    if (sym === 'USDC' || sym === 'USDUC' || seen.has(sym)) continue;
+    const key = sym.toUpperCase();
+    if (sym === 'USDC' || sym === 'USDUC' || seen.has(key)) continue;
     const liq = t.liquidityUsdc || 0, vol = t.volume24 || 0;
     if (liq < 1400) continue;
-    seen.add(sym);
+    seen.add(key);
     const price = t.price || 0;
     const spark = Array.isArray(t.spark) && t.spark.length ? t.spark : [1];
     const apr = liq > 0 ? (vol * 0.003 * 0.85 / liq) * 365 * 100 : 0;
@@ -735,12 +738,16 @@ async function loadPositionsUI() {
 function statCards() {
   const total = S.positions.reduce((s,x)=>s+x.value,0);
   const fees = S.positions.reduce((s,x)=>s+x.feesUsd,0);
+  const inRangeCount = S.positions.filter(x => x.tick >= x.tickLower && x.tick < x.tickUpper).length;
+  const apr = S.positions.length ? S.positions.reduce((s,x)=>s+x.apr*x.value,0)/Math.max(1,total) : 0;
   $('stTotal').textContent = fmtUsd(total);
-  $('stTotalSub').textContent = S.positions.length + ' position' + (S.positions.length===1?'':'s') + (S.address ? '' : ' (connect wallet)');
+  $('stTotalSub').textContent = S.positions.length + ' position' + (S.positions.length===1?'':'s') + (S.address ? '' : ' · connect wallet');
   $('stFees').textContent = fmtUsd(fees);
-  $('stShare').textContent = fees ? 'pending' : '0';
-  const apr = 0;
-  $('stApr').textContent = 'V3';
+  $('stFees').className = 'value up';
+  $('stShare').textContent = S.positions.length ? inRangeCount + '/' + S.positions.length : '0';
+  $('stShare').parentElement.querySelector('.sub').textContent = 'in-range positions';
+  $('stApr').textContent = total > 0 && apr > 0 ? apr.toFixed(1)+'%' : '—';
+  $('stApr').parentElement.querySelector('.sub').textContent = 'weighted by value';
   S._total = total;
 }
 
@@ -860,8 +867,9 @@ function renderMonitor() {
   $('monGrid').innerHTML = S.pools.map(p => {
     const hasPos = S.positions.find(x => x.meta1 && x.meta1.symbol === p.b);
     const cls = p.spark && p.spark.length ? (p.spark[p.spark.length-1] >= p.spark[0] ? 'good' : 'bad') : 'good';
+    const logoB = p.icon ? `<img class="monico" src="${p.icon}" alt="" onerror="this.style.display='none'"/>` : `<span class="monico-l" style="background:${token(p.b).color||'#3ddad8'}">${p.b.slice(0,1)}</span>`;
     return `<div class="mon-card">
-      <div class="mon-top"><span class="nm">${p.a} / ${p.b}</span><span class="pr">${fmt(p.priceB)} ${p.b}</span></div>
+      <div class="mon-top"><span class="nm">${logoB}${p.a} / ${p.b}</span><span class="pr">${fmt(p.priceB)} ${p.b}</span></div>
       <div class="mon-val">${fmtUsd(p.tvl)}</div>
       <div class="mon-sub">TVL · <b>${fmtUsd(p.vol)}</b> vol · <b class="text-green">${p.apr.toFixed(1)}%</b> APR</div>
       <svg class="spark ${cls}" viewBox="0 0 120 58" preserveAspectRatio="none">${sparkInner(p.spark||[1], 120, 58, cls)}</svg>
@@ -882,7 +890,7 @@ function renderRewards() {
   $('rwTotal').textContent = fmtUsd(total);
   const rows = S.positions.map(p => `
     <div class="rw-row">
-      <div><div class="nm">#${p.tokenId} · ${p.meta0 ? p.meta0.symbol : '?'} / ${p.meta1 ? p.meta1.symbol : '?'} · ${feeName(p.fee)}</div><div class="src">VF fees pending (collect via NFPM)</div></div>
+      <div><div class="nm">#${p.tokenId} · ${p.meta0 ? p.meta0.symbol : '?'} / ${p.meta1 ? p.meta1.symbol : '?'} · ${feeName(p.fee)}</div><div class="src">V3 fees pending (collect via NFPM)</div></div>
       <div style="display:flex;align-items:center;gap:.9rem">
         <span class="amt">${fmtUsd(p.feesUsd)}</span>
         <span class="st ${p.feesUsd > 0 ? 'pd' : 'un'}">${p.feesUsd > 0 ? 'pending' : 'none'}</span>
@@ -1033,13 +1041,6 @@ async function claimRewardPos(tokenId) {
     await loadPositionsUI();
   } catch (e) { toast('Claim failed: ' + e.message, 'err'); }
   busy(false);
-}
-
-// ADD — for a position id: increaseLiquidity by amounts (simplified: reuse existing position if user picks)
-async function addLiquidityPos(tokenId) {
-  if (!S.address) return toast('Connect wallet first', 'err');
-  // For now: real increaseLiquidity needs amounts; keep UI flow — but V3 add on existing position:
-  toast('Add on position #' + tokenId + ' — need amounts in modal (todo)', '');
 }
 
 // REMOVE — decreaseLiquidity + collect + burn
