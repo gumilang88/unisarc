@@ -1540,6 +1540,11 @@ window.addEventListener('load', async ()=>{
     renderPoolChips(); renderAddSide(); renderMonitor();
     if (S.address) loadPositionsUI();
   }
+  // auto-refresh pool market data every 60s so TVL/price/volume stay live & synced
+  setInterval(async () => {
+    const l = await fetchRadarTop();
+    if (l && l.length) { S.pools = buildPoolsFromRadar(l); renderPoolChips(); renderAddSide(); renderMonitor(); }
+  }, 60000);
 });</script>
 </body>
 </html>
