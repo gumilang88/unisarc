@@ -824,6 +824,11 @@ async function resolveManualPool() {
   btn.disabled = true;
   try {
     const [m0, m1] = await Promise.all([tokenMeta(a0), tokenMeta(a1)]);
+    // if the token is in our embedded snapshot, reuse its known icon (works even without proxy/CORS)
+    const snapTok = (typeof RADAR_SNAPSHOT !== 'undefined' ? RADAR_SNAPSHOT : []).find(t => t.address && t.address.toLowerCase() === a0);
+    const snapTokB = (typeof RADAR_SNAPSHOT !== 'undefined' ? RADAR_SNAPSHOT : []).find(t => t.address && t.address.toLowerCase() === a1);
+    m0.icon = m0.icon || (snapTok ? snapTok.icon || '' : '');
+    m1.icon = m1.icon || (snapTokB ? snapTokB.icon || '' : '');
     let pool = await getPool(a0, a1, fee);
     let usedFee = fee;
     if (!pool || pool === '0x0000000000000000000000000000000000000000') {
@@ -838,7 +843,7 @@ async function resolveManualPool() {
       st.textContent = 'Pool not found — no Uniswap V3 pool for this pair on any fee tier (0.01/0.05/0.3/1%) on ARC. Check the token address & that it has USDC liquidity.'; st.style.color = 'var(--red)';
       return;
     }
-    CUSTOM_POOL = { id: '__manual__', a: m0.symbol, b: m1.symbol, addr: pool, tvl: 0, priceB: 0, reserveA: 0, reserveB: 0, vol: 0, apr: 0, spark: [1], icon: m1.icon || '', fee: usedFee };
+    CUSTOM_POOL = { id: '__manual__', a: m0.symbol, b: m1.symbol, addr: pool, tvl: 0, priceB: 0, reserveA: 0, reserveB: 0, vol: 0, apr: 0, spark: [1], icon: m1.icon || '', iconA: m0.icon || '', iconB: m1.icon || '', fee: usedFee };
     // push to pools list so it renders + currentPool() finds it
     S.pools.unshift(CUSTOM_POOL);
     S.selected = '__manual__';
@@ -857,10 +862,17 @@ function renderAddSide() {
   $('symA').textContent = p.a;
   $('symB').textContent = p.b;
   const tkA = token(p.a), tkB = token(p.b);
-  const iconA = tkA.icon || USDC_ICON;
-  const iconB = p.icon || tkB.icon || USDC_ICON;
-  $('chipA').innerHTML = `<img class="tkimg-sm" src="${iconA}" alt="${p.a}" onerror="this.outerHTML='${p.a.slice(0,1)}'"/>`;
-  $('chipB').innerHTML = `<img class="tkimg-sm" src="${iconB}" alt="${p.b}" onerror="this.outerHTML='${p.b.slice(0,1)}'"/>`;
+  // custom/manual pools: use resolved icon if any, else letter fallback (not USDC)
+  const isCustom = p.id === '__manual__';
+  const iconA = p.iconA || (isCustom ? '' : tkA.icon || '');
+  const iconB = p.iconB || p.icon || (isCustom ? '' : tkB.icon || '');
+  const letA = p.a.slice(0,1), letB = p.b.slice(0,1);
+  $('chipA').innerHTML = iconA
+    ? `<img class="tkimg-sm" src="${iconA}" alt="${p.a}" onerror="this.outerHTML='<span class=\\"monico-l\\" style=\\"background:${tkA.color||'#3ddad8'}\\">${letA}</span>'"/>`
+    : `<span class="monico-l" style="background:${tkA.color||'#3ddad8'}">${letA}</span>`;
+  $('chipB').innerHTML = iconB
+    ? `<img class="tkimg-sm" src="${iconB}" alt="${p.b}" onerror="this.outerHTML='<span class=\\"monico-l\\" style=\\"background:${tkB.color||'#3ddad8'}\\">${letB}</span>'"/>`
+    : `<span class="monico-l" style="background:${tkB.color||'#3ddad8'}">${letB}</span>`;
   $('chipA').style.background = '';  // no box — clean circle logo
   $('chipB').style.background = '';
   const a = parseFloat($('amtA').value) || 0, b = parseFloat($('amtB').value) || 0;
