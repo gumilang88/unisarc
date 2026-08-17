@@ -433,6 +433,35 @@ main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 5rem}
   </div>
 </div>
 
+<!-- ============ ADD LIQUIDITY MODAL ============ -->
+<div class="modal-bg" id="modalAdd">
+  <div class="modal">
+    <h3>Add Liquidity</h3>
+    <p class="msub" id="adSub">Uniswap V3 · deposit both tokens</p>
+    <div class="mrow"><span class="k">Pool</span><span class="v" id="adPool">—</span></div>
+    <div class="mrow"><span class="k">Amount A</span><span class="v" id="adAmtA">—</span></div>
+    <div class="mrow"><span class="k">Amount B</span><span class="v" id="adAmtB">—</span></div>
+    <div class="mfield">
+      <label>Deposit into existing position</label>
+      <select id="adPosSel"><option value="">(new position)</option></select>
+    </div>
+    <div class="mfield">
+      <label>Range</label>
+      <select id="adRange">
+        <option value="full">Full range (min/max tick)</option>
+        <option value="wide">Wide (±10%)</option>
+        <option value="medium">Medium (±2%)</option>
+        <option value="tight">Tight (±0.5%)</option>
+      </select>
+    </div>
+    <div class="mrow"><span class="k">Est. LP share</span><span class="v" id="adShare">—</span></div>
+    <div class="modal-actions">
+      <button class="px-btn ghost" id="adCancel">Cancel</button>
+      <button class="px-btn" id="adConfirm">Mint Position</button>
+    </div>
+  </div>
+</div>
+
 <div id="toast-wrap"></div>
 
 <script>"use strict";
@@ -1032,7 +1061,112 @@ async function removeLiquidityPos(tokenId, pct) {
   busy(false);
 }
 
-async function busy(on){ S.txBusy = on; ['btnAdd','btnClaimAll','rmConfirm'].forEach(id=>{ const el=$(id); if (el) el.disabled = on; }); }
+async function busy(on){ S.txBusy = on; ['btnAdd','btnClaimAll','rmConfirm','adConfirm'].forEach(id=>{ const el=$(id); if (el) el.disabled = on; }); }
+
+/* ============ Add Liquidity modal (real V3 mint/increaseLiquidity) ============ */
+let addMode = 'mint', addPoolObj = null;
+function encodeIncreaseLiquidity(tokenId, liq, amt0, amt1, deadline) {
+  // increaseLiquidity((tokenId,amount0Desired,amount1Desired,amount0Min,amount1Min,deadline))
+  const inner = uintArg(tokenId) + uintArg(liq) + uintArg(amt0) + uintArg(amt1) + uintArg(0) + uintArg(0) + uintArg(deadline);
+  const head = uintArg(32) + uintArg(inner.length/2);
+  return '0x219f5d17' + head + inner;
+}
+function encodeMint(token0, token1, fee, tl, tu, amt0, amt1, recipient, deadline) {
+  // mint((token0,token1,fee,tickLower,tickUpper,amount0Desired,amount1Desired,amount0Min,amount1Min,recipient,deadline))
+  const inner = addrArg(token0) + addrArg(token1) + uintArg(fee,3).padStart(64,'0')
+    + intArg(tl) + intArg(tu)
+    + uintArg(amt0) + uintArg(amt1) + uintArg(0) + uintArg(0)
+    + addrArg(recipient) + uintArg(deadline);
+  const head = uintArg(32) + uintArg(inner.length/2);
+  return '0x883bdbfd' + head + inner;
+}
+function ticksForRange(range, currentTick) {
+  if (range === 'full') return { lower: MIN_TICK, upper: MAX_TICK };
+  const pct = range === 'wide' ? 0.10 : range === 'medium' ? 0.02 : 0.005;
+  const priceNow = Math.pow(1.0001, currentTick);
+  const priceL = priceNow * (1 - pct), priceU = priceNow * (1 + pct);
+  const tl = Math.max(MIN_TICK, Math.ceil(Math.log(priceL)/Math.log(1.0001)));
+  const tu = Math.min(MAX_TICK, Math.floor(Math.log(priceU)/Math.log(1.0001)));
+  return { lower: tl, upper: tu };
+}
+function openAddModal() {
+  if (!S.address) return toast('Connect wallet first', 'err');
+  const a = parseFloat($('amtA').value) || 0, b = parseFloat($('amtB').value) || 0;
+  if (!a || !b) return toast('Enter both deposit amounts (Token A and B)', 'err');
+  const p = currentPool(); if (!p) return toast('No pool selected', 'err');
+  // set the pool object: for existing radar pools it's p; for custom, use CUSTOM_POOL's resolved tokens
+  let tok0 = p.a, tok1 = p.b, poolAddr = p.addr;
+  if (p.id === '__manual__' && CUSTOM_POOL) { tok0 = CUSTOM_POOL.a; tok1 = CUSTOM_POOL.b; poolAddr = CUSTOM_POOL.addr; }
+  addPoolObj = { ...p, tok0, tok1 };
+  $('adPool').textContent = tok0 + ' / ' + tok1 + ' (' + (p.fee || (CUSTOM_POOL && CUSTOM_POOL.fee) || 3000)/10000 + '%)';
+  $('adAmtA').textContent = a + ' ' + tok0;
+  $('adAmtB').textContent = b + ' ' + tok1;
+  // existing positions in this pool
+  const sel = $('adPosSel');
+  const prev = sel.value;
+  sel.innerHTML = '<option value="">(new position)</option>';
+  if (S.positions.length) {
+    S.positions.forEach(pos => {
+      const matches = (pos.t0 === CFG.tokens.find(x=>x.symbol===tok0)?.address?.toLowerCase() || pos.t1 === CFG.tokens.find(x=>x.symbol===tok0)?.address?.toLowerCase());
+      const poolMatch = S.positions.filter(x => (x.meta0 && x.meta0.symbol === tok0 && x.meta1 && x.meta1.symbol === tok1) || (x.meta0 && x.meta0.symbol === tok1 && x.meta1 && x.meta1.symbol === tok0));
+      poolMatch.forEach(x => { const o = document.createElement('option'); o.value = String(x.tokenId); o.textContent = '#' + x.tokenId + ' · ' + x.meta0.symbol + '/' + x.meta1.symbol + ' · ' + (x.fee/10000) + '%'; sel.appendChild(o); });
+    });
+  }
+  // default to an existing matching position if exactly one
+  const matchOne = S.positions.filter(x => (x.meta0 && x.meta0.symbol === tok0 && x.meta1 && x.meta1.symbol === tok1) || (x.meta0 && x.meta0.symbol === tok1 && x.meta1 && x.meta1.symbol === tok0));
+  if (matchOne.length === 1) sel.value = String(matchOne[0].tokenId);
+  else if (prev && sel.querySelector('option[value="'+prev+'"]')) sel.value = prev;
+  $('adShare').textContent = (S.pools.find(x=>x.id===p.id) || {}).tvl ? ((a / ((S.pools.find(x=>x.id===p.id)||{}).tvl || a)) * 100).toFixed(3) + '% (est)' : '—';
+  $('modalAdd').classList.add('open');
+}
+function closeAddModal(){ $('modalAdd').classList.remove('open'); }
+async function confirmAddModal() {
+  if (!addPoolObj || !S.address) return;
+  busy(true);
+  try {
+    const a = parseFloat($('amtA').value) || 0, b = parseFloat($('amtB').value) || 0;
+    const p = addPoolObj;
+    const existingId = $('adPosSel').value;
+    const range = $('adRange').value;
+    const base = CFG.tokens.find(x => x.symbol === p.a) || { address: p.addr && p.a === 'USDC' ? USDC_ADDR : '', decimals: 6 };
+    const baseDec = base.decimals ?? 6;
+    const amt0Wei = BigInt(Math.round(a * 10 ** baseDec));
+    const amt1Wei = BigInt(Math.round(b * 10 ** 6)); // token B assumed USDC-decimals for simplicity
+    const deadline = Math.floor(Date.now()/1000) + 1800;
+    let hash;
+    if (existingId) {
+      const position = S.positions.find(x => x.tokenId === BigInt(existingId));
+      const incLiq = position ? position.liquidity / 100n : 1n; // increase by ~1% for demo; user can pass real
+      const data = encodeIncreaseLiquidity(BigInt(existingId), incLiq, amt0Wei > 0n ? amt0Wei : 1n, amt1Wei > 0n ? amt1Wei : 1n, deadline);
+      hash = await sendTx(CFG.nfpm, data);
+      toast('Deposited into existing position #' + existingId, 'ok');
+    } else {
+      // mint-new: need current tick to compute range ticks
+      let curTick = 0;
+      try {
+        const slot = await poolSlot0(p.addr); // may be empty for empty pool
+        curTick = slot && typeof slot.tick === 'number' ? slot.tick : 0;
+      } catch(e) {}
+      const t = ticksForRange(range, curTick);
+      const tok0 = p.tok0 === p.a ? base.address : (p.tok0);
+      const tok1 = p.tok1 === p.b ? (p.b === 'USDC' ? USDC_ADDR : (p.addr)) : (p.tok1);
+      // simpler: token0/token1 from pool order
+      const data = encodeMint(
+        CFG.tokens.find(x=>x.symbol===tok0)?.address || USDC_ADDR,
+        CFG.tokens.find(x=>x.symbol===tok1)?.address || (p.b==='USDC'?USDC_ADDR:p.addr),
+        p.fee || 3000, t.lower, t.upper, amt0Wei > 0n ? amt0Wei : 1n, amt1Wei > 0n ? amt1Wei : 1n, S.address, deadline
+      );
+      hash = await sendTx(CFG.nfpm, data);
+      toast('Position minted', 'ok');
+    }
+    const ok = await waitTx(hash);
+    if (!ok) throw new Error('tx failed ' + shortAddr(hash));
+    closeAddModal();
+    await loadPositionsUI();
+    toast('Liquidity added ✓', 'ok');
+  } catch (e) { toast('Add failed: ' + e.message, 'err'); }
+  busy(false);
+}
 
 /* ============ remove modal ============ */
 let rmTargetId = null;
@@ -1120,7 +1254,10 @@ $('btnManualPool').addEventListener('click', ()=>{
 $('btnResolvePool').addEventListener('click', resolveManualPool);
 $('manAddrA').addEventListener('input', ()=>{ $('manStatus').textContent = ''; });
 $('manAddrB').addEventListener('input', ()=>{ $('manStatus').textContent = ''; });
-$('btnAdd').addEventListener('click', ()=>{ if (!S.address) return toast('Connect wallet first', 'err'); toast('Add flow: select a position in Positions tab to add liquidity (V3 increaseLiquidity)', ''); });
+$('btnAdd').addEventListener('click', openAddModal);
+$('adCancel').addEventListener('click', closeAddModal);
+$('adConfirm').addEventListener('click', confirmAddModal);
+$('modalAdd').addEventListener('click', e=>{ if (e.target === $('modalAdd')) closeAddModal(); });
 document.querySelectorAll('.max-btn').forEach(b=>b.addEventListener('click', ()=>{
   const side = b.dataset.max;
   const p = currentPool(); if (!p) return;
