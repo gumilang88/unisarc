@@ -288,7 +288,7 @@ main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 5rem}
       <div class="search" style="max-width:300px"><input id="posSearch" placeholder="Filter pool..." /></div>
       <div style="margin-left:auto;display:flex;gap:.6rem">
         <button class="px-btn" id="btnRefresh">Refresh</button>
-        <button class="px-btn orange" data-go="add">Add LP</button>
+        <button class="px-btn pxa" data-go="add">Add LP</button>
       </div>
     </div>
     <div class="pos-grid" id="posGrid"></div>
@@ -875,7 +875,7 @@ function renderMonitor() {
       <svg class="spark ${cls}" viewBox="0 0 120 58" preserveAspectRatio="none">${sparkInner(p.spark||[1], 120, 58, cls)}</svg>
       <div class="mon-sub" style="margin-top:.6rem">${hasPos ? 'Position: <b>'+fmtUsd(hasPos.value)+'</b>' : 'No position'}</div>
       <div style="display:flex;gap:.5rem;margin-top:.5rem">
-        <button class="px-btn orange" style="flex:1" data-go="add" data-pool="${p.id}">Add</button>
+        <button class="px-btn pxa" style="flex:1" data-go="add" data-pool="${p.id}">Add</button>
       </div>
     </div>`;
   }).join('');
