@@ -182,8 +182,8 @@ main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 5rem}
 .reward-hero .amt{font-family:var(--vt);font-size:2.25rem;font-weight:700;line-height:1.1;color:var(--yellow);text-shadow:3px 3px 0 #000}
 .reward-hero .lbl{font-family:var(--px);font-size:14px;text-transform:uppercase;color:rgba(255,255,255,.7);margin-bottom:.3rem}
 .claim-all{display:flex;align-items:center;gap:.6rem;font-family:var(--px);font-size:13px;text-transform:uppercase;padding:.9rem 1.3rem;border:4px solid #000;
-     box-shadow:6px 6px 0 #000;background:var(--green);color:var(--ink)}
-.claim-all:hover{background:var(--yellow)}
+     box-shadow:6px 6px 0 #000;background:var(--red);color:#fff}
+.claim-all:hover{background:#f2218b}
 .claim-all:active{transform:translate(3px,3px);box-shadow:2px 2px 0 #000}
 .rw-row{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.3rem;border-bottom:3px solid #000;gap:1rem;flex-wrap:wrap}
 .rw-row:last-child{border-bottom:0}
@@ -900,7 +900,7 @@ function renderRewards() {
       <div style="display:flex;align-items:center;gap:.9rem">
         <span class="amt">${fmtUsd(p.feesUsd)}</span>
         <span class="st ${p.feesUsd > 0 ? 'pd' : 'un'}">${p.feesUsd > 0 ? 'pending' : 'none'}</span>
-        <button class="px-btn yellow" style="padding:.55rem .7rem;font-size:13px" data-act="claim" data-id="${p.tokenId}">Claim</button>
+        <button class="px-btn pxa" style="padding:.55rem .7rem;font-size:13px" data-act="claim" data-id="${p.tokenId}">Claim</button>
       </div>
     </div>`).join('');
   $('rwList').innerHTML = rows || (S.address ? '<div class="empty" style="box-shadow:none;border:0"><p>No positions — nothing to claim.</p></div>' : '<div class="empty" style="box-shadow:none;border:0"><p>Connect wallet to check claimable fees.</p></div>');
