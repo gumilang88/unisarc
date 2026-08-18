@@ -21,7 +21,7 @@
   --vt:'Inter',ui-monospace,monospace;
 }
 *{margin:0;padding:0;box-sizing:border-box}
-html{background:var(--bg)}
+html{background:var(--bg);scroll-behavior:smooth}
 body{
   background:var(--bg);
   background-image:
@@ -493,6 +493,13 @@ a.px-btn{display:inline-block;text-align:center;text-decoration:none;width:auto}
   .home-hero{padding:2.6rem 1rem 3rem}
   .pillars{grid-template-columns:1fr}
   .home-about{padding:1.2rem 1.1rem}
+}
+
+/* ============ scroll reveal animation ============ */
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .55s cubic-bezier(.2,.7,.3,1),transform .55s cubic-bezier(.2,.7,.3,1);will-change:opacity,transform}
+.reveal.in{opacity:1;transform:none}
+@media (prefers-reduced-motion: reduce){
+  .reveal{opacity:1;transform:none;transition:none}
 }
 
 </style>
@@ -1854,6 +1861,35 @@ window.addEventListener('load', async ()=>{
     const l = await fetchRadarTop();
     if (l && l.length) { S.pools = buildPoolsFromRadar(l); renderPoolChips(); renderAddSide(); renderMonitor(); }
   }, 60000);
-});</script>
+});
+
+/* ============ scroll-reveal animation (all pages) ============ */
+let revealIO = null;
+function initReveal() {
+  if (typeof IntersectionObserver === 'undefined') return;
+  if (!revealIO) {
+    revealIO = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) { e.target.classList.add('in'); revealIO.unobserve(e.target); }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -6% 0px' });
+  }
+  // tag common blocks on every page, then observe the untagged ones
+  const sel = '.home-hero, .hero-inner, .hero-cta, .home-about, .pillar, .about-mission, ' +
+              '.page-head, .stat, .px-card, .pos-card, .mon-card, .rw-row, .reward-hero, ' +
+              '.toolbar, .dt-row, .chart-card, .add-panel, .pos-grid, .mon-grid, .empty';
+  document.querySelectorAll(sel).forEach(el => {
+    if (!el.classList.contains('reveal')) { el.classList.add('reveal'); revealIO.observe(el); }
+  });
+}
+// re-run reveal after renders & view switches so dynamically added blocks animate too
+['renderPositions', 'renderMonitor', 'renderRewards', 'renderAddSide', 'showView', 'renderPoolChips'].forEach(nm => {
+  if (typeof window[nm] === 'function') {
+    const orig = window[nm];
+    window[nm] = function (...a) { const r = orig.apply(this, a); setTimeout(initReveal, 30); return r; };
+  }
+});
+window.addEventListener('load', () => setTimeout(initReveal, 50));
+</script>
 </body>
 </html>
