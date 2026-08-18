@@ -461,12 +461,29 @@ main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 5rem}
   font-family:var(--px);font-size:clamp(2.6rem,8vw,5rem);text-transform:uppercase;
   color:var(--red);letter-spacing:.06em;line-height:1;
   text-shadow:5px 5px 0 #000,0 0 30px rgba(216,4,106,.55);
-  margin-bottom:1.2rem;
+  margin-bottom:1.2rem;animation:uniBrandPulse 3s ease-in-out infinite;
 }
-.hero-logo{margin:1rem auto 1.6rem}
+@keyframes uniBrandPulse{
+  0%,100%{opacity:1;text-shadow:5px 5px 0 #000,0 0 22px rgba(216,4,106,.45)}
+  50%{opacity:.96;text-shadow:5px 5px 0 #000,0 0 44px rgba(216,4,106,.95)}
+}
+@media (prefers-reduced-motion: reduce){ .hero-brand{animation:none} }
+.hero-logo{margin:1rem auto 1.6rem;filter:drop-shadow(0 0 0 transparent)}
 .hero-logo img{
-  width:min(180px,60vw);height:auto;filter:drop-shadow(6px 6px 0 #000)
-    drop-shadow(0 0 22px rgba(216,4,106,.5)) brightness(1.08);
+  width:min(180px,60vw);height:auto;
+  filter:drop-shadow(6px 6px 0 #000) drop-shadow(0 0 22px rgba(216,4,106,.5)) brightness(1.08);
+  animation:uniFloat 5s ease-in-out infinite, uniGlow 3.2s ease-in-out infinite;
+}
+@keyframes uniFloat{
+  0%,100%{transform:translateY(0) rotate(0deg)}
+  50%{transform:translateY(-16px) rotate(-2deg)}
+}
+@keyframes uniGlow{
+  0%,100%{filter:drop-shadow(6px 6px 0 #000) drop-shadow(0 0 16px rgba(216,4,106,.35)) brightness(1.02)}
+  50%{filter:drop-shadow(6px 6px 0 #000) drop-shadow(0 0 34px rgba(216,4,106,.85)) brightness(1.16)}
+}
+@media (prefers-reduced-motion: reduce){
+  .hero-logo img{animation:none}
 }
 .hero-tagline{
   font-family:var(--px);font-size:clamp(.8rem,2.6vw,1.15rem);text-transform:uppercase;
