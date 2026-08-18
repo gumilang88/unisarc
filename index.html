@@ -534,6 +534,7 @@ a.px-btn{display:inline-block;text-align:center;text-decoration:none;width:auto}
   padding:2rem 2rem 2.4rem;max-width:920px;margin:0 auto 2rem;
 }
 .home-about .card-title{margin-bottom:1rem}
+.home-about .card-title h2{font-size:clamp(1.6rem,3.4vw,2.3rem);color:var(--white);letter-spacing:.02em}
 .about-lead{font-size:1.2rem;color:var(--white);line-height:1.6;margin-bottom:1rem}
 .about-body{font-size:16px;color:rgba(255,255,255,.72);line-height:1.7;margin-bottom:2rem}
 .pillars{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;margin-bottom:2rem}
@@ -548,6 +549,41 @@ a.px-btn{display:inline-block;text-align:center;text-decoration:none;width:auto}
   .home-hero{padding:2.6rem 1rem 3rem}
   .pillars{grid-template-columns:1fr}
   .home-about{padding:1.2rem 1.1rem}
+}
+
+/* ============ roadmap ============ */
+.home-roadmap{max-width:980px;margin:0 auto 2rem}
+.road-title{margin-bottom:.4rem}
+.road-title h2{font-size:clamp(1.6rem,3.4vw,2.3rem);color:var(--white);text-transform:uppercase;letter-spacing:.02em}
+.road-lead{font-size:16px;color:rgba(255,255,255,.68);line-height:1.6;margin-bottom:2rem}
+.road-timeline{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.4rem}
+.road-phase{display:flex;flex-direction:column;gap:.7rem}
+.road-node{display:flex;align-items:center;gap:.55rem}
+.road-dot{width:11px;height:11px;border:2px solid #000;border-radius:50%;flex:0 0 auto}
+.road-num{font-family:var(--px);font-size:12px;color:rgba(255,255,255,.55);letter-spacing:.08em}
+.road-card{background:var(--card);border:3px solid #000;box-shadow:5px 5px 0 #000;padding:1.1rem 1.2rem;height:100%;display:flex;flex-direction:column;gap:.8rem}
+.road-head{display:flex;align-items:center;justify-content:space-between;gap:.6rem}
+.road-head h3{font-family:var(--px);font-size:13px;text-transform:uppercase;color:#fff;line-height:1.35}
+.road-badge{font-family:var(--px);font-size:10px;text-transform:uppercase;padding:.22rem .5rem;border:2px solid #000;white-space:nowrap;flex:0 0 auto}
+.road-badge.now{background:var(--green);color:var(--ink)}
+.road-badge.next{background:var(--red);color:#fff}
+.road-badge.future{background:var(--red);color:#fff}
+.road-items{list-style:none;display:flex;flex-direction:column;gap:.6rem}
+.road-item{font-size:14px;color:rgba(255,255,255,.75);line-height:1.5;padding-left:1.05rem;position:relative}
+.road-item::before{content:"·";position:absolute;left:0;top:-2px;color:var(--red);font-size:18px}
+.road-item b{display:block;font-family:var(--vt);color:#fff;font-size:14px;font-weight:600}
+.road-item span{display:block;font-size:13px;color:rgba(255,255,255,.6);line-height:1.5;max-height:0;overflow:hidden;opacity:0;transition:max-height .3s ease,opacity .3s ease,margin .3s ease}
+/* reveal description on hover / focus */
+.road-card:hover .road-item span{max-height:120px;opacity:1;margin-top:.25rem}
+.road-item:has(> span:hover) span{max-height:120px;opacity:1;margin-top:.25rem}
+/* on touch devices (no hover) always show the description */
+@media (hover: none){
+  .road-item span{max-height:none;opacity:1;margin-top:.25rem}
+}
+.road-note{margin-top:1.8rem;text-align:center;font-size:13px;color:rgba(255,255,255,.45);font-style:italic;max-width:720px;margin-left:auto;margin-right:auto}
+@media(max-width:640px){
+  .road-timeline{grid-template-columns:1fr;gap:1.4rem}
+  .road-note{font-size:12px}
 }
 
 /* ============ scroll reveal animation ============ */
@@ -620,6 +656,51 @@ a.px-btn{display:inline-block;text-align:center;text-decoration:none;width:auto}
         <h3>Protocol Mission</h3>
         <p>&ldquo;To make decentralized liquidity provision safe, institutional-grade, and self-sustaining&mdash;empowering liquidity providers with protected capital while anchoring seamless trading depth across the entire Arc network.&rdquo;</p>
       </div>
+    </div>
+
+    <!-- ============ ROADMAP ============ -->
+    <div class="home-roadmap" id="roadmap">
+      <div class="card-title road-title"><h2>Strategic Roadmap</h2></div>
+      <p class="road-lead">Automated Liquidity Provisioning and Capital Protection built natively for the Arc Network ecosystem.</p>
+
+      <div class="road-timeline">
+        <div class="road-phase">
+          <div class="road-node"><span class="road-dot" style="background:var(--green)"></span></div>
+          <div class="road-card">
+            <div class="road-head"><h3>Foundation &amp; Pre-Mainnet</h3><span class="road-badge now">In Progress</span></div>
+            <div class="road-items">
+              <div class="road-item"><b>Core Community Bootstrap</b><span>Build early community conviction and foster organic liquidity awareness across the ecosystem.</span></div>
+              <div class="road-item"><b>On-Chain Snapshot Events</b><span>Execute periodic snapshot events to identify and recognize early network participants and active holders.</span></div>
+              <div class="road-item"><b>Ecosystem Visibility</b><span>Establish top-tier momentum and secure prime visibility across early Arc decentralized dashboards and tools.</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="road-phase">
+          <div class="road-node"><span class="road-dot" style="background:var(--red)"></span></div>
+          <div class="road-card">
+            <div class="road-head"><h3>Public Mainnet Rollout</h3><span class="road-badge next">Upcoming</span></div>
+            <div class="road-items">
+              <div class="road-item"><b>Mainnet Integration</b><span>Synchronize full protocol accessibility directly with the official Arc Public Mainnet launch.</span></div>
+              <div class="road-item"><b>Automated Vault Activation</b><span>Open live liquidity management vaults for decentralized and hands-free capital deployment.</span></div>
+              <div class="road-item"><b>Risk Mitigation Engine</b><span>Implement algorithmic Impermanent Loss mitigation logic across active Uniswap trading pairs.</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="road-phase">
+          <div class="road-node"><span class="road-dot" style="background:var(--red)"></span></div>
+          <div class="road-card">
+            <div class="road-head"><h3>Ecosystem Expansion &amp; Scale</h3><span class="road-badge future">Future Vision</span></div>
+            <div class="road-items">
+              <div class="road-item"><b>Multi-Pair Expansion</b><span>Scale protocol coverage to support broader token pairs and expand Total Value Locked (TVL).</span></div>
+              <div class="road-item"><b>Capital Optimization</b><span>Deploy dynamic routing enhancements to maximize capital efficiency across changing market regimes.</span></div>
+              <div class="road-item"><b>Strategic Integrations</b><span>Form cross-ecosystem partnerships and broaden institutional and retail adoption globally on Arc.</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="road-note">Note: Milestones and development tracks are designed to align seamlessly with Arc Network&rsquo;s public release schedule and technical milestones.</p>
     </div>
   </section>
 
@@ -1944,6 +2025,7 @@ function initReveal() {
   }
   // tag common blocks on every page, then observe the untagged ones
   const sel = '.home-hero, .hero-inner, .hero-cta, .home-about, .pillar, .about-mission, ' +
+              '.road-title, .road-card, .home-roadmap, ' +
               '.page-head, .stat, .px-card, .pos-card, .mon-card, .rw-row, .reward-hero, ' +
               '.toolbar, .dt-row, .chart-card, .add-panel, .pos-grid, .mon-grid, .empty';
   document.querySelectorAll(sel).forEach(el => {
