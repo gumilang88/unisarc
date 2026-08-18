@@ -176,9 +176,10 @@ main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 5rem}
 
 /* ---------- monitor ---------- */
 .mon-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(265px,1fr));gap:1.2rem;margin-top:1.2rem}
-.mon-card{background:var(--card);border:4px solid #000;box-shadow:8px 8px 0 #000;border-radius:0;padding:1.1rem 1.2rem}
-.mon-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem}
-.mon-top .nm{font-family:var(--px);font-size:13px;text-transform:uppercase;display:flex;align-items:center;gap:.45rem}
+.mon-grid > *{min-width:0}
+.mon-card{background:var(--card);border:4px solid #000;box-shadow:8px 8px 0 #000;border-radius:0;padding:1.1rem 1.2rem;min-width:0}
+.mon-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem;gap:.6rem;flex-wrap:wrap}
+.mon-top .nm{font-family:var(--px);font-size:13px;text-transform:uppercase;display:flex;align-items:center;gap:.45rem;min-width:0;overflow:hidden}
 .monico{width:22px;height:22px;border-radius:50%;object-fit:contain;background:transparent;flex:0 0 22px}
 .monico-l{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;flex:0 0 22px;font-family:var(--px);font-size:9px;color:#20102e}
 .mon-top .pr{font-family:var(--vt);font-size:16px;color:rgba(255,255,255,.6)}
