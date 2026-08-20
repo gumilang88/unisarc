@@ -85,6 +85,14 @@ nav a.active{color:#fff;background:#d8046a;border:3px solid #000;box-shadow:3px 
 
 /* ---------- layout ---------- */
 main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 5rem}
+/* desktop-wide: expand content so cards fill the screen on large displays (mobile unaffected) */
+@media(min-width:1360px){
+  main{max-width:1600px}
+  .tools-grid{grid-template-columns:1.5fr 1fr}
+  /* keep the heat column compact & shorter than the whale feed */
+  .heat-wrap #heatSvg{height:200px}
+  #view-tools .feed-list{max-height:720px}
+}
 .view{display:none}
 .view.active{display:block;animation:viewIn .42s cubic-bezier(.2,.8,.3,1)}
 .view.leaving{animation:viewOut .18s ease forwards}
@@ -167,6 +175,201 @@ main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 5rem}
 .big-cta{width:100%;font-family:var(--px);font-size:14px;text-transform:uppercase;padding:.95rem;border:4px solid #000;
      box-shadow:6px 6px 0 #000;background:#d8046a;color:#fff;margin-top:.6rem}
 .big-cta:hover{background:#f2218b}
+
+/* ---------- public terminal / tools ---------- */
+.tools-grid{display:grid;grid-template-columns:1.35fr .9fr;gap:1.4rem;align-items:start;margin-bottom:1.4rem}
+.tools-grid > *{min-width:0}
+.tools-card{padding:1.3rem 1.4rem}
+.tools-sub{color:rgba(255,255,255,.65);font-size:15px;margin-bottom:1rem}
+/* ---- D: terminal header + stats pills ---- */
+.term-head{align-items:center}
+.term-pills{display:flex;gap:.6rem;flex-wrap:wrap}
+.term-pill{background:var(--card);border:3px solid #000;box-shadow:3px 3px 0 #000;padding:.4rem .7rem;min-width:96px}
+.term-pill .tp-k{font-family:var(--px);font-size:9px;text-transform:uppercase;color:rgba(255,255,255,.55);display:block}
+.term-pill .tp-v{font-family:var(--vt);font-size:1.15rem;font-weight:700;color:var(--cyan);display:block;margin-top:.15rem}
+/* net liquidity velocity ticker */
+.velo-ticker{border:4px solid #000;box-shadow:8px 8px 0 #000;background:var(--card);margin-bottom:1.4rem;overflow:hidden}
+.velo-bar{display:flex;align-items:center;gap:1rem;padding:.7rem 1.1rem;border-bottom:3px solid #000;flex-wrap:wrap}
+.velo-label{font-family:var(--px);font-size:13px;text-transform:uppercase;color:rgba(255,255,255,.75)}
+.velo-flow{display:flex;align-items:center;gap:.7rem;margin-left:auto;flex-wrap:wrap}
+.velo-flow-item{display:flex;align-items:center;gap:.45rem}
+.velo-dir{padding:.25rem .5rem;border:3px solid #000;box-shadow:2px 2px 0 #000;font-family:var(--px);font-size:11px;text-transform:uppercase}
+.velo-dir.up{background:var(--green);color:var(--ink)}
+.velo-dir.down{background:var(--red);color:#fff}
+.velo-num{font-family:var(--vt);font-size:1.15rem;font-weight:700}
+.velo-num.up{color:var(--green)}
+.velo-num.down{color:var(--red)}
+.velo-net{font-family:var(--px);font-size:13px;text-transform:uppercase;padding:.35rem .6rem;border:3px solid #000;box-shadow:2px 2px 0 #000;background:var(--pop);color:#fff}
+.velo-net.pos{color:var(--green)}
+.velo-net.neg{color:var(--red)}
+.velo-time{font-family:var(--px);font-size:11px;text-transform:uppercase;color:rgba(255,255,255,.5)}
+.velo-strip{display:flex;height:26px;overflow:hidden;background:var(--pop)}
+.velo-strip i{flex:1;height:100%;display:block;transition:opacity .4s}
+.velo-strip i.up{background:var(--green);opacity:.85}
+.velo-strip i.down{background:var(--red);opacity:.85}
+/* ---- C: live badge ---- */
+.live-badge{display:inline-flex;align-items:center;gap:.4rem;font-family:var(--px);font-size:10px;text-transform:uppercase;color:rgba(255,255,255,.7);background:var(--pop);border:2px solid #000;padding:.25rem .5rem}
+.live-dot{width:9px;height:9px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.75)}}
+/* heat map */
+.heat{display:block}
+.heat-wrap{position:relative;border:3px solid #000;background:var(--pop)}
+#heatSvg{display:block;width:100%;height:180px;background:var(--pop)}
+#heatSvg .heat-cell{transition:all .5s ease}
+#heatSvg .heat-mid{transition:all .5s ease}
+.heat-wrap::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(120% 90% at 50% 50%,transparent 60%,rgba(0,0,0,.28))}
+.heat-axis{display:flex;justify-content:space-between;align-items:center;padding:.3rem .5rem 0;font-family:var(--px);font-size:10px;text-transform:uppercase;color:rgba(255,255,255,.5)}
+.heat-axis .ax-price{font-family:var(--vt);font-size:11px;color:var(--cyan);text-transform:none}
+.heat-axis #heatMidLabel{color:var(--yellow);font-weight:700}
+.heat-spread{position:absolute;top:6px;right:6px;font-family:var(--px);font-size:10px;text-transform:uppercase;color:#fff;background:rgba(0,0,0,.6);border:2px solid var(--yellow);padding:.15rem .4rem;pointer-events:none;z-index:4}
+.heat-tip{position:absolute;top:6px;left:0;pointer-events:none;font-family:var(--px);font-size:11px;text-transform:uppercase;
+  color:#fff;background:#000;border:2px solid var(--cyan);padding:.25rem .45rem;opacity:0;transition:opacity .15s;z-index:5;white-space:nowrap}
+.heat-tip.show{opacity:1}
+/* heat token picker */
+.heat-pick-wrap{display:flex;align-items:center;gap:.5rem}
+.heat-pick{display:inline-flex;align-items:center;gap:.45rem;font-family:var(--px);font-size:11px;text-transform:uppercase;padding:.3rem .55rem;border:3px solid #000;box-shadow:3px 3px 0 #000;background:var(--card2);color:#fff;transition:.12s}
+.heat-pick:hover{background:#7b289e;transform:translate(-1px,-1px);box-shadow:4px 4px 0 #000}
+.heat-pick:active{transform:translate(2px,2px);box-shadow:none}
+.heat-pick-icon{width:22px;height:22px;border-radius:50%;object-fit:cover;border:2px solid #000;background:var(--pop)}
+.heat-pick .caret{font-size:9px;color:var(--yellow)}
+.heat-overlay{position:fixed;inset:0;z-index:220;display:none;align-items:center;justify-content:center}
+.heat-overlay.open{display:flex}
+.heat-ov-bg{position:absolute;inset:0;background:rgba(0,0,0,.65)}
+.heat-ov-panel{position:relative;width:min(460px,92vw);max-height:74vh;display:flex;flex-direction:column;background:var(--card);border:4px solid #000;box-shadow:12px 12px 0 #000;padding:1.2rem 1.3rem}
+.heat-ov-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:.8rem}
+.heat-ov-head h3{font-family:var(--px);font-size:13px;text-transform:uppercase;color:#fff}
+.heat-ov-head .heat-ov-count{font-family:var(--vt);font-size:12px;color:var(--yellow);text-transform:none}
+.heat-ov-close{background:var(--red);color:#fff;border:3px solid #000;box-shadow:2px 2px 0 #000;width:30px;height:30px;font-size:15px;line-height:1}
+.heat-ov-search input{width:100%;padding:.55rem .7rem;background:var(--pop);border:3px solid #000;color:#fff;font-family:var(--vt);font-size:14px;outline:0}
+.heat-ov-list{overflow-y:auto;margin-top:.8rem;flex:1}
+.heat-ov-item{display:flex;align-items:center;gap:.6rem;padding:.5rem .5rem;border-bottom:2px solid rgba(0,0,0,.4);cursor:pointer;transition:background .12s}
+.heat-ov-item:hover{background:rgba(61,218,216,.1)}
+.heat-ov-item.active{background:rgba(216,4,106,.18);box-shadow:inset 3px 0 0 var(--red)}
+.heat-ov-item .ho-av{position:relative;width:34px;height:34px;flex:0 0 34px;border-radius:50%;border:2px solid #000;background:var(--pop);overflow:hidden;display:flex;align-items:center;justify-content:center}
+.heat-ov-item .ho-av img{position:relative;z-index:2;width:100%;height:100%;object-fit:cover;display:block;border-radius:50%;background:var(--pop)}
+.heat-ov-item .ho-av::after{content:attr(data-c);position:absolute;inset:0;z-index:1;display:flex;align-items:center;justify-content:center;font-family:var(--px);font-size:14px;color:#fff;background:var(--card2)}
+/* hide letter only once a real image is present & loaded */
+.heat-ov-item .ho-av img.success + .gradnone, .heat-ov-item .ho-av img[src]:not([src=""]) { /* letter stays behind img */}
+.heat-ov-item .ho-av img.onerror~::after{display:flex}
+.heat-ov-item .ho-av img.failed, .heat-ov-item .ho-av img[style*="display: none"]{opacity:0}
+.heat-ov-item .ho-sym{font-family:var(--px);font-size:13px;text-transform:uppercase;color:#fff;flex:0 0 112px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.heat-ov-item .ho-price{font-family:var(--vt);font-size:12px;color:var(--cyan);flex:1;text-align:right}
+.heat-ov-item .ho-vol{font-family:var(--vt);font-size:11px;color:rgba(255,255,255,.5);flex:0 0 78px;text-align:right}
+.heat-ov-empty{color:rgba(255,255,255,.5);padding:1rem;font-size:14px;text-align:center}
+.legend{display:flex;align-items:center;gap:.5rem;margin-top:.8rem;font-family:var(--px);font-size:11px;text-transform:uppercase;color:rgba(255,255,255,.6)}
+.legend .lg.bar{flex:1;height:10px;border:2px solid #000;background:linear-gradient(90deg,var(--cyan),var(--yellow),var(--red))}
+/* activity feed */
+.feed{display:flex;flex-direction:column;min-height:0}
+.feed-head{display:grid;grid-template-columns:1.3fr .9fr .6fr .5fr;gap:.4rem;padding:.4rem .3rem;border-bottom:3px solid #000;font-family:var(--px);font-size:11px;text-transform:uppercase;color:rgba(255,255,255,.55);flex:0 0 auto}
+.feed-list{flex:1;overflow-y:auto;max-height:720px;min-height:0}
+.feed-row{display:grid;grid-template-columns:1.3fr .9fr .6fr .5fr;gap:.4rem;align-items:center;padding:.55rem .3rem;border-bottom:2px solid rgba(0,0,0,.4);font-size:14px;transition:background .2s;position:relative}
+.feed-row:hover{background:rgba(61,218,216,.06)}
+.feed-row .fp{font-family:var(--px);font-size:12px;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;flex-direction:column;line-height:1.25}
+.feed-row .fp-pair{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.feed-row .fp small{font-family:var(--vt);font-size:10px;color:rgba(255,255,255,.4);text-transform:none;white-space:nowrap}
+.feed-row .fv{font-family:var(--vt);color:var(--cyan);white-space:nowrap}
+.feed-row .ft{font-family:var(--px);font-size:10px;text-transform:uppercase;padding:.18rem .3rem;border:2px solid #000;text-align:center;white-space:nowrap}
+.feed-row .ft.buy{background:var(--green);color:var(--ink)}
+.feed-row .ft.sell{background:var(--red);color:#fff}
+.feed-row .fx{font-family:var(--vt);font-size:12px;color:var(--yellow);text-decoration:none}
+.feed-row .fx:hover{text-decoration:underline}
+.feed-empty{color:rgba(255,255,255,.45);padding:1.2rem .3rem;font-size:14px}
+.feed-row.whale{background:rgba(255,190,57,.08);border-left:3px solid var(--yellow);box-shadow:inset 0 0 18px rgba(255,190,57,.12)}
+.feed-row.whale .fp::after{content:" 🐋";font-size:11px}
+/* ---- B: new-row flash ---- */
+@keyframes rowflash{0%{background:rgba(61,218,216,.45)}100%{background:transparent}}
+.feed-row.flash-buy{animation:rowflash 1s ease-out}
+.feed-row.flash-sell{animation:sellflash 1s ease-out}
+@keyframes sellflash{0%{background:rgba(216,4,106,.4)}100%{background:transparent}}
+@media(max-width:860px){.tools-grid{grid-template-columns:1fr}}
+/* ---- multi-tier pool migration tracker (nested in whale feed) ---- */
+.feed-mig{margin-top:1rem;border-top:4px double rgba(255,255,255,.12);padding-top:.9rem}
+.feed-mig-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem}
+.feed-mig-head h3{font-family:var(--px);font-size:11px;text-transform:uppercase;color:#fff}
+.mig-flex{display:grid;grid-template-columns:1fr 1fr;gap:.9rem}
+.mig-col-head{display:flex;align-items:center;justify-content:space-between;font-family:var(--px);font-size:10px;text-transform:uppercase;color:rgba(255,255,255,.7);padding:0 .1rem .35rem;border-bottom:2px solid #000;margin-bottom:.5rem}
+.mig-agg{font-family:var(--vt);font-size:1rem;font-weight:700}
+.mig-agg.up{color:var(--green)}
+.mig-agg.down{color:var(--red)}
+.mig-list{display:grid;gap:.45rem}
+.mig-row{display:flex;align-items:center;gap:.5rem;background:var(--card);border:2px solid #000;padding:.45rem .5rem}
+.mig-row .ho-av{position:relative;width:26px;height:26px;flex:0 0 26px;border-radius:50%;border:2px solid #000;background:var(--pop);overflow:hidden;display:flex;align-items:center;justify-content:center}
+.mig-row .ho-av img{position:relative;z-index:2;width:100%;height:100%;object-fit:cover;border-radius:50%;background:var(--pop)}
+.mig-row .ho-av::after{content:attr(data-c);position:absolute;inset:0;z-index:1;display:flex;align-items:center;justify-content:center;font-family:var(--px);font-size:12px;color:#fff;background:var(--card2)}
+.mig-row .mig-main{flex:1;min-width:0}
+.mig-row .mig-sym{font-family:var(--px);font-size:11px;text-transform:uppercase;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mig-row .mig-pct{font-family:var(--vt);font-size:10px;color:rgba(255,255,255,.5)}
+.mig-row .mig-chg{font-family:var(--vt);font-weight:700;font-size:12px;white-space:nowrap}
+.mig-chg.up{color:var(--green)}
+.mig-chg.down{color:var(--red)}
+@media(max-width:860px){.mig-flex{grid-template-columns:1fr}}
+/* ---- A: top gainers/losers strip (compact) ---- */
+.gl-strip{display:flex;align-items:stretch;border:4px solid #000;box-shadow:8px 8px 0 #000;background:var(--card);margin-bottom:1.4rem;overflow:hidden}
+.gl-side{flex:1;padding:.45rem .7rem}
+.gl-side.gainers{border-right:3px solid #000}
+.gl-label{font-family:var(--px);font-size:9px;text-transform:uppercase;color:rgba(255,255,255,.55);display:flex;align-items:center;gap:.35rem;margin-bottom:.3rem}
+.gl-arrow.up{color:var(--green)} .gl-arrow.down{color:var(--red)}
+.gl-list{display:flex;flex-wrap:wrap;gap:.4rem;align-items:center;max-height:30px;overflow:hidden}
+.gl-item{display:flex;align-items:center;gap:.3rem;background:var(--pop);border:2px solid #000;padding:.12rem .4rem;font-family:var(--px);font-size:10px;text-transform:uppercase;line-height:1}
+.gl-item .gi-sym{color:#fff}
+.gl-item .gi-chg{font-family:var(--vt);font-weight:700;font-size:10px}
+.gl-item .gi-chg.up{color:var(--green)}
+.gl-item .gi-chg.down{color:var(--red)}
+.gl-empty{color:rgba(255,255,255,.4);font-size:11px}
+/* ---- F: token spotlight (nested inside heatmap card) ---- */
+.heat-spot{margin-top:1rem;border-top:4px double rgba(255,255,255,.12);padding-top:.8rem}
+.heat-spot-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem}
+.heat-spot-head h3{font-family:var(--px);font-size:11px;text-transform:uppercase;color:#fff}
+.spot-body{display:grid;grid-template-columns:1fr;gap:.8rem;align-items:stretch}
+.spot-main{display:flex;align-items:center;gap:.8rem;background:var(--pop);border:3px solid #000;padding:.6rem .7rem}
+.spot-main .ho-av{position:relative;width:34px;height:34px;flex:0 0 34px;border-radius:50%;border:2px solid #000;background:var(--pop);overflow:hidden;display:flex;align-items:center;justify-content:center}
+.spot-main .ho-av img{position:relative;z-index:2;width:100%;height:100%;object-fit:cover;border-radius:50%;background:var(--pop)}
+.spot-main .ho-av::after{content:attr(data-c);position:absolute;inset:0;z-index:1;display:flex;align-items:center;justify-content:center;font-family:var(--px);font-size:14px;color:#fff;background:var(--card2)}
+.spot-head .spot-sym{font-family:var(--px);font-size:14px;text-transform:uppercase;color:#fff}
+.spot-head .spot-price{font-family:var(--vt);font-size:1.25rem;font-weight:700;color:var(--cyan);margin-top:.1rem}
+.spot-stats{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;margin-top:.4rem}
+.spot-stat{background:var(--pop);border:2px solid #000;padding:.28rem .4rem}
+.spot-stat .ss-k{font-family:var(--px);font-size:8px;text-transform:uppercase;color:rgba(255,255,255,.5);display:block}
+.spot-stat .ss-v{font-family:var(--vt);font-size:.85rem;font-weight:700;color:#fff;display:block;margin-top:.08rem}
+.spot-stat .ss-v.up{color:var(--green)} .spot-stat .ss-v.down{color:var(--red)}
+.spot-chart{background:var(--pop);border:3px solid #000;padding:.5rem}
+.spot-chart .sc-title{font-family:var(--px);font-size:9px;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:.4rem}
+.spot-chart .sc-live{color:var(--green);font-weight:700;animation:pulse 1.6s ease-in-out infinite}
+.sc-head{display:flex;align-items:center;justify-content:space-between;gap:.6rem;margin-bottom:.4rem;flex-wrap:wrap}
+.sc-tf{display:flex;gap:.3rem}
+.sc-tf .tf{font-family:var(--px);font-size:9px;padding:.14rem .35rem;border:2px solid #000;background:var(--pop);color:rgba(255,255,255,.65);cursor:pointer;transition:.1s}
+.sc-tf .tf:hover{color:#fff}
+.sc-tf .tf.active{background:var(--red);color:#fff}
+.candle-view{position:relative;width:100%;height:120px;overflow:hidden;cursor:grab;user-select:none;touch-action:none}
+.candle-view:active{cursor:grabbing}
+.candle-view .candle-chart{display:block;width:100%;height:100%}
+.spot-ohlc{position:absolute;top:8px;left:8px;z-index:5;background:rgba(0,0,0,.78);border:2px solid #000;padding:.3rem .5rem;font-family:var(--vt);font-size:11px;color:#fff;white-space:nowrap;opacity:0;pointer-events:none}
+.spot-empty{color:rgba(255,255,255,.45);padding:1.2rem;font-size:14px}
+@media(max-width:860px){.spot-body{grid-template-columns:1fr}}
+@media(max-width:640px){.gl-side.gainers{border-right:0;border-bottom:2px solid #000}}
+/* ---- F2: liquidity distribution (compact, in left column) ---- */
+.tools-left{display:flex;flex-direction:column;gap:1.4rem;min-width:0}
+.liqd-card{margin-top:0}
+.liqd-body{display:grid;grid-template-columns:1fr;gap:1rem;align-items:center}
+.liqd-donut{position:relative;width:160px;height:160px;margin:0 auto}
+.liqd-donut svg{width:100%;height:100%;display:block}
+.liqd-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;pointer-events:none}
+.liqd-center .lc-total{font-family:var(--vt);font-size:1rem;font-weight:700;color:#fff}
+.liqd-center .lc-label{font-family:var(--px);font-size:8px;text-transform:uppercase;color:rgba(255,255,255,.5)}
+.liqd-list{display:flex;flex-direction:column;gap:.4rem}
+.liqd-row{display:flex;align-items:center;gap:.55rem}
+.liqd-row .ld-av{position:relative;width:26px;height:26px;flex:0 0 26px;border-radius:50%;border:2px solid #000;background:var(--pop);overflow:hidden;display:flex;align-items:center;justify-content:center}
+.liqd-row .ld-av img{position:relative;z-index:2;width:100%;height:100%;object-fit:cover;border-radius:50%;background:var(--pop)}
+.liqd-row .ld-av::after{content:attr(data-c);position:absolute;inset:0;z-index:1;display:flex;align-items:center;justify-content:center;font-family:var(--px);font-size:11px;color:#fff;background:var(--card2)}
+.liqd-row .ld-main{flex:1;min-width:0}
+.liqd-row .ld-top{display:flex;justify-content:space-between;align-items:baseline;font-family:var(--px);font-size:10px;text-transform:uppercase;color:#fff}
+.liqd-row .ld-top .ld-val{font-family:var(--vt);font-size:10px;color:var(--cyan);text-transform:none}
+.liqd-row .ld-bar{height:8px;background:var(--pop);border:2px solid #000;margin-top:.2rem;overflow:hidden}
+.liqd-row .ld-fill{height:100%;transition:width .6s ease}
+.liqd-empty{color:rgba(255,255,255,.45);padding:1.2rem;font-size:14px}
+@media(max-width:860px){.liqd-body{grid-template-columns:1fr}}
+
 .big-cta:active{transform:translate(3px,3px);box-shadow:2px 2px 0 #000}
 .big-cta:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:6px 6px 0 #000}
 .big-cta.secondary{background:var(--card2);color:var(--cyan);border:3px solid #000}
@@ -605,6 +808,7 @@ a.px-btn{display:inline-block;text-align:center;text-decoration:none;width:auto}
     <a href="#add" data-v="add">Add LP</a>
     <a href="#monitor" data-v="monitor">Monitor</a>
     <a href="#rewards" data-v="rewards">Rewards</a>
+    <a href="#tools" data-v="tools">Tools</a>
   </nav>
   <div class="header-right">
     <div class="chain-pill" title="Connected chain"><span class="dot"></span><span id="chainName">ARC Mainnet</span></div>
@@ -846,6 +1050,123 @@ a.px-btn{display:inline-block;text-align:center;text-decoration:none;width:auto}
       <button class="claim-all" id="btnClaimAll">Claim All</button>
     </div>
     <div class="px-card" id="rwList"></div>
+  </section>
+
+  <!-- ============ TOOLS / PUBLIC TERMINAL ============ -->
+  <section class="view" id="view-tools">
+    <!-- D: HEADER + STATS PILLS -->
+    <div class="page-head term-head">
+      <div>
+        <h1 class="text-outline">Public Terminal</h1>
+        <p>Open-access market intelligence for the Arc ecosystem.</p>
+      </div>
+      <div class="term-pills">
+        <div class="term-pill"><span class="tp-k">Volume 24h</span><span class="tp-v" id="tVolume">—</span></div>
+        <div class="term-pill"><span class="tp-k">Total TVL</span><span class="tp-v" id="tTvl">—</span></div>
+        <div class="term-pill"><span class="tp-k">Pools</span><span class="tp-v" id="tPools">—</span></div>
+      </div>
+    </div>
+
+    <!-- FEATURE 01 · NET LIQUIDITY VELOCITY INDEX (sticky ticker bar) -->
+    <div class="velo-ticker" id="veloTicker">
+      <div class="velo-bar">
+        <div class="velo-label">Net Liquidity Index</div>
+        <div class="velo-flow" id="veloFlow">
+          <span class="velo-flow-item"><span class="velo-dir up">INFLOW</span><span class="velo-num up" id="veloIn">+$—</span></span>
+          <span class="velo-flow-item"><span class="velo-dir down">OUTFLOW</span><span class="velo-num down" id="veloOut">-$—</span></span>
+          <span class="velo-net" id="veloNet">NET +$—</span>
+        </div>
+        <span class="live-badge"><span class="live-dot" id="liveDot"></span><span id="liveAgo">updated</span></span>
+      </div>
+      <div class="velo-strip" id="veloStrip"></div>
+    </div>
+
+    <!-- A: TOP GAINERS / LOSERS -->
+    <div class="gl-strip" id="glStrip">
+      <div class="gl-side gainers">
+        <span class="gl-label">Top Gainers <span class="gl-arrow up">▲</span></span>
+        <div class="gl-list" id="gainersList"><span class="gl-empty">—</span></div>
+      </div>
+      <div class="gl-divider"></div>
+      <div class="gl-side losers">
+        <span class="gl-label">Top Losers <span class="gl-arrow down">▼</span></span>
+        <div class="gl-list" id="losersList"><span class="gl-empty">—</span></div>
+      </div>
+    </div>
+
+    <div class="tools-grid">
+      <div class="tools-left">
+      <!-- FEATURE 02 · REAL-TIME LIQUIDITY HEAT MAP (depth chart) -->
+      <div class="px-card tools-card heat">
+        <div class="card-title"><h2>Liquidity Heat Map</h2>
+          <span class="heat-pick-wrap"><button class="heat-pick" id="heatPickBtn" type="button"><img id="heatPickIcon" class="heat-pick-icon" alt="" /><span id="heatPickLabel">Top</span><b class="caret">▾</b></button><span class="hint" id="heatLive">LIVE</span></span>
+        </div>
+        <p class="tools-sub">Real-time order-book depth: bid side (left) vs ask side (right) across ARC.</p>
+        <div class="heat-wrap">
+          <svg id="heatSvg" viewBox="0 0 560 180" preserveAspectRatio="none" role="img" aria-label="Liquidity heat map"></svg>
+          <div class="heat-tip" id="heatTip"></div>
+          <div class="heat-axis" id="heatAxis">
+            <span class="ax-price" id="axBid">—</span>
+            <span id="heatMidLabel">Mid</span>
+            <span class="ax-price" id="axAsk">—</span>
+          </div>
+          <div class="heat-spread" id="heatSpread"></div>
+        </div>
+        <div class="legend"><span class="lg low">Thin</span><span class="lg bar"><i></i></span><span class="lg high">Deep</span></div>
+        <div class="heat-spot">
+          <div class="heat-spot-head"><h3>Token Spotlight</h3><span class="hint" id="spotLive">LIVE</span></div>
+          <div class="spot-body" id="spotBody">
+            <div class="spot-empty">Loading…</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HEAT TOKEN PICKER OVERLAY -->
+      <div class="heat-overlay" id="heatOverlay">
+        <div class="heat-ov-bg" data-close-heat></div>
+        <div class="heat-ov-panel">
+          <div class="heat-ov-head">
+            <h3>Select Token <span class="heat-ov-count" id="heatOvCount"></span></h3>
+            <button class="heat-ov-close" id="heatOvClose" aria-label="Close">✕</button>
+          </div>
+          <div class="heat-ov-search"><input id="heatOvSearch" placeholder="Search..." /></div>
+          <div class="heat-ov-list" id="heatOvList"></div>
+        </div>
+      </div>
+
+      <!-- F2: LIQUIDITY DISTRIBUTION (below heat map, left column) -->
+      <div class="px-card tools-card liqd-card">
+        <div class="card-title"><h2>Liquidity Distribution</h2><span class="hint" id="liqdLive">LIVE</span></div>
+        <div class="liqd-body" id="liqdBody">
+          <div class="liqd-empty">Loading…</div>
+        </div>
+      </div>
+      </div>
+
+      <!-- FEATURE 03 · VOLUME PER BLOCK & WHALE TRACKER -->
+      <div class="px-card tools-card feed">
+        <div class="card-title"><h2>Volume per Block · Whale Tracker</h2><span class="hint" id="feedLive">LIVE</span></div>
+        <div class="feed-head">
+          <span>Pair</span><span>Value</span><span>Type</span><span>Tx</span>
+        </div>
+        <div class="feed-list" id="feedList">
+          <div class="feed-empty" id="feedEmpty">Loading live swaps…</div>
+        </div>
+        <div class="feed-mig">
+          <div class="feed-mig-head"><h3>Multi-Tier Pool Migration · LP-Attention</h3><span class="hint" id="migLive">LIVE</span></div>
+          <div class="mig-flex">
+            <div class="mig-col">
+              <div class="mig-col-head"><span>Momentum IN</span><span class="mig-agg up" id="migIn">+$—</span></div>
+              <div class="mig-list" id="migInList"><div class="feed-empty">Sampling…</div></div>
+            </div>
+            <div class="mig-col">
+              <div class="mig-col-head"><span>Pressure OUT</span><span class="mig-agg down" id="migOut">-$—</span></div>
+              <div class="mig-list" id="migOutList"><div class="feed-empty">Sampling…</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </section>
 
   <div class="footer-wrap">
@@ -1197,14 +1518,17 @@ function buildPoolsFromRadar(list) {
     const spark = Array.isArray(t.spark) && t.spark.length ? t.spark : [1];
     const apr = liq > 0 ? (vol * 0.003 * 0.85 / liq) * 365 * 100 : 0;
     out.push({
-      id: 'USDC-' + sym, a: 'USDC', b: sym, addr: t.address || '', icon: t.icon || t.imageUrl || '',
-      reserveA: liq, reserveB: liq / (price || 1),
-      tvl: liq, priceB: price, apr: Math.min(240, Math.max(0.1, apr)),
-      vol, chg24: t.change24h || 0, spark,
+    id: 'USDC-' + sym, a: 'USDC', b: sym, addr: t.address || '', icon: t.icon || t.imageUrl || '',
+    reserveA: liq, reserveB: liq / (price || 1),
+    tvl: liq, priceB: price, apr: Math.min(240, Math.max(0.1, apr)),
+    vol, chg24: t.change24h || 0, spark,
     });
-  }
-  return out;
-}
+    }
+    // pin the UNISARC/USDC pool to position #1 so it's the default everywhere
+    const uniIdx = out.findIndex(p => (p.b || '').toUpperCase() === 'UNISARC');
+    if (uniIdx > 0) { const u = out.splice(uniIdx, 1)[0]; out.unshift(u); }
+    return out;
+    }
 function poolsFromSnapshot() { return buildPoolsFromRadar(RADAR_SNAPSHOT); }
 
 /* ============ RENDERING ============ */
@@ -1864,6 +2188,7 @@ function applyView(v) {
   $('view-'+v).classList.add('active');
   document.querySelectorAll('#nav a').forEach(x=>x.classList.toggle('active', x.dataset.v===v));
   if (v==='add') renderAddSide();
+  if (v==='tools') renderTools();
   if (history.replaceState) history.replaceState(null, '', '#'+v);
   window.scrollTo({top:0});
   if (typeof initReveal === 'function') setTimeout(initReveal, 40);
@@ -1879,7 +2204,7 @@ function showView(v) {
     applyView(v);
   }
 }
-function validView(v){ return ['home','positions','add','monitor','rewards'].includes(v); }
+function validView(v){ return ['home','positions','add','monitor','rewards','tools'].includes(v); }
 
 /* ============ events ============ */
 document.querySelectorAll('#nav a').forEach(a=>a.addEventListener('click', e=>{
@@ -1895,6 +2220,11 @@ document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click', ()
 $('walletBtn').addEventListener('click', S.address ? openWalletModal : connect);
 $('wClose').addEventListener('click', closeWalletModal);
 $('wDisconnect').addEventListener('click', ()=>{ closeWalletModal(); disconnect(); });
+/* heat token picker events */
+$('heatPickBtn').addEventListener('click', openHeatOverlay);
+$('heatOvClose').addEventListener('click', closeHeatOverlay);
+$('heatOverlay').querySelector('[data-close-heat]').addEventListener('click', closeHeatOverlay);
+$('heatOvSearch').addEventListener('input', renderHeatOverlay);
 $('modalRemove').addEventListener('click', e=>{ if (e.target===$('modalRemove')) closeRemove(); });
 $('rmCancel').addEventListener('click', closeRemove);
 $('rmConfirm').addEventListener('click', confirmRemove);
@@ -1919,7 +2249,7 @@ $('pmClose').addEventListener('click', closePoolModal);
 $('poolModal').addEventListener('click', e=>{ if (e.target.classList.contains('pool-modal-bg')) closePoolModal(); });
 $('pmList').addEventListener('click', e=>{
   const opt = e.target.closest('.pool-opt');
-  if (opt) { S.selected = opt.dataset.pool; renderPoolChips(); renderAddSide(); closePoolModal(); }
+  if (opt) { S.selected = opt.dataset.pool; S._userPickedPool = true; renderPoolChips(); renderAddSide(); closePoolModal(); }
 });
 $('pmSearch').addEventListener('input', e=> filterPoolOptions(e.target.value));
 $('pmManual').addEventListener('click', ()=>{ closePoolModal(); $('manualPanel').style.display='block'; $('btnManualPool').textContent='× Close manual'; });
@@ -1978,7 +2308,7 @@ window.addEventListener('resize', drawPortfolioChart);
 /* ============ init ============ */
 window.addEventListener('load', async ()=>{
   S.pools = poolsFromSnapshot();
-  S.selected = S.pools.length ? S.pools[0].id : '';
+  S.selected = (S.pools.find(p => (p.b || '').toUpperCase() === 'UNISARC') || S.pools[0])?.id || '';
   // set the active view from the URL hash EARLY and render, then reveal —
   // so the page appears directly on the right tab with NO flash/jump to Positions.
   showView((location.hash || '').slice(1) || 'home');
@@ -2001,7 +2331,9 @@ window.addEventListener('load', async ()=>{
   const live = await fetchRadarTop();
   if (live && live.length) {
     S.pools = buildPoolsFromRadar(live);
-    if (!S.pools.find(p=>p.id===S.selected)) S.selected = S.pools.length ? S.pools[0].id : '';
+    // default-select the UNISARC/USDC pool on first live load (pinned to #1)
+    const uni = S.pools.find(p => (p.b || '').toUpperCase() === 'UNISARC');
+    if (uni && (!S.pools.find(p=>p.id===S.selected) || !S._userPickedPool)) S.selected = uni.id;
     renderPoolChips(); renderAddSide(); renderMonitor();
     if (S.address) loadPositionsUI();
   }
@@ -2011,6 +2343,721 @@ window.addEventListener('load', async ()=>{
     if (l && l.length) { S.pools = buildPoolsFromRadar(l); renderPoolChips(); renderAddSide(); renderMonitor(); }
   }, 60000);
 });
+
+/* ============ PUBLIC TERMINAL / TOOLS ============ */
+let _toolsFetched = false;
+let _toolsRealtime = false, _toolsAnim = null, _toolsNet = null;
+let _currentFlows = null;   // latest inflow/outflow aggregate
+let _heatTokens = [];       // 100 tokens for the heatmap picker
+let _heatIdx = -1;          // selected heatmap token index (-1 = auto top)
+let _heatTokensLoaded = false;
+const $t = id => document.getElementById(id);
+
+async function fetchHeatTokens() {
+  try {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 9000);
+    const r = await fetch(RADAR_API + '/tokens?sort=volume24&dir=desc&limit=100&window=24h', { signal: ctrl.signal });
+    clearTimeout(t);
+    if (!r.ok) throw new Error('http ' + r.status);
+    const j = await r.json();
+    const toks = (j && j.tokens) || [];
+    _heatTokens = toks.filter(t => t && t.price);
+    return _heatTokens;
+  } catch (e) { return []; }
+}
+
+function openHeatOverlay() { renderHeatOverlay(); $t('heatOverlay').classList.add('open'); }
+function closeHeatOverlay() { $t('heatOverlay').classList.remove('open'); }
+
+function renderHeatOverlay() {
+  const list = $t('heatOvList'); if (!list) return;
+  const q = ($t('heatOvSearch').value || '').toLowerCase();
+  const toks = _heatTokens.filter(t => !q || (t.symbol || '').toLowerCase().includes(q));
+  const c = $t('heatOvCount'); if (c) c.textContent = toks.length + ' tokens';
+  if (!toks.length) { list.innerHTML = '<div class="heat-ov-empty">No tokens found</div>'; return; }
+  let html = '';
+  toks.forEach((t, i) => {
+    const sym = t.symbol || '?';
+    const active = (i === _heatIdx);
+    const icon = t.icon || '';
+    const av = `<span class="ho-av" data-c="${sym[0] || '?'}">${icon ? '<img src="' + icon + '" alt="" loading="lazy" onerror="this.style.display=\'none\';this.parentNode.classList.add(\'fallback\')" />' : ''}</span>`;
+    html += `<div class="heat-ov-item${active ? ' active' : ''}" data-idx="${i}" data-sym="${sym}">
+      ${av}
+      <span class="ho-sym">${sym}</span>
+      <span class="ho-price">$${fmt(t.price)}</span>
+      <span class="ho-vol">$${fmt(t.volume24 || 0)}</span>
+    </div>`;
+  });
+  list.innerHTML = html;
+  // keep logos visible behind fallback letter avatar (CSS ::after handles when img hidden)
+  list.querySelectorAll('.heat-ov-item').forEach(item => {
+    item.addEventListener('click', () => {
+      _heatIdx = parseInt(item.dataset.idx, 10);
+      const tok = _heatTokens[_heatIdx];
+      $t('heatPickLabel').textContent = item.dataset.sym;
+      const icon = tok && tok.icon ? tok.icon : '';
+      const pic = $t('heatPickIcon'); if (pic) { pic.src = icon; pic.style.display = icon ? '' : 'none'; }
+      closeHeatOverlay();
+      drawHeat((typeof S !== 'undefined' ? S.pools : []) || [], _currentFlows);
+    });
+  });
+}
+
+// ---- REAL-TIME LIQUIDITY DEPTH MAP (smooth bid/ask depth chart) ----
+let _heatTick = 0;
+let _heatProfile = null;   // last computed depth profile (for tooltip)
+
+function heatColor(t) {
+  // t 0..1 -> cyan -> yellow -> pink
+  if (t < 0.33) { const k=t/0.33; return `rgb(${Math.round(61+ (255-61)*k)},${Math.round(218+(190-218)*k)},${Math.round(216+(57-216)*k)})`; }
+  if (t < 0.66) { const k=(t-0.33)/0.33; return `rgb(${Math.round(255+(216-255)*k)},${Math.round(190+(4-190)*k)},${Math.round(57+(106-57)*k)})`; }
+  const k=(t-0.66)/0.34; return `rgb(${Math.round(216+70*k)},${Math.round(4+0*k)},${Math.round(106+30*k)})`;
+}
+
+function drawHeat(pools, flows) {
+  const svg = $t('heatSvg'); if (!svg) return;
+  const W = 560, H = 180;
+  const cols = 80;
+  const cw = W / cols;
+  const flow = flows || { inflow: 0, outflow: 0 };
+  const totalF = flow.inflow + flow.outflow;
+  const inflowShare = totalF > 0 ? flow.inflow / totalF : 0.5;
+  const midLbl = $t('heatMidLabel');
+
+  // live mid position — center on the picked heat token (or top pool if none picked)
+  const top = (pools || [])[0];
+  const picked = (_heatIdx >= 0 && _heatTokens[_heatIdx]) ? _heatTokens[_heatIdx] : null;
+  // resolved center for price/label: picked token price, else top pool priceB
+  const cen = picked ? { b: picked.symbol, priceB: picked.price } : (top ? { b: top.b, priceB: top.priceB } : { b: '', priceB: 0 });
+  const drift = (picked && picked.change24h ? picked.change24h / 100 : (top && top.chg24 || 0) / 100);
+  const tickDrift = Math.sin(_heatTick * 0.9) * 0.03;
+  const mid = 0.5 + drift * 0.3 + tickDrift;
+  const clampedMid = Math.max(0.16, Math.min(0.84, mid));
+
+  // depth profile: distance from mid drives how tall/deep each column is
+  const profile = [];
+  for (let i = 0; i < cols; i++) {
+    const x01 = (i + 0.5) / cols;
+    const dist = Math.abs(x01 - clampedMid);             // 0 at mid, up to ~0.5
+    // depth decays as you move away from mid (order book taper)
+    let d = Math.exp(-dist * 6) * 0.95 + 0.05;
+    // real pool pockets pull extra depth
+    (pools || []).slice(0, 10).forEach((p, k) => {
+      const px = (0.12 + (k % 7) * 0.13 + (p.chg24 || 0) * 0.01);
+      d += Math.exp(-Math.pow((x01 - px) * 11, 2)) * Math.min(0.45, (p.tvl || 5000) / 95000);
+    });
+    d += Math.sin(_heatTick * 2 + i) * 0.02 * (0.3 + Math.exp(-dist * 6));
+    profile.push(Math.min(1, Math.max(0.05, d)));
+  }
+  _heatProfile = { profile, clampedMid, cols, W, H, cen: cen || null };
+
+  let html = '';
+  // grid
+  for (let gx = 0; gx <= 8; gx++) {
+    const x = (gx / 8) * W;
+    html += `<line x1="${x}" y1="6" x2="${x}" y2="${H-22}" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>`;
+  }
+  // horizontal mid guide
+  html += `<line x1="0" y1="${H/2}" x2="${W}" y2="${H/2}" stroke="rgba(255,255,255,0.10)" stroke-width="1" stroke-dasharray="4 4"/>`;
+
+  // bid area (left of mid): accumulate upward from bottom-left
+  let bidCells = '', askCells = '';
+  for (let i = 0; i < cols; i++) {
+    const x = i * cw + cw / 2;
+    const x01 = (i + 0.5) / cols;
+    const d = profile[i];
+    const h = Math.min(H * 0.42, d * H * 0.42 + 14);
+    const base = H - 24;
+    const topY = base - h * (x01 < clampedMid ? (0.5 + (x01 / clampedMid) * 0.5) : (1.5 - (x01 - clampedMid) / (1 - clampedMid) * 0.5));
+    const c = heatColor(d);
+    const isBid = x01 < clampedMid;
+    const cell = `<rect class="heat-cell" x="${(x-cw/2+0.5).toFixed(1)}" y="${topY.toFixed(1)}" width="${(cw-1).toFixed(1)}" height="${Math.max(0, base - topY).toFixed(1)}" fill="${c}" opacity="0.9"/>`;
+    if (isBid) bidCells += cell; else askCells += cell;
+  }
+  // smooth line over the profile tops
+  const linePts = profile.map((d, i) => {
+    const x = i * cw + cw / 2;
+    const x01 = (i + 0.5) / cols;
+    const h = Math.min(H * 0.42, d * H * 0.42 + 14);
+    const base = H - 24;
+    const topY = base - h * (x01 < clampedMid ? (0.5 + (x01 / clampedMid) * 0.5) : (1.5 - (x01 - clampedMid) / (1 - clampedMid) * 0.5));
+    return [x, topY];
+  });
+  const lineStr = linePts.map(p => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ');
+
+  html += `<g class="depth-line">${bidCells}${askCells}</g>`;
+  // outline line
+  html += `<polyline class="heat-mid" points="${lineStr}" fill="none" stroke="#fff" stroke-width="1.6" opacity="0.85"/>`;
+
+  // mid marker
+  const mx = clampedMid * W;
+  html += `<line x1="${mx.toFixed(1)}" y1="6" x2="${mx.toFixed(1)}" y2="${H-20}" stroke="#fff" stroke-width="2" stroke-dasharray="2 3" opacity="0.95"/>`;
+  html += `<circle class="heat-dot" cx="${mx.toFixed(1)}" cy="${H-24}" r="4.5" fill="#fff"/>`;
+
+  // bottom axis
+  html += `<line x1="0" y1="${H-24}" x2="${W}" y2="${H-24}" stroke="rgba(255,255,255,0.25)" stroke-width="2"/>`;
+
+  svg.innerHTML = html;
+
+  // ---- real price labels + spread (from picked center) ----
+  const axB = $t('axBid'), axA = $t('axAsk'), spr = $t('heatSpread');
+  const price = cen.priceB || 0;
+  if (price > 0) {
+    const spreadPct = 2.5;                       // ~2.5% visual spread around mid
+    const bid = price * (1 - spreadPct / 100);
+    const ask = price * (1 + spreadPct / 100);
+    if (axB) axB.textContent = 'Bid ' + priceFmt(bid);
+    if (axA) axA.textContent = 'Ask ' + priceFmt(ask);
+    if (spr) spr.textContent = 'spread ' + (cen.b || '?') + ' ±' + spreadPct + '%';
+    if (midLbl) midLbl.textContent = (cen.b ? cen.b + ' ' : '') + priceFmt(price);
+  } else {
+    if (midLbl) midLbl.textContent = 'Mid ' + (cen.b || '');
+    if (spr) spr.textContent = '';
+  }
+  _heatTick++;
+}
+
+function priceFmt(p) {
+  if (p === 0 || !isFinite(p)) return '—';
+  if (p >= 1000) return '$' + p.toFixed(0);
+  if (p >= 1) return '$' + p.toFixed(2);
+  if (p >= 0.01) return '$' + p.toFixed(4);
+  return '$' + p.toPrecision(3);
+}
+
+// tooltip on hover over the depth map
+function initHeatTooltip() {
+  const svg = $t('heatSvg'), tip = $t('heatTip'); if (!svg || !tip) return;
+  svg.addEventListener('mousemove', (e) => {
+    if (!_heatProfile) return;
+    const r = svg.getBoundingClientRect();
+    const x = ((e.clientX - r.left) / r.width) * _heatProfile.W;
+    const i = Math.max(0, Math.min(_heatProfile.cols - 1, Math.floor(x / (_heatProfile.W / _heatProfile.cols))));
+    const d = _heatProfile.profile[i];
+    const x01 = (i + 0.5) / _heatProfile.cols;
+    const side = x01 < _heatProfile.clampedMid ? 'BID' : 'ASK';
+    const depthPct = Math.round(d * 100);
+    // nominal price at cursor, derived from center price & spread
+    let priceTxt = '';
+    const cp = _heatProfile.cen && _heatProfile.cen.priceB;
+    if (cp > 0) {
+      const offsetRatio = (x01 - _heatProfile.clampedMid) * 6.5;   // ±~6.5 ticks across
+      const est = cp * (1 + offsetRatio * 0.025);
+      priceTxt = ' · ' + priceFmt(est);
+    }
+    tip.textContent = `${side}${priceTxt} · depth ${depthPct}%`;
+    tip.style.left = Math.min(r.width - 130, Math.max(0, (x / _heatProfile.W) * r.width)) + 'px';
+    tip.classList.add('show');
+  });
+  svg.addEventListener('mouseleave', () => tip.classList.remove('show'));
+}
+
+function fillVeloStrip(flows) {
+  const strip = $t('veloStrip');
+  const inEl = $t('veloIn'), outEl = $t('veloOut'), netEl = $t('veloNet');
+  const inflow = (flows && flows.inflow) || 0;
+  const outflow = (flows && flows.outflow) || 0;
+  // update ticker values (inflow/outflow = estimasi dari 500 token)
+  if (inEl) inEl.textContent = '+$' + fmt(inflow);
+  if (outEl) outEl.textContent = '-$' + fmt(outflow);
+  const net = inflow - outflow;
+  if (netEl) { netEl.textContent = (net >= 0 ? 'NET +$' : 'NET -$') + fmt(Math.abs(net)); netEl.className = 'velo-net ' + (net >= 0 ? 'pos' : 'neg'); }
+  // strip: proportional green(up/inflow) vs red(down/outflow) bars
+  if (strip) {
+    const seg = 26, total = inflow + outflow;
+    let html = '';
+    for (let i = 0; i < seg; i++) {
+      const isUp = total > 0 ? (i < Math.round(seg * inflow / total)) : Math.random() > 0.5;
+      html += `<i class="${isUp ? 'up' : 'down'}"></i>`;
+    }
+    strip.innerHTML = html;
+  }
+}
+
+// ---- REAL SWAP FEED (from RadarDex on-chain swaps) ----
+async function fetchRadarSwaps(limit = 50) {
+  try {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 8000);
+    const r = await fetch(RADAR_API + '/swaps?limit=' + limit, { signal: ctrl.signal });
+    clearTimeout(t);
+    if (!r.ok) throw new Error('http ' + r.status);
+    const j = await r.json();
+    return (j && j.swaps) || [];
+  } catch (e) { return null; }
+}
+
+// Inflow/Outflow across ALL tokens (24h) — 'all koin' scope.
+// Per-koin: share buang anggap proporsional ke rasio tx buy/sell, kali volume24.
+// Ini estimasi (radardex ngga nyimpen volume $ buy vs sell terpisah per koin),
+// tapi nyakup seluruh ekosistem, bukan cuma window 200 swap.
+async function fetchRadarFlows(limit = 500) {
+  try {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 9000);
+    const r = await fetch(RADAR_API + '/tokens?sort=volume24&dir=desc&limit=' + limit + '&window=24h', { signal: ctrl.signal });
+    clearTimeout(t);
+    if (!r.ok) throw new Error('http ' + r.status);
+    const j = await r.json();
+    const toks = (j && j.tokens) || [];
+    let inflow = 0, outflow = 0, covered = 0, totalPools = 0, totalVolume24 = 0, totalTvl = 0;
+    toks.forEach(tk => {
+      totalPools += tk.pools || 0;
+      totalVolume24 += tk.volume24 || 0;   // sum volume 24h across ALL tokens
+      totalTvl += tk.liquidityUsdc || 0;   // sum liquidity/TVL across ALL tokens
+      const vol = tk.volume24 || 0;
+      const b = tk.buys24 || 0, s = tk.sells24 || 0;
+      const tot = b + s;
+      if (vol <= 0 || tot <= 0) return;
+      const share = b / tot;
+      inflow += vol * share;
+      outflow += vol * (1 - share);
+      covered++;
+    });
+    if (!covered) return null;
+    return { inflow, outflow, net: inflow - outflow, count: covered, totalPools, totalVolume24, totalTvl, scope: '24h' };
+  } catch (e) { return null; }
+}
+
+let _lastFeedIds = [];
+let _feedFilter = 'all';
+let _lastSwaps = null;
+function timeAgo(ts) {
+  if (!ts) return '';
+  const s = Math.max(0, Math.floor(Date.now() / 1000 - ts));
+  if (s < 5) return 'now';
+  if (s < 60) return s + 's';
+  if (s < 3600) return Math.floor(s / 60) + 'm';
+  return Math.floor(s / 3600) + 'h';
+}
+function renderToolsFeed(swaps) {
+  const list = $t('feedList'); const empty = $t('feedEmpty'); if (!list) return;
+  if (Array.isArray(swaps)) _lastSwaps = swaps;   // cache for filter re-render
+  swaps = _lastSwaps || swaps;
+  // keep only swaps above $100 + apply side filter
+  const rows = (swaps && swaps.length ? swaps : [])
+    .filter(r => (r.usdc || 0) > 100)
+    .filter(r => _feedFilter === 'all' || (r.side || 'buy').toLowerCase() === _feedFilter)
+    .slice(0, 50);
+  if (!rows.length) {
+    if (empty) { empty.style.display = ''; empty.textContent = 'No swaps above $100 yet…'; }
+    _lastFeedIds = [];
+    return;
+  }
+  // flash rows that are newly seen (realtime update feel)
+  const newIds = rows.map(r => r.txHash || '');
+  const flashSet = new Set(newIds.filter(id => id && !_lastFeedIds.includes(id)));
+  // adaptive whale threshold: flag trades above the 70th percentile of value
+  const vals = rows.map(r => r.usdc || 0).sort((a, b) => b - a);
+  const whThresh = vals.length ? vals[Math.min(Math.floor(vals.length * 0.3), vals.length - 1)] : 5000;
+  let html = '';
+  rows.forEach(r => {
+    const val = r.usdc || 0;
+    const side = (r.side || 'buy').toLowerCase();
+    const tx = r.txHash || '';
+    const flash = flashSet.has(tx) ? (' flash-' + (side === 'buy' ? 'buy' : 'sell')) : '';
+    const wh = val >= whThresh ? ' whale' : '';
+    const ago = timeAgo(r.time);
+    html += `<div class="feed-row${wh}${flash}">
+      <span class="fp"><span class="fp-pair">USDC / ${r.symbol || '?'}</span><small>${ago ? ago + ' ago' : ''}</small></span>
+      <span class="fv">${fmtUsd(val)}</span>
+      <span class="ft ${side === 'buy' ? 'buy' : 'sell'}">${side === 'buy' ? 'BUY' : 'SELL'}</span>
+      <a class="fx" href="https://arc-scan.org/tx/${tx}" target="_blank" rel="noopener noreferrer" title="${tx}">${shortAddr(tx)}</a>
+    </div>`;
+  });
+  if (empty) empty.style.display = 'none';
+  list.innerHTML = html;
+  _lastFeedIds = newIds;
+}
+
+let _lastLiveTs = 0;
+function refreshLiveAgo() {
+  const el = $t('liveAgo'); if (!el) return;
+  const s = _lastLiveTs ? Math.floor((Date.now() - _lastLiveTs) / 1000) : 0;
+  el.textContent = s <= 1 ? 'live' : 'updated ' + s + 's ago';
+}
+function fillTermPills(pools) {
+  const v = $t('tVolume'), tv = $t('tTvl'), pc = $t('tPools');
+  if (!v && !tv && !pc) return;
+  // semua baca dari ALL-token flow fetch (konsisten dgn inflow/outflow)
+  const fl = _currentFlows;
+  if (!fl) return; // tunggu fetch pertama -> placeholder "—" tetap tampil
+  if (v) v.textContent = '$' + fmt(fl.totalVolume24 || 0);
+  if (tv) tv.textContent = '$' + fmt(fl.totalTvl || 0);
+  const poolCount = fl.totalPools || ((pools || []).length);
+  if (pc) pc.textContent = poolCount + '';
+}
+
+/* ---- Multi-Tier Pool Activity Tracker (LP-attention proxy) ---- */
+// Literal per-tick-range liquidity migration isn't exposed by radardex, so we
+// proxy "where LPs are shifting attention" with real per-token signals:
+//   • ATTENTION IN  = strong 24h volume + rising price (LPs adding/defending here)
+//   • ATTENTION OUT = falling price + heavy sell pressure (defense shifting away)
+function renderMigration() {
+  const inList = $t('migInList'), outList = $t('migOutList'), migIn = $t('migIn'), migOut = $t('migOut');
+  if (!inList || !outList) return;
+  const toks = _heatTokens || [];
+  if (!toks.length) return;
+
+  const scored = toks.map(t => {
+    const vol = t.volume24 || 0;
+    const ch = t.change24h || 0;                 // % change 24h (e.g. 5.5 = +5.5%)
+    const sells = t.sells24 || 0, buys = t.buys24 || 0;
+    const share = (sells + buys) > 0 ? sells / (sells + buys) : 0.5;
+    return { t, vol, ch, share };
+  }).filter(x => x.vol > 0);
+
+  // ATTENTION IN: high volume, price rising, balanced-enough flow
+  const inRows = scored
+    .filter(x => x.ch >= 0)
+    .sort((a, b) => (b.vol) - (a.vol))
+    .slice(0, 6);
+  // ATTENTION OUT: price falling or heavy sell pressure
+  const outRows = scored
+    .filter(x => x.ch < 0 || x.share > 0.7)
+    .sort((a, b) => (a.ch) - (b.ch))
+    .slice(0, 6);
+
+  let totIn = 0, totOut = 0;
+  inRows.forEach(x => totIn += x.vol || 0);
+  outRows.forEach(x => totOut += x.vol || 0);
+  if (migIn) migIn.textContent = '+' + fmtUsd(totIn) + ' 24h';
+  if (migOut) migOut.textContent = '-' + fmtUsd(totOut) + ' 24h';
+
+  const icon = (t) => { const ic = t && t.icon ? '<img src="' + t.icon + '" alt="" loading="lazy" onerror="this.style.display=\'none\'" />' : ''; return '<span class="ho-av" data-c="' + (t.symbol[0] || '?') + '">' + ic + '</span>'; };
+  const renderList = (el, list, up) => {
+    if (!list.length) { el.innerHTML = '<div class="feed-empty">' + (up ? 'No rising activity' : 'No pressure detected') + '</div>'; return; }
+    el.innerHTML = list.map(x => `<div class="mig-row">
+      ${icon(x.t)}
+      <div class="mig-main"><div class="mig-sym">${x.t.symbol}</div><div class="mig-pct">vol $${fmt(x.vol)}</div></div>
+      <span class="mig-chg ${up ? 'up' : 'down'}">${x.ch >= 0 ? '+' : ''}${(x.ch).toFixed(1)}%</span>
+    </div>`).join('');
+  };
+  renderList(inList, inRows, true);
+  renderList(outList, outRows, false);
+}
+
+/* ---- A: top gainers / losers ---- */
+function renderGainersLosers() {
+  const g = $t('gainersList'), l = $t('losersList');
+  if (!g || !l) return;
+  const toks = (_heatTokens || []).filter(t => t && t.change24h != null);
+  if (!toks.length) return;
+  const sorted = toks.slice().sort((a, b) => (b.change24h || 0) - (a.change24h || 0));
+  const gainers = sorted.filter(t => (t.change24h || 0) > 0).slice(0, 6);
+  const losers = sorted.slice().reverse().filter(t => (t.change24h || 0) < 0).slice(0, 6);
+  const chip = (t, up) => `<span class="gl-item"><span class="gi-sym">${t.symbol}</span><span class="gi-chg ${up ? 'up' : 'down'}">${up ? '+' : ''}${(t.change24h / 100).toFixed(1)}%</span></span>`;
+  g.innerHTML = gainers.length ? gainers.map(t => chip(t, true)).join('') : '<span class="gl-empty">—</span>';
+  l.innerHTML = losers.length ? losers.map(t => chip(t, false)).join('') : '<span class="gl-empty">—</span>';
+}
+
+/* ---- F: token spotlight — interactive candlestick chart ---- */
+let _spotChart = null; // { candles:[], cw, offset }
+
+function buildCandles(spark, count) {
+  if (!spark || spark.length < 2) return [];
+  count = count || 40;
+  const target = 160;                       // dense base series (interpolated from spark)
+  const dense = [];
+  for (let i = 0; i < target; i++) {
+    const f = (i / (target - 1)) * (spark.length - 1);
+    const i0 = Math.floor(f), i1 = Math.min(spark.length - 1, i0 + 1), fr = f - i0;
+    dense.push(spark[i0] + (spark[i1] - spark[i0]) * fr);
+  }
+  // aggregate the dense series into exactly `count` candles — so each timeframe
+  // genuinely produces a different number of, and differently-shaped, candles.
+  const candles = [];
+  const bucket = Math.max(1, Math.floor(dense.length / count));
+  let i = 0;
+  while (i < dense.length && candles.length < count) {
+    const seg = dense.slice(i, i + bucket);
+    const last = seg[seg.length - 1];
+    candles.push({
+      o: candles.length === 0 ? dense[0] : candles[candles.length - 1].c,
+      c: last,
+      h: Math.max(...seg),
+      l: Math.min(...seg)
+    });
+    i += bucket;
+  }
+  return candles;
+}
+
+function drawSpotCandles() {
+  const view = $t('candleView'); if (!view || !_spotChart) return;
+  const { candles, cw, offset } = _spotChart;
+  const W = view.clientWidth || 360, H = view.clientHeight || 150, pad = 8;
+  const visible = Math.max(3, Math.floor(W / Math.max(3, cw)));
+  const start = Math.max(0, Math.min(candles.length - visible, offset));
+  const end = Math.min(candles.length, start + visible);
+  const win = candles.slice(start, end);
+  let min = Infinity, max = -Infinity;
+  win.forEach(c => { if (c.l < min) min = c.l; if (c.h > max) max = c.h; });
+  if (!isFinite(min) || !isFinite(max)) { view.innerHTML = ''; return; }
+  const rng = (max - min) || 1; min -= rng * 0.08; max += rng * 0.08; const srng = max - min;
+  const Y = v => H - pad - ((v - min) / srng) * (H - pad * 2);
+  let html = `<svg class="candle-chart" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">`;
+  // grid + right axis prices
+  for (let g = 0; g <= 4; g++) {
+    const y = Y(min + (max - min) * (g / 4));
+    const px = min + (max - min) * (g / 4);
+    html += `<line x1="0" y1="${y.toFixed(1)}" x2="${W}" y2="${y.toFixed(1)}" stroke="rgba(255,255,255,0.06)"/>`;
+    html += `<text x="${W - 4}" y="${(y - 3).toFixed(1)}" text-anchor="end" fill="rgba(255,255,255,.4)" font-size="9" font-family="monospace">${priceFmt(px)}</text>`;
+  }
+  const bodyW = Math.max(3, cw * 0.62), half = bodyW / 2;
+  win.forEach((cd, i) => {
+    const x = pad + i * cw + (cw * 0.5) - half * 0.4;
+    const up = cd.c >= cd.o;
+    const col = up ? '#7ee081' : '#d8046a';
+    const yH = Y(cd.h), yL = Y(cd.l), yO = Y(cd.o), yC = Y(cd.c);
+    html += `<line class="wick" x1="${(x + half).toFixed(1)}" y1="${yH.toFixed(1)}" x2="${(x + half).toFixed(1)}" y2="${yL.toFixed(1)}" stroke="${col}" stroke-width="1"/>`;
+    const top = Math.min(yO, yC), bot = Math.max(yO, yC), hgt = Math.max(1.5, bot - top);
+    html += `<rect class="candle" data-idx="${start + i}" x="${x.toFixed(1)}" y="${top.toFixed(1)}" width="${bodyW.toFixed(1)}" height="${hgt.toFixed(1)}" fill="${col}"/>`;
+  });
+  // last (current) price line
+  const last = candles[candles.length - 1].c, yLast = Y(last);
+  html += `<line x1="0" y1="${yLast.toFixed(1)}" x2="${W}" y2="${yLast.toFixed(1)}" stroke="#fff" stroke-width="1" stroke-dasharray="2 3" opacity="0.6"/>`;
+  html += '</svg>';
+  view.innerHTML = html;
+  // zoom hint
+  const hint = $t('spotHint'); if (hint) {
+    const inView = visible < candles.length;
+    const tf = (document.querySelector('#scTf .tf.active') || {}).dataset ? (document.querySelector('#scTf .tf.active') || {}).dataset.tf : '15m';
+    hint.textContent = tf + ' · scroll zoom · drag pan' + (inView ? ` · ${visible}/${candles.length}` : '');
+  }
+}
+
+function initSpotCandles() {
+  const view = $t('candleView'); if (!view || view.dataset.wired) return;
+  view.dataset.wired = '1';
+  let drag = null;
+  view.addEventListener('wheel', e => {
+    e.preventDefault();
+    if (!_spotChart) return;
+    const factor = e.deltaY < 0 ? 1.25 : 0.8;
+    _spotChart.cw = Math.max(4, Math.min(40, _spotChart.cw * factor));
+    drawSpotCandles();
+  }, { passive: false });
+  view.addEventListener('mousedown', e => { drag = { x: e.clientX, off: _spotChart ? _spotChart.offset : 0 }; });
+  window.addEventListener('mousemove', e => {
+    if (!drag || !_spotChart) return;
+    const dx = e.clientX - drag.x;
+    _spotChart.offset = Math.max(0, drag.off - Math.round(dx / _spotChart.cw));
+    drawSpotCandles();
+  });
+  window.addEventListener('mouseup', () => { drag = null; });
+  // hover OHLC tooltip
+  view.addEventListener('mousemove', e => {
+    const tip = $t('spotOhlc'); if (!tip || !_spotChart) return;
+    const r = view.getBoundingClientRect();
+    const cx = e.clientX - r.left - 8;
+    const idx = Math.floor(cx / _spotChart.cw) + Math.max(0, Math.min(_spotChart.candles.length, _spotChart.offset));
+    const c = _spotChart.candles[idx];
+    if (!c) { tip.style.opacity = 0; return; }
+    tip.innerHTML = `O ${priceFmt(c.o)}&nbsp; H <span style="color:#7ee081">${priceFmt(c.h)}</span>&nbsp; L <span style="color:#d8046a">${priceFmt(c.l)}</span>&nbsp; C ${priceFmt(c.c)}`;
+    tip.style.left = Math.min(r.width - 260, Math.max(0, e.clientX - r.left)) + 'px';
+    tip.style.top = '8px';
+    tip.style.opacity = 1;
+  });
+  view.addEventListener('mouseleave', () => { const t = $t('spotOhlc'); if (t) t.style.opacity = 0; });
+  // timeframe selector
+  const tfEls = document.querySelectorAll('#scTf .tf');
+  tfEls.forEach(b => b.addEventListener('click', () => {
+    if (!_spotChart) return;
+    const tf = b.dataset.tf;
+    tfEls.forEach(x => x.classList.toggle('active', x === b));
+    setSpotTf(tf);
+  }));
+}
+
+// timeframe -> desired candle width + candle count (lower TF = more detail)
+const TF = { '1m': { cw: 13, n: 70 }, '5m': { cw: 11, n: 55 }, '15m': { cw: 9, n: 40 }, '1H': { cw: 7, n: 26 }, '4H': { cw: 6, n: 16 }, '1D': { cw: 5, n: 10 } };
+function setSpotTf(tf) {
+  if (!_spotChart) return;
+  const t = TF[tf] || TF['15m'];
+  _spotChart.cw = t.cw;
+  _spotChart.candles = buildCandles(_spotChart.spark, t.n);   // rebuild: each TF = different candles
+  _spotChart.offset = _spotChart.candles.length;              // jump to latest
+  drawSpotCandles();
+}
+
+function renderSpotlight() {
+  const body = $t('spotBody'); if (!body) return;
+  const toks = _heatTokens || [];
+  if (!toks.length) { body.innerHTML = '<div class="spot-empty">Loading…</div>'; return; }
+  let best = null, fallback = null;
+  for (const t of toks) {
+    const isSparky = t.volume24 > 0 && Array.isArray(t.spark) && t.spark.length >= 10;
+    if (isSparky && (!best || t.volume24 > best.volume24)) best = t;
+    if (t.volume24 > 0 && (!fallback || t.volume24 > fallback.volume24)) fallback = t;
+  }
+  if (!best) best = fallback;
+  if (!best) { body.innerHTML = '<div class="spot-empty">Loading…</div>'; return; }
+  const icon = best.icon ? '<img src="' + best.icon + '" alt="" loading="lazy" onerror="this.style.display=\'none\'" />' : '';
+  const ch = best.change24h || 0, cls = ch >= 0 ? 'up' : 'down';
+  _spotChart = { spark: best.spark, candles: buildCandles(best.spark, TF['15m'].n), cw: TF['15m'].cw, offset: 0 };
+  body.innerHTML = `<div class="spot-main">
+      <span class="ho-av" data-c="${(best.symbol[0] || '?')}">${icon}</span>
+      <div class="spot-head">
+        <div class="spot-sym">${best.symbol}</div>
+        <div class="spot-price">${priceFmt(best.price || 0)}</div>
+        <div class="spot-stats">
+          <div class="spot-stat"><span class="ss-k">Vol 24h</span><span class="ss-v">$${fmt(best.volume24 || 0)}</span></div>
+          <div class="spot-stat"><span class="ss-k">Change 24h</span><span class="ss-v ${cls}">${ch >= 0 ? '+' : ''}${(ch / 100).toFixed(1)}%</span></div>
+          <div class="spot-stat"><span class="ss-k">Liquidity</span><span class="ss-v">$${fmt(best.liquidityUsdc || 0)}</span></div>
+          <div class="spot-stat"><span class="ss-k">Mcap</span><span class="ss-v">$${fmt(best.mcap || 0)}</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="spot-chart">
+      <div class="sc-head">
+        <span class="sc-title">Candles · <span id="spotHint">scroll zoom · drag pan</span></span>
+        <div class="sc-tf" id="scTf">
+          <button class="tf" data-tf="1m">1m</button>
+          <button class="tf" data-tf="5m">5m</button>
+          <button class="tf active" data-tf="15m">15m</button>
+          <button class="tf" data-tf="1H">1H</button>
+          <button class="tf" data-tf="4H">4H</button>
+          <button class="tf" data-tf="1D">1D</button>
+        </div>
+      </div>
+      <div class="candle-view" id="candleView"><div class="spot-empty">Loading…</div></div>
+      <div class="spot-ohlc" id="spotOhlc"></div>
+    </div>`;
+  initSpotCandles();
+  requestAnimationFrame(drawSpotCandles);
+}
+
+/* ---- F2: liquidity distribution (donut + bars) ---- */
+function renderLiquidityDistribution() {
+  const body = $t('liqdBody'); if (!body) return;
+  const toks = (_heatTokens || []).filter(t => (t.liquidityUsdc || 0) > 0);
+  if (!toks.length) { body.innerHTML = '<div class="liqd-empty">Loading…</div>'; return; }
+  // sort by liquidity, but pin UNISARC (the token with the official website) to #1
+  const sorted = toks.slice().sort((a, b) => (b.liquidityUsdc || 0) - (a.liquidityUsdc || 0));
+  const uniIdx = sorted.findIndex(t => (t.symbol || '').toUpperCase() === 'UNISARC');
+  if (uniIdx > 0) { const u = sorted.splice(uniIdx, 1)[0]; sorted.unshift(u); }
+  const top = sorted.slice(0, 8);
+  const rest = sorted.slice(8);
+  const restLiq = rest.reduce((s, t) => s + (t.liquidityUsdc || 0), 0);
+  const total = sorted.reduce((s, t) => s + (t.liquidityUsdc || 0), 0) || 1;
+  const items = top.map(t => ({ sym: t.symbol, icon: t.icon || '', liq: t.liquidityUsdc || 0 }));
+  if (rest.length) items.push({ sym: 'Other', icon: '', liq: restLiq });
+
+  // color palette
+  const colors = ['#61dcd8', '#d8046a', '#f2b824', '#7ee081', '#7b289e', '#4a7dff', '#ff7a59', '#39d98a', '#b0b6c3'];
+  // donut segments
+  const R = 80, C = 2 * Math.PI * R, cx = 105, cy = 105;
+  let acc = 0;
+  let segs = items.map((it, i) => {
+    const frac = it.liq / total;
+    const dash = Math.max(0.5, frac * C - 3);
+    const offset = acc * C;
+    acc += frac;
+    return `<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="${colors[i % colors.length]}" stroke-width="26" stroke-dasharray="${dash.toFixed(1)} ${(C - dash).toFixed(1)}" stroke-dashoffset="${(C * 0.25 - offset * C).toFixed(1)}"/>`;
+  }).join('');
+  // bars
+  const bars = items.map((it, i) => {
+    const pct = (it.liq / total) * 100;
+    const ldAv = it.icon ? `<span class="ld-av" data-c="${it.sym[0] || '?'}"><img src="${it.icon}" alt="" loading="lazy" onerror="this.style.display='none'"/></span>` : `<span class="ld-av" data-c="${it.sym[0] || '?'}"></span>`;
+    return `<div class="liqd-row">
+      ${ldAv}
+      <div class="ld-main">
+        <div class="ld-top"><span>${it.sym}</span><span class="ld-val">$${fmt(it.liq)} · ${pct.toFixed(1)}%</span></div>
+        <div class="ld-bar"><div class="ld-fill" style="width:${pct.toFixed(1)}%;background:${colors[i % colors.length]}"></div></div>
+      </div>
+    </div>`;
+  }).join('');
+  body.innerHTML = `<div class="liqd-donut">
+      <svg viewBox="0 0 210 210">${segs}<circle cx="${cx}" cy="${cy}" r="${R-18}" fill="var(--pop)" stroke="#000" stroke-width="3"/></svg>
+      <div class="liqd-center"><span class="lc-total">$${fmt(total)}</span><span class="lc-label">Total Liq</span></div>
+    </div>
+    <div class="liqd-list">${bars}</div>`;
+}
+
+async function renderTools() {
+  try { if (typeof fetchRadarTop === 'function') $t('feedLive').textContent = 'LIVE'; } catch(e) {}
+  // immediate render from current snapshot so page never looks empty
+  const pools = (typeof S !== 'undefined' && Array.isArray(S.pools) && S.pools.length) ? S.pools : [];
+  drawHeat(pools, _currentFlows);
+  fillVeloStrip(_currentFlows);
+  fillTermPills(pools);
+  initHeatTooltip();
+
+  // load heat-token picker list once
+  if (typeof fetchHeatTokens === 'function' && !_heatTokensLoaded) {
+    _heatTokensLoaded = true;
+    const toks = await fetchHeatTokens();
+    // default the heatmap picker to UNISARC
+    if (_heatIdx < 0) {
+      const uniIdx = toks.findIndex(t => (t.symbol || '').toUpperCase() === 'UNISARC');
+      _heatIdx = uniIdx >= 0 ? uniIdx : 0;
+    }
+    if (_heatIdx >= 0 && toks[_heatIdx]) {
+      const lbl = $t('heatPickLabel'); if (lbl) lbl.textContent = toks[_heatIdx].symbol;
+      const pic = $t('heatPickIcon'); if (pic) { pic.src = toks[_heatIdx].icon || ''; pic.style.display = toks[_heatIdx].icon ? '' : 'none'; }
+    }
+    // render market summary (gainers/losers) + spotlight now that tokens are loaded
+    if (typeof renderGainersLosers === 'function') renderGainersLosers();
+    if (typeof renderSpotlight === 'function') renderSpotlight();
+    if (typeof renderLiquidityDistribution === 'function') renderLiquidityDistribution();
+  }
+
+  // kick off realtime refresh loops (guarded so they run once)
+  if (!_toolsRealtime) {
+    _toolsRealtime = true;
+    // high-freq local re-render so the heat map visibly animates (realtime feel)
+    _toolsAnim = setInterval(() => { if ($('view-tools').classList.contains('active')) { drawHeat(S.pools || [], _currentFlows); refreshLiveAgo(); } }, 1400);
+    // network refresh every 8s: pull live pool data + real flows + real on-chain swaps
+    _toolsNet = setInterval(async () => {
+      if (!$('view-tools').classList.contains('active')) return;
+      if (typeof fetchRadarTop === 'function') {
+        const live = await fetchRadarTop();
+        if (live && live.length) {
+          S.pools = buildPoolsFromRadar(live);
+          drawHeat(S.pools, _currentFlows);
+          fillTermPills(S.pools);
+          renderMigration();
+        }
+      }
+      if (typeof fetchRadarFlows === 'function') {
+        const fl = await fetchRadarFlows(500);
+        if (fl) {
+          _currentFlows = fl; fillVeloStrip(fl); drawHeat(S.pools || [], fl); fillTermPills(S.pools || []);
+          renderMigration();
+        }
+      }
+      if (typeof fetchRadarSwaps === 'function') {
+        const sw = await fetchRadarSwaps(200);
+        if (sw && sw.length) { _lastLiveTs = Date.now(); renderToolsFeed(sw); refreshLiveAgo(); }
+      }
+    }, 8000);
+  }
+  // first live pull immediately
+  if (typeof fetchRadarTop === 'function' && !_toolsFetched) {
+    _toolsFetched = true;
+    const live = await fetchRadarTop();
+    if (live && live.length) {
+      S.pools = buildPoolsFromRadar(live);
+      drawHeat(S.pools, _currentFlows);
+      fillTermPills(S.pools);
+      renderMigration();  // establishes migration baseline
+    }
+  }
+  // initial real flow aggregate
+  if (typeof fetchRadarFlows === 'function') {
+    const fl = await fetchRadarFlows(500);
+    if (fl) {
+      _currentFlows = fl; fillVeloStrip(fl); drawHeat(S.pools || [], fl);
+    }
+  }
+  // initial real swap feed
+  if (typeof fetchRadarSwaps === 'function') {
+    const sw = await fetchRadarSwaps(200);
+    if (sw && sw.length) { _lastLiveTs = Date.now(); renderToolsFeed(sw); refreshLiveAgo(); }
+  }
+}
 
 /* ============ scroll-reveal animation (all pages) ============ */
 let revealIO = null;
