@@ -89,8 +89,8 @@ main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 5rem}
 @media(min-width:1360px){
   main{max-width:1600px}
   .tools-grid{grid-template-columns:1.5fr 1fr}
-  /* balance vertical size on wide screens — cards should fill vertically too, not just stretch wide */
-  .heat-wrap #heatSvg{height:320px}
+  /* keep the heat column compact & shorter than the whale feed */
+  .heat-wrap #heatSvg{height:200px}
   #view-tools .feed-list{max-height:720px}
 }
 .view{display:none}
@@ -177,7 +177,7 @@ main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 5rem}
 .big-cta:hover{background:#f2218b}
 
 /* ---------- public terminal / tools ---------- */
-.tools-grid{display:grid;grid-template-columns:1.35fr .9fr;gap:1.4rem;align-items:stretch;margin-bottom:1.4rem}
+.tools-grid{display:grid;grid-template-columns:1.35fr .9fr;gap:1.4rem;align-items:start;margin-bottom:1.4rem}
 .tools-grid > *{min-width:0}
 .tools-card{padding:1.3rem 1.4rem}
 .tools-sub{color:rgba(255,255,255,.65);font-size:15px;margin-bottom:1rem}
@@ -212,6 +212,7 @@ main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 5rem}
 .live-dot{width:9px;height:9px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 1.6s ease-in-out infinite}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.75)}}
 /* heat map */
+.heat{display:block}
 .heat-wrap{position:relative;border:3px solid #000;background:var(--pop)}
 #heatSvg{display:block;width:100%;height:180px;background:var(--pop)}
 #heatSvg .heat-cell{transition:all .5s ease}
@@ -282,26 +283,27 @@ main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 5rem}
 .feed-row.flash-sell{animation:sellflash 1s ease-out}
 @keyframes sellflash{0%{background:rgba(216,4,106,.4)}100%{background:transparent}}
 @media(max-width:860px){.tools-grid{grid-template-columns:1fr}}
-/* ---- multi-tier pool migration tracker ---- */
-.mig-card{margin-top:1.4rem}
-.mig-flex{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem}
-.mig-col-head{display:flex;align-items:center;justify-content:space-between;font-family:var(--px);font-size:12px;text-transform:uppercase;color:rgba(255,255,255,.75);padding:0 .2rem .5rem;border-bottom:3px solid #000;margin-bottom:.6rem}
-.mig-agg{font-family:var(--vt);font-size:1.15rem;font-weight:700}
+/* ---- multi-tier pool migration tracker (nested in whale feed) ---- */
+.feed-mig{margin-top:1rem;border-top:4px double rgba(255,255,255,.12);padding-top:.9rem}
+.feed-mig-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem}
+.feed-mig-head h3{font-family:var(--px);font-size:11px;text-transform:uppercase;color:#fff}
+.mig-flex{display:grid;grid-template-columns:1fr 1fr;gap:.9rem}
+.mig-col-head{display:flex;align-items:center;justify-content:space-between;font-family:var(--px);font-size:10px;text-transform:uppercase;color:rgba(255,255,255,.7);padding:0 .1rem .35rem;border-bottom:2px solid #000;margin-bottom:.5rem}
+.mig-agg{font-family:var(--vt);font-size:1rem;font-weight:700}
 .mig-agg.up{color:var(--green)}
 .mig-agg.down{color:var(--red)}
-.mig-list{display:grid;gap:.6rem}
-.mig-row{display:flex;align-items:center;gap:.6rem;background:var(--card);border:3px solid #000;padding:.6rem .7rem}
-.mig-row .ho-av{position:relative;width:30px;height:30px;flex:0 0 30px;border-radius:50%;border:2px solid #000;background:var(--pop);overflow:hidden;display:flex;align-items:center;justify-content:center}
+.mig-list{display:grid;gap:.45rem}
+.mig-row{display:flex;align-items:center;gap:.5rem;background:var(--card);border:2px solid #000;padding:.45rem .5rem}
+.mig-row .ho-av{position:relative;width:26px;height:26px;flex:0 0 26px;border-radius:50%;border:2px solid #000;background:var(--pop);overflow:hidden;display:flex;align-items:center;justify-content:center}
 .mig-row .ho-av img{position:relative;z-index:2;width:100%;height:100%;object-fit:cover;border-radius:50%;background:var(--pop)}
 .mig-row .ho-av::after{content:attr(data-c);position:absolute;inset:0;z-index:1;display:flex;align-items:center;justify-content:center;font-family:var(--px);font-size:12px;color:#fff;background:var(--card2)}
 .mig-row .mig-main{flex:1;min-width:0}
-.mig-row .mig-sym{font-family:var(--px);font-size:12px;text-transform:uppercase;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.mig-row .mig-pct{font-family:var(--vt);font-size:11px;color:rgba(255,255,255,.5)}
-.mig-row .mig-chg{font-family:var(--vt);font-weight:700;font-size:13px;white-space:nowrap}
+.mig-row .mig-sym{font-family:var(--px);font-size:11px;text-transform:uppercase;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mig-row .mig-pct{font-family:var(--vt);font-size:10px;color:rgba(255,255,255,.5)}
+.mig-row .mig-chg{font-family:var(--vt);font-weight:700;font-size:12px;white-space:nowrap}
 .mig-chg.up{color:var(--green)}
 .mig-chg.down{color:var(--red)}
 @media(max-width:860px){.mig-flex{grid-template-columns:1fr}}
-@media(max-width:860px){.tools-grid{grid-template-columns:1fr}}
 /* ---- A: top gainers/losers strip (compact) ---- */
 .gl-strip{display:flex;align-items:stretch;border:4px solid #000;box-shadow:8px 8px 0 #000;background:var(--card);margin-bottom:1.4rem;overflow:hidden}
 .gl-side{flex:1;padding:.45rem .7rem}
@@ -315,30 +317,58 @@ main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 5rem}
 .gl-item .gi-chg.up{color:var(--green)}
 .gl-item .gi-chg.down{color:var(--red)}
 .gl-empty{color:rgba(255,255,255,.4);font-size:11px}
-/* ---- F: token spotlight ---- */
-.spot-card{margin-top:1.4rem}
-.spot-body{display:grid;grid-template-columns:1.1fr 1fr;gap:1.2rem;align-items:stretch}
-.spot-main{display:flex;align-items:center;gap:1rem;background:var(--pop);border:3px solid #000;padding:1rem}
-.spot-main .ho-av{position:relative;width:48px;height:48px;flex:0 0 48px;border-radius:50%;border:3px solid #000;background:var(--pop);overflow:hidden;display:flex;align-items:center;justify-content:center}
+/* ---- F: token spotlight (nested inside heatmap card) ---- */
+.heat-spot{margin-top:1rem;border-top:4px double rgba(255,255,255,.12);padding-top:.8rem}
+.heat-spot-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem}
+.heat-spot-head h3{font-family:var(--px);font-size:11px;text-transform:uppercase;color:#fff}
+.spot-body{display:grid;grid-template-columns:1fr;gap:.8rem;align-items:stretch}
+.spot-main{display:flex;align-items:center;gap:.8rem;background:var(--pop);border:3px solid #000;padding:.6rem .7rem}
+.spot-main .ho-av{position:relative;width:34px;height:34px;flex:0 0 34px;border-radius:50%;border:2px solid #000;background:var(--pop);overflow:hidden;display:flex;align-items:center;justify-content:center}
 .spot-main .ho-av img{position:relative;z-index:2;width:100%;height:100%;object-fit:cover;border-radius:50%;background:var(--pop)}
-.spot-main .ho-av::after{content:attr(data-c);position:absolute;inset:0;z-index:1;display:flex;align-items:center;justify-content:center;font-family:var(--px);font-size:20px;color:#fff;background:var(--card2)}
-.spot-head .spot-sym{font-family:var(--px);font-size:17px;text-transform:uppercase;color:#fff}
-.spot-head .spot-price{font-family:var(--vt);font-size:1.6rem;font-weight:700;color:var(--cyan);margin-top:.1rem}
-.spot-stats{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-top:.5rem}
-.spot-stat{background:var(--pop);border:2px solid #000;padding:.4rem .5rem}
-.spot-stat .ss-k{font-family:var(--px);font-size:9px;text-transform:uppercase;color:rgba(255,255,255,.5);display:block}
-.spot-stat .ss-v{font-family:var(--vt);font-size:1.05rem;font-weight:700;color:#fff;display:block;margin-top:.1rem}
+.spot-main .ho-av::after{content:attr(data-c);position:absolute;inset:0;z-index:1;display:flex;align-items:center;justify-content:center;font-family:var(--px);font-size:14px;color:#fff;background:var(--card2)}
+.spot-head .spot-sym{font-family:var(--px);font-size:14px;text-transform:uppercase;color:#fff}
+.spot-head .spot-price{font-family:var(--vt);font-size:1.25rem;font-weight:700;color:var(--cyan);margin-top:.1rem}
+.spot-stats{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;margin-top:.4rem}
+.spot-stat{background:var(--pop);border:2px solid #000;padding:.28rem .4rem}
+.spot-stat .ss-k{font-family:var(--px);font-size:8px;text-transform:uppercase;color:rgba(255,255,255,.5);display:block}
+.spot-stat .ss-v{font-family:var(--vt);font-size:.85rem;font-weight:700;color:#fff;display:block;margin-top:.08rem}
 .spot-stat .ss-v.up{color:var(--green)} .spot-stat .ss-v.down{color:var(--red)}
-.spot-chart{background:var(--pop);border:3px solid #000;padding:.6rem}
-.spot-chart .sc-title{font-family:var(--px);font-size:10px;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:.4rem}
+.spot-chart{background:var(--pop);border:3px solid #000;padding:.5rem}
+.spot-chart .sc-title{font-family:var(--px);font-size:9px;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:.4rem}
 .spot-chart .sc-live{color:var(--green);font-weight:700;animation:pulse 1.6s ease-in-out infinite}
-.spot-chart svg{width:100%;height:130px;display:block}
-.spot-chart .candle{transition:opacity .3s}
-.candle-chart .candle:last-of-type{animation:candleLive 1.4s ease-in-out infinite}
-@keyframes candleLive{0%,100%{opacity:1;filter:brightness(1)}50%{opacity:.55;filter:brightness(1.35)}}
+.sc-head{display:flex;align-items:center;justify-content:space-between;gap:.6rem;margin-bottom:.4rem;flex-wrap:wrap}
+.sc-tf{display:flex;gap:.3rem}
+.sc-tf .tf{font-family:var(--px);font-size:9px;padding:.14rem .35rem;border:2px solid #000;background:var(--pop);color:rgba(255,255,255,.65);cursor:pointer;transition:.1s}
+.sc-tf .tf:hover{color:#fff}
+.sc-tf .tf.active{background:var(--red);color:#fff}
+.candle-view{position:relative;width:100%;height:120px;overflow:hidden;cursor:grab;user-select:none;touch-action:none}
+.candle-view:active{cursor:grabbing}
+.candle-view .candle-chart{display:block;width:100%;height:100%}
+.spot-ohlc{position:absolute;top:8px;left:8px;z-index:5;background:rgba(0,0,0,.78);border:2px solid #000;padding:.3rem .5rem;font-family:var(--vt);font-size:11px;color:#fff;white-space:nowrap;opacity:0;pointer-events:none}
 .spot-empty{color:rgba(255,255,255,.45);padding:1.2rem;font-size:14px}
 @media(max-width:860px){.spot-body{grid-template-columns:1fr}}
 @media(max-width:640px){.gl-side.gainers{border-right:0;border-bottom:2px solid #000}}
+/* ---- F2: liquidity distribution (compact, in left column) ---- */
+.tools-left{display:flex;flex-direction:column;gap:1.4rem;min-width:0}
+.liqd-card{margin-top:0}
+.liqd-body{display:grid;grid-template-columns:1fr;gap:1rem;align-items:center}
+.liqd-donut{position:relative;width:160px;height:160px;margin:0 auto}
+.liqd-donut svg{width:100%;height:100%;display:block}
+.liqd-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;pointer-events:none}
+.liqd-center .lc-total{font-family:var(--vt);font-size:1rem;font-weight:700;color:#fff}
+.liqd-center .lc-label{font-family:var(--px);font-size:8px;text-transform:uppercase;color:rgba(255,255,255,.5)}
+.liqd-list{display:flex;flex-direction:column;gap:.4rem}
+.liqd-row{display:flex;align-items:center;gap:.55rem}
+.liqd-row .ld-av{position:relative;width:26px;height:26px;flex:0 0 26px;border-radius:50%;border:2px solid #000;background:var(--pop);overflow:hidden;display:flex;align-items:center;justify-content:center}
+.liqd-row .ld-av img{position:relative;z-index:2;width:100%;height:100%;object-fit:cover;border-radius:50%;background:var(--pop)}
+.liqd-row .ld-av::after{content:attr(data-c);position:absolute;inset:0;z-index:1;display:flex;align-items:center;justify-content:center;font-family:var(--px);font-size:11px;color:#fff;background:var(--card2)}
+.liqd-row .ld-main{flex:1;min-width:0}
+.liqd-row .ld-top{display:flex;justify-content:space-between;align-items:baseline;font-family:var(--px);font-size:10px;text-transform:uppercase;color:#fff}
+.liqd-row .ld-top .ld-val{font-family:var(--vt);font-size:10px;color:var(--cyan);text-transform:none}
+.liqd-row .ld-bar{height:8px;background:var(--pop);border:2px solid #000;margin-top:.2rem;overflow:hidden}
+.liqd-row .ld-fill{height:100%;transition:width .6s ease}
+.liqd-empty{color:rgba(255,255,255,.45);padding:1.2rem;font-size:14px}
+@media(max-width:860px){.liqd-body{grid-template-columns:1fr}}
 
 .big-cta:active{transform:translate(3px,3px);box-shadow:2px 2px 0 #000}
 .big-cta:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:6px 6px 0 #000}
@@ -1065,6 +1095,7 @@ a.px-btn{display:inline-block;text-align:center;text-decoration:none;width:auto}
     </div>
 
     <div class="tools-grid">
+      <div class="tools-left">
       <!-- FEATURE 02 · REAL-TIME LIQUIDITY HEAT MAP (depth chart) -->
       <div class="px-card tools-card heat">
         <div class="card-title"><h2>Liquidity Heat Map</h2>
@@ -1082,6 +1113,12 @@ a.px-btn{display:inline-block;text-align:center;text-decoration:none;width:auto}
           <div class="heat-spread" id="heatSpread"></div>
         </div>
         <div class="legend"><span class="lg low">Thin</span><span class="lg bar"><i></i></span><span class="lg high">Deep</span></div>
+        <div class="heat-spot">
+          <div class="heat-spot-head"><h3>Token Spotlight</h3><span class="hint" id="spotLive">LIVE</span></div>
+          <div class="spot-body" id="spotBody">
+            <div class="spot-empty">Loading…</div>
+          </div>
+        </div>
       </div>
 
       <!-- HEAT TOKEN PICKER OVERLAY -->
@@ -1097,6 +1134,15 @@ a.px-btn{display:inline-block;text-align:center;text-decoration:none;width:auto}
         </div>
       </div>
 
+      <!-- F2: LIQUIDITY DISTRIBUTION (below heat map, left column) -->
+      <div class="px-card tools-card liqd-card">
+        <div class="card-title"><h2>Liquidity Distribution</h2><span class="hint" id="liqdLive">LIVE</span></div>
+        <div class="liqd-body" id="liqdBody">
+          <div class="liqd-empty">Loading…</div>
+        </div>
+      </div>
+      </div>
+
       <!-- FEATURE 03 · VOLUME PER BLOCK & WHALE TRACKER -->
       <div class="px-card tools-card feed">
         <div class="card-title"><h2>Volume per Block · Whale Tracker</h2><span class="hint" id="feedLive">LIVE</span></div>
@@ -1106,29 +1152,18 @@ a.px-btn{display:inline-block;text-align:center;text-decoration:none;width:auto}
         <div class="feed-list" id="feedList">
           <div class="feed-empty" id="feedEmpty">Loading live swaps…</div>
         </div>
-      </div>
-    </div>
-
-    <!-- F: TOKEN SPOTLIGHT -->
-    <div class="px-card tools-card spot-card">
-      <div class="card-title"><h2>Token Spotlight</h2><span class="hint" id="spotLive">LIVE</span></div>
-      <div class="spot-body" id="spotBody">
-        <div class="spot-empty">Loading…</div>
-      </div>
-    </div>
-
-    <!-- FEATURE 04 · MULTI-TIER POOL MIGRATION TRACKER -->
-    <div class="px-card tools-card mig-card">
-      <div class="card-title"><h2>Multi-Tier Pool Migration Tracker</h2><span class="hint" id="migLive">LIVE</span></div>
-      <p class="tools-sub">LP-attention proxy: where activity & price momentum is strongest (IN) vs pressure / pullback (OUT) — early hint of where smart LPs are defending next. Based on real 24h volume & price change.</p>
-      <div class="mig-flex">
-        <div class="mig-col">
-          <div class="mig-col-head"><span>Momentum IN / Attention</span><span class="mig-agg up" id="migIn">+$—</span></div>
-          <div class="mig-list" id="migInList"><div class="feed-empty">Sampling activity…</div></div>
-        </div>
-        <div class="mig-col">
-          <div class="mig-col-head"><span>Pressure OUT / Pullback</span><span class="mig-agg down" id="migOut">-$—</span></div>
-          <div class="mig-list" id="migOutList"><div class="feed-empty">Sampling activity…</div></div>
+        <div class="feed-mig">
+          <div class="feed-mig-head"><h3>Multi-Tier Pool Migration · LP-Attention</h3><span class="hint" id="migLive">LIVE</span></div>
+          <div class="mig-flex">
+            <div class="mig-col">
+              <div class="mig-col-head"><span>Momentum IN</span><span class="mig-agg up" id="migIn">+$—</span></div>
+              <div class="mig-list" id="migInList"><div class="feed-empty">Sampling…</div></div>
+            </div>
+            <div class="mig-col">
+              <div class="mig-col-head"><span>Pressure OUT</span><span class="mig-agg down" id="migOut">-$—</span></div>
+              <div class="mig-list" id="migOutList"><div class="feed-empty">Sampling…</div></div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -1483,14 +1518,17 @@ function buildPoolsFromRadar(list) {
     const spark = Array.isArray(t.spark) && t.spark.length ? t.spark : [1];
     const apr = liq > 0 ? (vol * 0.003 * 0.85 / liq) * 365 * 100 : 0;
     out.push({
-      id: 'USDC-' + sym, a: 'USDC', b: sym, addr: t.address || '', icon: t.icon || t.imageUrl || '',
-      reserveA: liq, reserveB: liq / (price || 1),
-      tvl: liq, priceB: price, apr: Math.min(240, Math.max(0.1, apr)),
-      vol, chg24: t.change24h || 0, spark,
+    id: 'USDC-' + sym, a: 'USDC', b: sym, addr: t.address || '', icon: t.icon || t.imageUrl || '',
+    reserveA: liq, reserveB: liq / (price || 1),
+    tvl: liq, priceB: price, apr: Math.min(240, Math.max(0.1, apr)),
+    vol, chg24: t.change24h || 0, spark,
     });
-  }
-  return out;
-}
+    }
+    // pin the UNISARC/USDC pool to position #1 so it's the default everywhere
+    const uniIdx = out.findIndex(p => (p.b || '').toUpperCase() === 'UNISARC');
+    if (uniIdx > 0) { const u = out.splice(uniIdx, 1)[0]; out.unshift(u); }
+    return out;
+    }
 function poolsFromSnapshot() { return buildPoolsFromRadar(RADAR_SNAPSHOT); }
 
 /* ============ RENDERING ============ */
@@ -2211,7 +2249,7 @@ $('pmClose').addEventListener('click', closePoolModal);
 $('poolModal').addEventListener('click', e=>{ if (e.target.classList.contains('pool-modal-bg')) closePoolModal(); });
 $('pmList').addEventListener('click', e=>{
   const opt = e.target.closest('.pool-opt');
-  if (opt) { S.selected = opt.dataset.pool; renderPoolChips(); renderAddSide(); closePoolModal(); }
+  if (opt) { S.selected = opt.dataset.pool; S._userPickedPool = true; renderPoolChips(); renderAddSide(); closePoolModal(); }
 });
 $('pmSearch').addEventListener('input', e=> filterPoolOptions(e.target.value));
 $('pmManual').addEventListener('click', ()=>{ closePoolModal(); $('manualPanel').style.display='block'; $('btnManualPool').textContent='× Close manual'; });
@@ -2270,7 +2308,7 @@ window.addEventListener('resize', drawPortfolioChart);
 /* ============ init ============ */
 window.addEventListener('load', async ()=>{
   S.pools = poolsFromSnapshot();
-  S.selected = S.pools.length ? S.pools[0].id : '';
+  S.selected = (S.pools.find(p => (p.b || '').toUpperCase() === 'UNISARC') || S.pools[0])?.id || '';
   // set the active view from the URL hash EARLY and render, then reveal —
   // so the page appears directly on the right tab with NO flash/jump to Positions.
   showView((location.hash || '').slice(1) || 'home');
@@ -2293,7 +2331,9 @@ window.addEventListener('load', async ()=>{
   const live = await fetchRadarTop();
   if (live && live.length) {
     S.pools = buildPoolsFromRadar(live);
-    if (!S.pools.find(p=>p.id===S.selected)) S.selected = S.pools.length ? S.pools[0].id : '';
+    // default-select the UNISARC/USDC pool on first live load (pinned to #1)
+    const uni = S.pools.find(p => (p.b || '').toUpperCase() === 'UNISARC');
+    if (uni && (!S.pools.find(p=>p.id===S.selected) || !S._userPickedPool)) S.selected = uni.id;
     renderPoolChips(); renderAddSide(); renderMonitor();
     if (S.address) loadPositionsUI();
   }
@@ -2712,48 +2752,140 @@ function renderGainersLosers() {
   l.innerHTML = losers.length ? losers.map(t => chip(t, false)).join('') : '<span class="gl-empty">—</span>';
 }
 
-/* ---- F: token spotlight + sparkline ---- */
-function candleSvg(spark) {
-  const W = 360, H = 150, pad = 6;
-  if (!spark || spark.length < 2) return '<svg viewBox="0 0 360 150" preserveAspectRatio="none"><text x="180" y="78" text-anchor="middle" fill="rgba(255,255,255,.4)" font-size="12" style="font-family:monospace">no candles</text></svg>';
-  // compact TradingView-style candles: many thin candles, thin wicks
-  const N = Math.min(60, spark.length - 1);
-  const step = (spark.length - 1) / N;
-  const candles = [];
-  for (let c = 0; c < N; c++) {
-    const i0 = Math.floor(c * step), i1 = Math.min(spark.length - 1, Math.floor((c + 1) * step));
-    const seg = spark.slice(i0, i1 + 1);
-    candles.push({ o: spark[i0], c: spark[i1], h: Math.max(...seg), l: Math.min(...seg) });
+/* ---- F: token spotlight — interactive candlestick chart ---- */
+let _spotChart = null; // { candles:[], cw, offset }
+
+function buildCandles(spark, count) {
+  if (!spark || spark.length < 2) return [];
+  count = count || 40;
+  const target = 160;                       // dense base series (interpolated from spark)
+  const dense = [];
+  for (let i = 0; i < target; i++) {
+    const f = (i / (target - 1)) * (spark.length - 1);
+    const i0 = Math.floor(f), i1 = Math.min(spark.length - 1, i0 + 1), fr = f - i0;
+    dense.push(spark[i0] + (spark[i1] - spark[i0]) * fr);
   }
-  let min = Math.min(...spark), max = Math.max(...spark);
-  const rng = (max - min) || 1; min -= rng * 0.06; max += rng * 0.06; const srng = max - min;
+  // aggregate the dense series into exactly `count` candles — so each timeframe
+  // genuinely produces a different number of, and differently-shaped, candles.
+  const candles = [];
+  const bucket = Math.max(1, Math.floor(dense.length / count));
+  let i = 0;
+  while (i < dense.length && candles.length < count) {
+    const seg = dense.slice(i, i + bucket);
+    const last = seg[seg.length - 1];
+    candles.push({
+      o: candles.length === 0 ? dense[0] : candles[candles.length - 1].c,
+      c: last,
+      h: Math.max(...seg),
+      l: Math.min(...seg)
+    });
+    i += bucket;
+  }
+  return candles;
+}
+
+function drawSpotCandles() {
+  const view = $t('candleView'); if (!view || !_spotChart) return;
+  const { candles, cw, offset } = _spotChart;
+  const W = view.clientWidth || 360, H = view.clientHeight || 150, pad = 8;
+  const visible = Math.max(3, Math.floor(W / Math.max(3, cw)));
+  const start = Math.max(0, Math.min(candles.length - visible, offset));
+  const end = Math.min(candles.length, start + visible);
+  const win = candles.slice(start, end);
+  let min = Infinity, max = -Infinity;
+  win.forEach(c => { if (c.l < min) min = c.l; if (c.h > max) max = c.h; });
+  if (!isFinite(min) || !isFinite(max)) { view.innerHTML = ''; return; }
+  const rng = (max - min) || 1; min -= rng * 0.08; max += rng * 0.08; const srng = max - min;
   const Y = v => H - pad - ((v - min) / srng) * (H - pad * 2);
-  const cw = W / N;
-  const bodyW = Math.max(3, Math.min(6, cw * 0.55));   // slim bodies like TV
-  const half = bodyW / 2;
-  let html = '';
-  for (let g = 0; g <= 4; g++) { const y = Y(min + (max - min) * (g / 4)); html += `<line x1="0" y1="${y.toFixed(1)}" x2="${W}" y2="${y.toFixed(1)}" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>`; }
-  candles.forEach((cd, i) => {
-    const x = i * cw + cw / 2;
+  let html = `<svg class="candle-chart" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">`;
+  // grid + right axis prices
+  for (let g = 0; g <= 4; g++) {
+    const y = Y(min + (max - min) * (g / 4));
+    const px = min + (max - min) * (g / 4);
+    html += `<line x1="0" y1="${y.toFixed(1)}" x2="${W}" y2="${y.toFixed(1)}" stroke="rgba(255,255,255,0.06)"/>`;
+    html += `<text x="${W - 4}" y="${(y - 3).toFixed(1)}" text-anchor="end" fill="rgba(255,255,255,.4)" font-size="9" font-family="monospace">${priceFmt(px)}</text>`;
+  }
+  const bodyW = Math.max(3, cw * 0.62), half = bodyW / 2;
+  win.forEach((cd, i) => {
+    const x = pad + i * cw + (cw * 0.5) - half * 0.4;
     const up = cd.c >= cd.o;
     const col = up ? '#7ee081' : '#d8046a';
     const yH = Y(cd.h), yL = Y(cd.l), yO = Y(cd.o), yC = Y(cd.c);
-    html += `<line class="wick" x1="${x.toFixed(1)}" y1="${yH.toFixed(1)}" x2="${x.toFixed(1)}" y2="${yL.toFixed(1)}" stroke="${col}" stroke-width="1"/>`;
+    html += `<line class="wick" x1="${(x + half).toFixed(1)}" y1="${yH.toFixed(1)}" x2="${(x + half).toFixed(1)}" y2="${yL.toFixed(1)}" stroke="${col}" stroke-width="1"/>`;
     const top = Math.min(yO, yC), bot = Math.max(yO, yC), hgt = Math.max(1.5, bot - top);
-    html += `<rect class="candle" x="${(x - half).toFixed(1)}" y="${top.toFixed(1)}" width="${bodyW.toFixed(1)}" height="${hgt.toFixed(1)}" fill="${col}"/>`;
+    html += `<rect class="candle" data-idx="${start + i}" x="${x.toFixed(1)}" y="${top.toFixed(1)}" width="${bodyW.toFixed(1)}" height="${hgt.toFixed(1)}" fill="${col}"/>`;
   });
-  const last = spark[spark.length - 1], yLast = Y(last);
-  html += `<line x1="0" y1="${yLast.toFixed(1)}" x2="${W}" y2="${yLast.toFixed(1)}" stroke="#fff" stroke-width="1" stroke-dasharray="2 3" opacity="0.65"/>`;
-  return `<svg class="candle-chart" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">${html}</svg>`;
+  // last (current) price line
+  const last = candles[candles.length - 1].c, yLast = Y(last);
+  html += `<line x1="0" y1="${yLast.toFixed(1)}" x2="${W}" y2="${yLast.toFixed(1)}" stroke="#fff" stroke-width="1" stroke-dasharray="2 3" opacity="0.6"/>`;
+  html += '</svg>';
+  view.innerHTML = html;
+  // zoom hint
+  const hint = $t('spotHint'); if (hint) {
+    const inView = visible < candles.length;
+    const tf = (document.querySelector('#scTf .tf.active') || {}).dataset ? (document.querySelector('#scTf .tf.active') || {}).dataset.tf : '15m';
+    hint.textContent = tf + ' · scroll zoom · drag pan' + (inView ? ` · ${visible}/${candles.length}` : '');
+  }
 }
 
-let _spotTick = 0;
+function initSpotCandles() {
+  const view = $t('candleView'); if (!view || view.dataset.wired) return;
+  view.dataset.wired = '1';
+  let drag = null;
+  view.addEventListener('wheel', e => {
+    e.preventDefault();
+    if (!_spotChart) return;
+    const factor = e.deltaY < 0 ? 1.25 : 0.8;
+    _spotChart.cw = Math.max(4, Math.min(40, _spotChart.cw * factor));
+    drawSpotCandles();
+  }, { passive: false });
+  view.addEventListener('mousedown', e => { drag = { x: e.clientX, off: _spotChart ? _spotChart.offset : 0 }; });
+  window.addEventListener('mousemove', e => {
+    if (!drag || !_spotChart) return;
+    const dx = e.clientX - drag.x;
+    _spotChart.offset = Math.max(0, drag.off - Math.round(dx / _spotChart.cw));
+    drawSpotCandles();
+  });
+  window.addEventListener('mouseup', () => { drag = null; });
+  // hover OHLC tooltip
+  view.addEventListener('mousemove', e => {
+    const tip = $t('spotOhlc'); if (!tip || !_spotChart) return;
+    const r = view.getBoundingClientRect();
+    const cx = e.clientX - r.left - 8;
+    const idx = Math.floor(cx / _spotChart.cw) + Math.max(0, Math.min(_spotChart.candles.length, _spotChart.offset));
+    const c = _spotChart.candles[idx];
+    if (!c) { tip.style.opacity = 0; return; }
+    tip.innerHTML = `O ${priceFmt(c.o)}&nbsp; H <span style="color:#7ee081">${priceFmt(c.h)}</span>&nbsp; L <span style="color:#d8046a">${priceFmt(c.l)}</span>&nbsp; C ${priceFmt(c.c)}`;
+    tip.style.left = Math.min(r.width - 260, Math.max(0, e.clientX - r.left)) + 'px';
+    tip.style.top = '8px';
+    tip.style.opacity = 1;
+  });
+  view.addEventListener('mouseleave', () => { const t = $t('spotOhlc'); if (t) t.style.opacity = 0; });
+  // timeframe selector
+  const tfEls = document.querySelectorAll('#scTf .tf');
+  tfEls.forEach(b => b.addEventListener('click', () => {
+    if (!_spotChart) return;
+    const tf = b.dataset.tf;
+    tfEls.forEach(x => x.classList.toggle('active', x === b));
+    setSpotTf(tf);
+  }));
+}
+
+// timeframe -> desired candle width + candle count (lower TF = more detail)
+const TF = { '1m': { cw: 13, n: 70 }, '5m': { cw: 11, n: 55 }, '15m': { cw: 9, n: 40 }, '1H': { cw: 7, n: 26 }, '4H': { cw: 6, n: 16 }, '1D': { cw: 5, n: 10 } };
+function setSpotTf(tf) {
+  if (!_spotChart) return;
+  const t = TF[tf] || TF['15m'];
+  _spotChart.cw = t.cw;
+  _spotChart.candles = buildCandles(_spotChart.spark, t.n);   // rebuild: each TF = different candles
+  _spotChart.offset = _spotChart.candles.length;              // jump to latest
+  drawSpotCandles();
+}
 
 function renderSpotlight() {
   const body = $t('spotBody'); if (!body) return;
   const toks = _heatTokens || [];
   if (!toks.length) { body.innerHTML = '<div class="spot-empty">Loading…</div>'; return; }
-  // feature a high-volume token that has a good spark series (>=10 pts) for candles
   let best = null, fallback = null;
   for (const t of toks) {
     const isSparky = t.volume24 > 0 && Array.isArray(t.spark) && t.spark.length >= 10;
@@ -2764,6 +2896,7 @@ function renderSpotlight() {
   if (!best) { body.innerHTML = '<div class="spot-empty">Loading…</div>'; return; }
   const icon = best.icon ? '<img src="' + best.icon + '" alt="" loading="lazy" onerror="this.style.display=\'none\'" />' : '';
   const ch = best.change24h || 0, cls = ch >= 0 ? 'up' : 'down';
+  _spotChart = { spark: best.spark, candles: buildCandles(best.spark, TF['15m'].n), cw: TF['15m'].cw, offset: 0 };
   body.innerHTML = `<div class="spot-main">
       <span class="ho-av" data-c="${(best.symbol[0] || '?')}">${icon}</span>
       <div class="spot-head">
@@ -2778,9 +2911,69 @@ function renderSpotlight() {
       </div>
     </div>
     <div class="spot-chart">
-      <div class="sc-title">15m · ${best.spark.length} pts · <span class="sc-live">LIVE</span></div>
-      ${candleSvg(best.spark)}
+      <div class="sc-head">
+        <span class="sc-title">Candles · <span id="spotHint">scroll zoom · drag pan</span></span>
+        <div class="sc-tf" id="scTf">
+          <button class="tf" data-tf="1m">1m</button>
+          <button class="tf" data-tf="5m">5m</button>
+          <button class="tf active" data-tf="15m">15m</button>
+          <button class="tf" data-tf="1H">1H</button>
+          <button class="tf" data-tf="4H">4H</button>
+          <button class="tf" data-tf="1D">1D</button>
+        </div>
+      </div>
+      <div class="candle-view" id="candleView"><div class="spot-empty">Loading…</div></div>
+      <div class="spot-ohlc" id="spotOhlc"></div>
     </div>`;
+  initSpotCandles();
+  requestAnimationFrame(drawSpotCandles);
+}
+
+/* ---- F2: liquidity distribution (donut + bars) ---- */
+function renderLiquidityDistribution() {
+  const body = $t('liqdBody'); if (!body) return;
+  const toks = (_heatTokens || []).filter(t => (t.liquidityUsdc || 0) > 0);
+  if (!toks.length) { body.innerHTML = '<div class="liqd-empty">Loading…</div>'; return; }
+  // sort by liquidity, but pin UNISARC (the token with the official website) to #1
+  const sorted = toks.slice().sort((a, b) => (b.liquidityUsdc || 0) - (a.liquidityUsdc || 0));
+  const uniIdx = sorted.findIndex(t => (t.symbol || '').toUpperCase() === 'UNISARC');
+  if (uniIdx > 0) { const u = sorted.splice(uniIdx, 1)[0]; sorted.unshift(u); }
+  const top = sorted.slice(0, 8);
+  const rest = sorted.slice(8);
+  const restLiq = rest.reduce((s, t) => s + (t.liquidityUsdc || 0), 0);
+  const total = sorted.reduce((s, t) => s + (t.liquidityUsdc || 0), 0) || 1;
+  const items = top.map(t => ({ sym: t.symbol, icon: t.icon || '', liq: t.liquidityUsdc || 0 }));
+  if (rest.length) items.push({ sym: 'Other', icon: '', liq: restLiq });
+
+  // color palette
+  const colors = ['#61dcd8', '#d8046a', '#f2b824', '#7ee081', '#7b289e', '#4a7dff', '#ff7a59', '#39d98a', '#b0b6c3'];
+  // donut segments
+  const R = 80, C = 2 * Math.PI * R, cx = 105, cy = 105;
+  let acc = 0;
+  let segs = items.map((it, i) => {
+    const frac = it.liq / total;
+    const dash = Math.max(0.5, frac * C - 3);
+    const offset = acc * C;
+    acc += frac;
+    return `<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="${colors[i % colors.length]}" stroke-width="26" stroke-dasharray="${dash.toFixed(1)} ${(C - dash).toFixed(1)}" stroke-dashoffset="${(C * 0.25 - offset * C).toFixed(1)}"/>`;
+  }).join('');
+  // bars
+  const bars = items.map((it, i) => {
+    const pct = (it.liq / total) * 100;
+    const ldAv = it.icon ? `<span class="ld-av" data-c="${it.sym[0] || '?'}"><img src="${it.icon}" alt="" loading="lazy" onerror="this.style.display='none'"/></span>` : `<span class="ld-av" data-c="${it.sym[0] || '?'}"></span>`;
+    return `<div class="liqd-row">
+      ${ldAv}
+      <div class="ld-main">
+        <div class="ld-top"><span>${it.sym}</span><span class="ld-val">$${fmt(it.liq)} · ${pct.toFixed(1)}%</span></div>
+        <div class="ld-bar"><div class="ld-fill" style="width:${pct.toFixed(1)}%;background:${colors[i % colors.length]}"></div></div>
+      </div>
+    </div>`;
+  }).join('');
+  body.innerHTML = `<div class="liqd-donut">
+      <svg viewBox="0 0 210 210">${segs}<circle cx="${cx}" cy="${cy}" r="${R-18}" fill="var(--pop)" stroke="#000" stroke-width="3"/></svg>
+      <div class="liqd-center"><span class="lc-total">$${fmt(total)}</span><span class="lc-label">Total Liq</span></div>
+    </div>
+    <div class="liqd-list">${bars}</div>`;
 }
 
 async function renderTools() {
@@ -2796,7 +2989,11 @@ async function renderTools() {
   if (typeof fetchHeatTokens === 'function' && !_heatTokensLoaded) {
     _heatTokensLoaded = true;
     const toks = await fetchHeatTokens();
-    if (toks.length && _heatIdx < 0) { _heatIdx = 0; }
+    // default the heatmap picker to UNISARC
+    if (_heatIdx < 0) {
+      const uniIdx = toks.findIndex(t => (t.symbol || '').toUpperCase() === 'UNISARC');
+      _heatIdx = uniIdx >= 0 ? uniIdx : 0;
+    }
     if (_heatIdx >= 0 && toks[_heatIdx]) {
       const lbl = $t('heatPickLabel'); if (lbl) lbl.textContent = toks[_heatIdx].symbol;
       const pic = $t('heatPickIcon'); if (pic) { pic.src = toks[_heatIdx].icon || ''; pic.style.display = toks[_heatIdx].icon ? '' : 'none'; }
@@ -2804,6 +3001,7 @@ async function renderTools() {
     // render market summary (gainers/losers) + spotlight now that tokens are loaded
     if (typeof renderGainersLosers === 'function') renderGainersLosers();
     if (typeof renderSpotlight === 'function') renderSpotlight();
+    if (typeof renderLiquidityDistribution === 'function') renderLiquidityDistribution();
   }
 
   // kick off realtime refresh loops (guarded so they run once)
