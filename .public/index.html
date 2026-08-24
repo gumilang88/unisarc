@@ -163,6 +163,12 @@ main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 5rem}
 .tk-stack .bal{font-family:var(--vt);font-size:11px;color:var(--green);white-space:nowrap;line-height:1.1}
 .tk-stack .bal-usd{font-family:var(--vt);font-size:10px;color:rgba(255,255,255,.55);white-space:nowrap;line-height:1.1}
 .tk-stack .tk-pill{display:flex;align-items:center;gap:.5rem;padding:0;background:transparent;border:0;font-family:var(--px);font-size:13px;text-transform:uppercase;white-space:nowrap;line-height:1}
+.mode-sel{display:flex;align-items:center;gap:.4rem;margin:.2rem 0 .55rem;flex-wrap:wrap}
+.mode-chip{font-family:var(--px);font-size:11px;text-transform:uppercase;padding:.35rem .65rem;border:3px solid #000;background:var(--card2);color:rgba(255,255,255,.8);cursor:pointer;transition:.12s;box-shadow:3px 3px 0 #000}
+.mode-chip:hover{background:#942fbb}
+.mode-chip.active{background:#d8046a;color:#fff}
+.mode-hint{font-family:var(--vt);font-size:12px;color:rgba(255,255,255,.5)}
+.single-note{font-family:var(--vt);font-size:13px;color:var(--yellow);background:rgba(255,255,255,.05);border:2px dashed rgba(255,190,57,.5);padding:.5rem .6rem;margin-bottom:.55rem}
 .ratio-bar{display:flex;align-items:center;gap:.6rem;margin:.9rem 0}
 .ratio-bar .line{flex:1;height:10px;border:3px solid #000;background:var(--pop);display:flex}
 .ratio-bar .line i{height:100%}
@@ -175,12 +181,101 @@ main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 5rem}
 .big-cta{width:100%;font-family:var(--px);font-size:14px;text-transform:uppercase;padding:.95rem;border:4px solid #000;
      box-shadow:6px 6px 0 #000;background:#d8046a;color:#fff;margin-top:.6rem}
 .big-cta:hover{background:#f2218b}
+/* pool stats panel */
+.pool-stats{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}
+.ps-card{background:var(--pop);border:2px solid #000;padding:.5rem .6rem}
+.ps-card .ps-k{font-family:var(--px);font-size:9px;text-transform:uppercase;color:rgba(255,255,255,.5);display:block}
+.ps-card .ps-v{font-family:var(--vt);font-size:1.05rem;font-weight:700;color:#fff;display:block;margin-top:.1rem}
+.ps-card .ps-v.up{color:var(--green)}
+.ps-card .ps-v.down{color:var(--red)}
+.ps-card .ps-v.hot{color:var(--yellow)}
+.ps-wide{grid-column:1/-1}
+.ps-sub{font-family:var(--vt);font-size:11px;color:rgba(255,255,255,.5);display:block;margin-top:.1rem}
+/* range visual (Add LP modal) */
+.range-viz{margin-top:.5rem;border:2px solid #000;background:var(--bg2);padding:.3rem}
+.range-viz canvas{display:block;width:100%;height:auto}
+.range-legend{display:flex;justify-content:space-between;font-family:var(--vt);font-size:11px;color:rgba(255,255,255,.6);margin-top:.25rem}
+.range-legend b{color:var(--green);font-weight:700}
+/* position preview (Add LP live) */
+.pos-preview{margin-top:.6rem;background:var(--bg2);border:3px solid #000;box-shadow:3px 3px 0 #000;padding:.7rem .8rem;display:none}
+.pos-preview .pv-title{font-family:var(--px);font-size:10px;text-transform:uppercase;color:var(--yellow);margin-bottom:.5rem;display:flex;justify-content:space-between;align-items:center}
+.pos-preview .pv-row{display:flex;justify-content:space-between;align-items:center;padding:.32rem 0;border-bottom:2px solid rgba(0,0,0,.4);font-family:var(--vt);font-size:14px}
+.pos-preview .pv-row:last-child{border-bottom:0}
+.pos-preview .pv-row .k{color:rgba(255,255,255,.6)}
+.pos-preview .pv-row .v{color:var(--cyan);font-weight:700;text-align:right}
+.pos-preview .pv-row .v.green{color:var(--green)}
+.pos-preview .pv-row .v.red{color:var(--red)}
+.pos-preview .pv-bar{height:8px;border:2px solid #000;background:var(--pop);margin:.5rem 0;position:relative;overflow:hidden}
+.pos-preview .pv-bar i{position:absolute;top:0;bottom:0;background:var(--green)}
+.pos-preview .pv-bar .cur{position:absolute;top:-3px;bottom:-3px;width:3px;background:var(--yellow)}
+/* maximize yield */
+.my-btn{width:100%;font-family:var(--px);font-size:12px;text-transform:uppercase;padding:.75rem;border:4px solid #000;box-shadow:6px 6px 0 #000;background:#7b289e;color:#fff;margin-top:.6rem;cursor:pointer;transition:.12s}
+.my-btn:hover{background:#942fbb;transform:translate(-1px,-1px);box-shadow:7px 7px 0 #000}
+.my-btn .mk{display:inline-block;width:14px;height:14px;border-radius:50%;background:var(--green);border:2px solid #000;margin-right:.35rem;vertical-align:-2px}
+/* token badges (#3) */
+.tok-badges{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.6rem}
+.tbadge{font-family:var(--px);font-size:9px;text-transform:uppercase;padding:.2rem .45rem;border:2px solid #000;background:var(--card);color:#fff;display:inline-flex;align-items:center;gap:.3rem}
+.tbadge.ver{background:#123c1b;color:#7ee081}
+.tbadge.unver{background:#3a120f;color:#f8a3b8}
+.tbadge.lp{color:var(--yellow)}
+.tbadge.web{color:var(--cyan)}
+.tbadge.web a{color:var(--cyan);text-decoration:none}
+.tbadge.web a:hover{text-decoration:underline}
+/* auto-balance toggle (#5) */
+.autobal-row{margin-top:.6rem}
+.ab-toggle{display:flex;align-items:center;gap:.5rem;cursor:pointer;font-family:var(--px);font-size:10px;text-transform:uppercase;color:rgba(255,255,255,.75)}
+.ab-toggle input{display:none}
+.ab-slider{width:36px;height:20px;border-radius:10px;background:var(--pop);border:2px solid #000;position:relative;flex:0 0 36px;transition:background .15s}
+.ab-slider::after{content:"";position:absolute;top:1px;left:2px;width:14px;height:14px;border-radius:50%;background:#fff;transition:left .15s}
+.ab-toggle input:checked + .ab-slider{background:var(--green)}
+.ab-toggle input:checked + .ab-slider::after{left:17px}
+.ab-toggle em{font-style:normal}
+.bal-warn{margin-top:.55rem;background:#3a120f;border:3px solid var(--red);padding:.5rem .65rem;font-family:var(--vt);font-size:12px;color:#ffb9c9}
+.my-btn:active{transform:translate(2px,2px);box-shadow:none}
+.maxy-panel{margin-top:.7rem;background:var(--pop);border:3px solid #000;padding:.7rem .8rem}
+.maxy-title{font-family:var(--px);font-size:10px;text-transform:uppercase;color:var(--yellow);margin-bottom:.5rem}
+.maxy-list{display:grid;gap:.4rem}
+.maxy-row{display:flex;align-items:center;justify-content:space-between;gap:.5rem;font-family:var(--px);font-size:11px;text-transform:uppercase;color:#fff;background:var(--card);border:2px solid #000;padding:.4rem .55rem}
+.maxy-row .mx-sym{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:inline-flex;align-items:center;gap:.25rem}
+.mx-ico{width:18px;height:18px;object-fit:contain;border-radius:3px;flex:0 0 18px;display:inline-block;vertical-align:-4px}
+.mx-ico.mx-letter{width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;font-family:var(--px);font-size:9px;color:#fff;border-radius:4px;flex:0 0 18px;vertical-align:-4px;border:1px solid #000}
+.maxy-row .mx-apr{font-family:var(--vt);font-weight:700;color:var(--yellow);white-space:nowrap}
+.maxy-row .mx-vol{font-family:var(--vt);font-size:10px;color:rgba(255,255,255,.5);white-space:nowrap}
+.maxy-row .mx-add{cursor:pointer;background:#61dcd8;color:#000;border:2px solid #000;padding:.15rem .5rem;font-family:var(--px);font-size:10px;text-transform:uppercase;white-space:nowrap}
+.maxy-row .mx-add:hover{background:#8ce8e5}
 
 /* ---------- public terminal / tools ---------- */
 .tools-grid{display:grid;grid-template-columns:1.35fr .9fr;gap:1.4rem;align-items:start;margin-bottom:1.4rem}
 .tools-grid > *{min-width:0}
 .tools-card{padding:1.3rem 1.4rem}
 .tools-sub{color:rgba(255,255,255,.65);font-size:15px;margin-bottom:1rem}
+/* ---- momentum matrix ---- */
+.mom-card{padding:.9rem 1rem}
+.mom-card .card-title{margin-bottom:.6rem}
+.mom-card .tools-sub{margin-bottom:.7rem;font-size:13px}
+.mom-grid{display:grid;grid-template-columns:repeat(10,1fr);grid-auto-rows:38px;gap:3px;margin-bottom:.7rem}
+.mom-cell{position:relative;border:2px solid #000;cursor:pointer;display:flex;align-items:flex-end;justify-content:flex-start;overflow:hidden;transition:transform .08s}
+.mom-cell:hover{transform:scale(1.28);z-index:5}
+.mom-cell .mc-sym{position:absolute;left:2px;top:1px;font-family:var(--px);font-size:10px;line-height:1;color:#000;text-shadow:0 1px 0 rgba(255,255,255,.6),1px 0 0 rgba(255,255,255,.6);max-width:100%;white-space:nowrap;overflow:hidden}
+.mom-cell .mc-s{position:absolute;right:1px;bottom:1px;font-family:var(--px);font-size:11px;line-height:1;color:#fff;text-shadow:1px 1px 0 #000}
+.mom-empty{grid-column:1/-1;color:rgba(255,255,255,.5);font-size:14px;padding:1.2rem 0;text-align:center}
+.mom-card .rsi-footer{align-items:flex-start}
+/* ---- pairs screener ---- */
+.scr-wrap{overflow-x:auto;max-height:560px;overflow-y:auto}
+.scr-table{width:100%;border-collapse:collapse;font-size:13px}
+.scr-table th{font-family:var(--px);font-size:11px;text-transform:uppercase;color:rgba(255,255,255,.6);text-align:right;padding:.5rem .5rem;border-bottom:3px solid #000;cursor:pointer;white-space:nowrap;user-select:none}
+.scr-table th:first-child{text-align:left}
+.scr-table th:hover{color:var(--yellow)}
+.scr-table th .sc{direction:rtl;unicode-bidi:plaintext}
+.scr-table td{padding:.45rem .5rem;border-bottom:2px solid rgba(0,0,0,.4);text-align:right;font-family:var(--vt);white-space:nowrap}
+.scr-table td:first-child{text-align:left;font-family:var(--px);font-size:12px;text-transform:uppercase;color:#fff}
+.scr-table tr{cursor:pointer}
+.scr-table tr:hover{background:rgba(61,218,216,.06)}
+.scr-table td.up{color:var(--green)}
+.scr-table td.down{color:var(--red)}
+.scr-table td.sym-main{display:flex;align-items:center;gap:.35rem}
+.scr-table td img{width:16px;height:16px;border:1px solid #000;background:#fff;object-fit:cover}
+.scr-table td small{color:rgba(255,255,255,.4);font-family:var(--vt);font-size:10px}
 /* ---- D: terminal header + stats pills ---- */
 .term-head{align-items:center}
 .term-pills{display:flex;gap:.6rem;flex-wrap:wrap}
@@ -403,6 +498,9 @@ main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 5rem}
 .claim-all{display:flex;align-items:center;gap:.6rem;font-family:var(--px);font-size:13px;text-transform:uppercase;padding:.9rem 1.3rem;border:4px solid #000;
      box-shadow:6px 6px 0 #000;background:var(--red);color:#fff}
 .claim-all:hover{background:#f2218b}
+.reward-actions{display:flex;align-items:center;gap:1rem}
+.claim-all.comp{background:var(--green);color:#08260f}
+.claim-all.comp:hover{background:#9cf0a3;color:#08260f}
 .claim-all:active{transform:translate(3px,3px);box-shadow:2px 2px 0 #000}
 .rw-row{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.3rem;border-bottom:3px solid #000;gap:1rem;flex-wrap:wrap}
 .rw-row:last-child{border-bottom:0}
@@ -433,11 +531,13 @@ main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 5rem}
 @keyframes pop{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:none}}
 .modal h3{font-family:var(--px);font-size:13px;text-transform:uppercase;margin-bottom:.4rem;text-shadow:2px 2px 0 #000}
 .modal .msub{font-family:var(--vt);font-size:17px;color:rgba(255,255,255,.65);margin-bottom:1.2rem}
-.mrow{display:flex;justify-content:space-between;padding:.55rem 0;border-bottom:2px solid rgba(0,0,0,.4);font-size:15px;gap:1rem}
-.mrow .k{color:rgba(255,255,255,.65)} .mrow .v{font-family:var(--vt);color:var(--cyan)}
+.mrow{display:flex;justify-content:space-between;align-items:center;padding:.55rem 0;border-bottom:2px solid rgba(0,0,0,.4);font-size:15px;gap:1rem}
+.mrow .k{font-family:var(--px);font-size:11px;text-transform:uppercase;color:rgba(255,255,255,.6);letter-spacing:.03em;white-space:nowrap}
+.mrow .v{font-family:var(--vt);color:var(--cyan);text-align:right;font-size:14px;word-break:break-word}
 .mfield{margin:.9rem 0}
-.mfield label{font-family:var(--px);font-size:13px;text-transform:uppercase;color:rgba(255,255,255,.6);display:block;margin-bottom:.4rem}
-.mfield input,.mfield select{width:100%;padding:.6rem .8rem;border:3px solid #000;background:var(--pop);color:var(--cyan);font-family:var(--vt);font-size:1.2rem;outline:0}
+.mfield label{font-family:var(--px);font-size:11px;text-transform:uppercase;color:rgba(255,255,255,.6);display:block;margin-bottom:.35rem;letter-spacing:.03em}
+.mfield label .opt{color:rgba(255,255,255,.35);text-transform:none;font-size:10px;font-family:var(--vt)}
+.mfield input,.mfield select{width:100%;padding:.55rem .7rem;border:3px solid #000;background:var(--pop);color:var(--cyan);font-family:var(--vt);font-size:.95rem;outline:0}
 .modal-actions{display:flex;gap:.6rem;margin-top:1.2rem}
 .wallet-card{display:flex;align-items:center;gap:.75rem;padding:.9rem 1rem;background:var(--pop);border:3px solid #000;margin-bottom:1.1rem}
 .wallet-card .ava{width:42px;height:42px;border:3px solid #000;display:grid;place-items:center;font-family:var(--px);font-size:13px;color:var(--ink);background:var(--yellow)}
@@ -977,7 +1077,13 @@ a.px-btn{display:inline-block;text-align:center;text-decoration:none;width:auto}
         </div>
 
         <div class="card-title" style="margin-top:1rem"><h2>2 - Deposit Amounts</h2></div>
-        <div class="amount-row">
+        <div class="mode-sel" id="modeSel">
+          <button class="mode-chip active" id="modeAuto" type="button">Auto balance</button>
+          <button class="mode-chip" id="modeSingle" type="button">1 asset</button>
+          <span class="mode-hint" id="modeHint">deposit one token — we swap 50% & add both sides</span>
+        </div>
+        <div class="single-note" id="singleNote" style="display:none">One-sided deposit: token A (USDC) only. 50% is swapped to token B, then the position is minted 50/50.</div>
+        <div class="amount-row" id="rowAmtA">
           <input id="amtA" type="text" inputmode="decimal" placeholder="0.00" />
           <button class="max-btn" data-max="a">MAX</button>
           <span class="tk-stack">
@@ -986,7 +1092,7 @@ a.px-btn{display:inline-block;text-align:center;text-decoration:none;width:auto}
             <span class="tk-pill"><span class="dot" id="chipA">A</span><span id="symA">—</span></span>
           </span>
         </div>
-        <div class="amount-row">
+        <div class="amount-row" id="rowAmtB">
           <input id="amtB" type="text" inputmode="decimal" placeholder="0.00" />
           <button class="max-btn" data-max="b">MAX</button>
           <span class="tk-stack">
@@ -995,10 +1101,21 @@ a.px-btn{display:inline-block;text-align:center;text-decoration:none;width:auto}
             <span class="tk-pill"><span class="dot" id="chipB">B</span><span id="symB">—</span></span>
           </span>
         </div>
-        <div class="ratio-bar">
+        <div class="ratio-bar" id="ratioBar">
           <div class="line"><i id="ratioA" style="width:50%;background:var(--cyan)"></i><i id="ratioB" style="width:50%;background:var(--yellow)"></i></div>
           <span class="hint" id="ratioText">50 / 50</span>
         </div>
+        <div class="pos-preview" id="posPreview">
+          <div class="pv-title"><span>Position Preview</span><span id="pvStatus" class="green">—</span></div>
+          <div class="pv-row"><span class="k">You deposit</span><span class="v" id="pvDeposit">—</span></div>
+          <div class="pv-row"><span class="k">Pool share</span><span class="v" id="pvShare">—</span></div>
+          <div class="pv-row"><span class="k">Value in pool</span><span class="v" id="pvValue">—</span></div>
+          <div class="pv-row"><span class="k">Est. daily fees</span><span class="v green" id="pvDaily">—</span></div>
+          <div class="pv-row"><span class="k">Price range</span><span class="v" id="pvRange">—</span></div>
+          <div class="pv-bar"><i id="pvBarFill" style="width:100%"></i><span class="cur" id="pvBarCur" style="left:50%"></span></div>
+        </div>
+        <div class="tok-badges" id="tokBadges"></div>
+        <div class="bal-warn" id="balWarn" style="display:none"></div>
         <div class="detail-table">
           <div class="dt-row"><span class="k">Price (A per B)</span><span class="v" id="detailPrice">—</span></div>
           <div class="dt-row"><span class="k">Pool reserves</span><span class="v" id="detailReserves">—</span></div>
@@ -1007,9 +1124,17 @@ a.px-btn{display:inline-block;text-align:center;text-decoration:none;width:auto}
           <div class="dt-row"><span class="k">Slippage tolerance</span><span class="v"><span class="slippage"><select id="slippageSel"><option>0.5</option><option selected>1.0</option><option>2.5</option><option>5.0</option></select>%</span></span></div>
         </div>
         <button class="big-cta" id="btnAdd">Add Liquidity</button>
-        <p style="font-size:15px;color:rgba(255,255,255,.55);text-align:center;margin-top:.7rem" id="addHint"></p>
+        <button class="my-btn" id="btnMaxYield" type="button"><span class="mk"></span> Maximize Yield (auto-allocate)</button>
+        <div class="maxy-panel" id="maxyPanel" style="display:none">
+          <div class="maxy-title">Recommended: best-yield allocation</div>
+          <div class="maxy-list" id="maxyList"></div>
+        </div>
       </div>
       <div>
+        <div class="px-card" style="padding:1.2rem 1.3rem;margin-bottom:1.4rem">
+          <div class="card-title"><h2>Pool Stats</h2><span class="hint" id="psLive">LIVE</span></div>
+          <div class="pool-stats" id="poolStats"></div>
+        </div>
         <div class="px-card" style="padding:1.2rem 1.3rem;margin-bottom:1.4rem">
           <div class="card-title"><h2>How it works</h2></div>
           <div class="info-list">
@@ -1047,7 +1172,10 @@ a.px-btn{display:inline-block;text-align:center;text-decoration:none;width:auto}
         <div class="amt" id="rwTotal">$0.00</div>
         <div class="lbl" id="rwNote" style="margin-top:.4rem">Connect wallet to see your rewards</div>
       </div>
-      <button class="claim-all" id="btnClaimAll">Claim All</button>
+      <div class="reward-actions">
+        <button class="claim-all" id="btnClaimAll">Claim All</button>
+        <button class="claim-all comp" id="btnCompound">Compound</button>
+      </div>
     </div>
     <div class="px-card" id="rwList"></div>
   </section>
@@ -1166,7 +1294,36 @@ a.px-btn{display:inline-block;text-align:center;text-decoration:none;width:auto}
           </div>
         </div>
       </div>
-    </div>
+      </div>
+
+      <!-- FEATURE 04 · PAIRS SCREENER (full width) -->
+      <div class="px-card tools-card scr-card">
+        <div class="card-title"><h2>Pairs Screener</h2><span class="hint" id="scrLive">TOP 50 · LIVE</span></div>
+        <p class="tools-sub">Sortable table of USDC pairs. Click a header to sort; click a row to jump to Add LP for that pool.</p>
+        <div class="scr-wrap">
+          <table class="scr-table" id="scrTable">
+            <thead><tr id="scrHead"></tr></thead>
+            <tbody id="scrBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- FEATURE 05 · MOMENTUM MATRIX (multi-TF score, compact) -->
+      <div class="px-card tools-card mom-card">
+        <div class="card-title"><h2>Momentum Matrix</h2><span class="hint" id="momLive">TOP 50 · est.</span></div>
+        <p class="tools-sub">Multi-timeframe momentum score (5m / 1h / 6h / 24h). Green = strong across all TFs, red = weak across all TFs. Hover for detail.</p>
+        <div class="mom-grid" id="momGrid">
+          <div class="mom-empty">Loading…</div>
+        </div>
+        <div class="rsi-footer">
+          <div class="rsi-legend">
+            <span class="lg"><span class="sw" style="background:linear-gradient(135deg,#16c784,#20e3b2)"></span>Strong</span>
+            <span class="lg"><span class="sw" style="background:linear-gradient(135deg,#6b7280,#9ca3af)"></span>Neutral</span>
+            <span class="lg"><span class="sw" style="background:linear-gradient(135deg,#ff5f6d,#ff2d55)"></span>Weak</span>
+          </div>
+          <div class="rsi-stats" id="momStats"></div>
+        </div>
+      </div>
   </section>
 
   <div class="footer-wrap">
@@ -1227,17 +1384,18 @@ a.px-btn{display:inline-block;text-align:center;text-decoration:none;width:auto}
     <div class="mrow"><span class="k">Amount A</span><span class="v" id="adAmtA">—</span></div>
     <div class="mrow"><span class="k">Amount B</span><span class="v" id="adAmtB">—</span></div>
     <div class="mfield">
-      <label>Deposit into existing position</label>
-      <select id="adPosSel"><option value="">(new position)</option></select>
+      <label>Existing position <span class="opt">(optional)</span></label>
+      <select id="adPosSel"><option value="">New position</option></select>
     </div>
     <div class="mfield">
       <label>Range</label>
       <select id="adRange">
-        <option value="full">Full range (min/max tick)</option>
-        <option value="wide">Wide (±10%)</option>
-        <option value="medium">Medium (±2%)</option>
-        <option value="tight">Tight (±0.5%)</option>
+        <option value="full">Full range — min/max</option>
+        <option value="wide">Wide — ±10%</option>
+        <option value="medium">Medium — ±2%</option>
+        <option value="tight">Tight — ±0.5%</option>
       </select>
+      <div class="range-viz" id="rangeViz"><canvas id="rangeChart" width="400" height="96"></canvas></div>
     </div>
     <div class="mrow"><span class="k">Est. LP share</span><span class="v" id="adShare">—</span></div>
     <div class="modal-actions">
@@ -1279,7 +1437,6 @@ const CFG = {
   rpcUrls: [
     'https://rpc.arc-scan.org',
     'https://arc-mainnet.infura.io/v3/b6bf7d3508c941499b10025c0776eaf8',
-    'https://robinlaunchpad.com/rpc/arc/v1',
   ],
   blockExplorerUrls: ['https://arc-scan.org'],
   factory: '0xf0db7b58379503491d857db50ac9ece64c653918',  // Uniswap V3 Factory
@@ -1409,6 +1566,7 @@ async function tokenBalanceOf(addr, decimals) {
 }
 
 let _balReq = 0;
+let _lastBal = { a: 0, b: 0 };
 async function renderBalances(p) {
   const req = ++_balReq;
   const symA = p.a || 'USDC', symB = p.b || '?';
@@ -1416,6 +1574,7 @@ async function renderBalances(p) {
   if (!S.address) {
     bA.textContent = '0 ' + symA; usdA.textContent = '≈ $0.00';
     bB.textContent = '0 ' + symB; usdB.textContent = '≈ $0.00';
+    _lastBal = { a: 0, b: 0 };
     return;
   }
   // token A = USDC (price 1); token B = quote token at priceB
@@ -1433,6 +1592,7 @@ async function renderBalances(p) {
   usdA.textContent = '≈ $' + fmt(valA);
   bB.textContent = fmtCoin(balB, decB) + ' ' + symB;
   usdB.textContent = '≈ $' + fmt(valB);
+  _lastBal = { a: balA, b: balB };
 }
 
 // Uniswap V3 pool address via factory.getPool(token0, token1, fee)
@@ -1484,6 +1644,8 @@ async function readPositions(owner) {
         tickLower: Number(BigInt.asIntN(24, get(5))),
         tickUpper: Number(BigInt.asIntN(24, get(6))),
         liquidity: get(7) & ((1n << 128n) - 1n),   // uint128
+        fgi0Last: get(8) & ((1n << 256n) - 1n),    // feeGrowthInside0LastX128
+        fgi1Last: get(9) & ((1n << 256n) - 1n),    // feeGrowthInside1LastX128
         owed0: get(10) & ((1n << 128n) - 1n),
         owed1: get(11) & ((1n << 128n) - 1n),
         pool: null, amounts: { a0:0, a1:0 }, price: 0, value: 0, feesUsd: 0, meta0: null, meta1: null,
@@ -1516,12 +1678,14 @@ function buildPoolsFromRadar(list) {
     seen.add(key);
     const price = t.price || 0;
     const spark = Array.isArray(t.spark) && t.spark.length ? t.spark : [1];
-    const apr = liq > 0 ? (vol * 0.003 * 0.85 / liq) * 365 * 100 : 0;
+    const apr = liq > 0 ? (vol * 0.01 * 0.85 / liq) * 365 * 100 : 0;
     out.push({
     id: 'USDC-' + sym, a: 'USDC', b: sym, addr: t.address || '', icon: t.icon || t.imageUrl || '',
+    fee: 10000, // fee tier 1% (semua pool Arc dari RadarDex = 1%)
     reserveA: liq, reserveB: liq / (price || 1),
     tvl: liq, priceB: price, apr: Math.min(240, Math.max(0.1, apr)),
     vol, chg24: t.change24h || 0, spark,
+    verified: !!t.verified, launchpad: t.launchpad || '', website: t.website || '', twitter: t.twitter || '',
     });
     }
     // pin the UNISARC/USDC pool to position #1 so it's the default everywhere
@@ -1534,7 +1698,7 @@ function poolsFromSnapshot() { return buildPoolsFromRadar(RADAR_SNAPSHOT); }
 /* ============ RENDERING ============ */
 const token = s => CFG.tokens.find(t=>t.symbol===s) || { symbol:s, decimals:6, color:'#3ddad8', icon:'' };
 const feeName = f => f === 100 ? '0.01%' : f === 500 ? '0.05%' : f === 3000 ? '0.3%' : f === 10000 ? '1%' : (f/10000)+'%';
-const rangeName = (pos) => (pos.tickLower === MIN_TICK && pos.tickUpper === MAX_TICK) ? 'FULL RANGE' : 'RANGE';
+const rangeName = (pos) => (pos.tickLower <= -880000 && pos.tickUpper >= 880000) ? 'FULL RANGE' : 'RANGE';
 
 async function loadPositionsUI() {
   if (!S.address) { S.positions = []; renderPositions(); renderRewards(); renderMonitor(); return; }
@@ -1547,6 +1711,14 @@ async function loadPositionsUI() {
       pos.meta0 = m0; pos.meta1 = m1;
       const pool = await getPool(pos.t0, pos.t1, pos.fee);
       pos.pool = pool;
+      // Logo koin: token non-USDC ambil dari poolInfo.icon (RadarDex). USDC selalu USDC_ICON. JANGAN USDC dobel.
+      { const _pi = S.pools.find(_p => String(_p.b).toLowerCase() === (pos.t0 === USDC_ADDR ? (m1.symbol||'').toLowerCase() : (m0.symbol||'').toLowerCase())
+                || String(_p.b).toLowerCase() === (pos.t0 === USDC_ADDR ? (m0.symbol||'').toLowerCase() : (m1.symbol||'').toLowerCase()));
+        const coinIcon = (_pi && _pi.icon && _pi.icon !== '/' && _pi.icon !== USDC_ICON) ? _pi.icon : '';
+        if (pos.t0 !== USDC_ADDR && coinIcon && (!m0.icon || m0.icon === USDC_ICON)) m0.icon = coinIcon;
+        if (pos.t1 !== USDC_ADDR && coinIcon && (!m1.icon || m1.icon === USDC_ICON)) m1.icon = coinIcon;
+        pos.poolIcon = coinIcon;
+      }
       const [slotHex, liqHex] = await Promise.all([
         ethCall(pool, '0x3850c7bd').catch(() => null),
         ethCall(pool, '0x1a686502').catch(() => null),
@@ -1556,27 +1728,59 @@ async function loadPositionsUI() {
       let tick = 0;
       try { const tickRaw = BigInt.asIntN(24, BigInt('0x' + r.slice(66, 130))); tick = Number(tickRaw); } catch(e) {}
       pos.sqrt = sqrtPriceX96; pos.tick = tick;
-      pos.price = sqrtPriceToPrice(sqrtPriceX96);
       const poolLiq = liqHex ? BigInt(liqHex) & ((1n << 128n) - 1n) : 0n;
       pos.poolLiquidity = poolLiq;
       const poolInfo = S.pools.find(pp => pp.addr && (pp.addr.toLowerCase() === pos.t0 || pp.addr.toLowerCase() === pos.t1));
-      const dollarPer0 = (pos.t0 === USDC_ADDR) ? 1 : (poolInfo ? poolInfo.priceB : 1 / (pos.price || 1));
-      const dollarPer1 = (pos.t1 === USDC_ADDR) ? 1 : dollarPer0 * (pos.price || 1);
+      // Harga token dari RadarDex (sumber akurat), BUKAN sqrt math (Arc fork scale beda → bomb).
+      const is0USDC = (pos.t0 === USDC_ADDR), is1USDC = (pos.t1 === USDC_ADDR);
+      let priceB = (poolInfo && poolInfo.priceB > 0) ? poolInfo.priceB : 0;
+      if (!priceB) { try {
+        // fallback: reserve ratio on-chain. token non-USDC yang dihitung harganya.
+        const tok0 = pos.t0, tok1 = pos.t1;
+        const [r0, r1] = await Promise.all([
+          ethCall(tok0, '0x70a08231' + addrArg(pool)).then(h => Number(BigInt(h)) / 10 ** m0.decimals).catch(() => 0),
+          ethCall(tok1, '0x70a08231' + addrArg(pool)).then(h => Number(BigInt(h)) / 10 ** m1.decimals).catch(() => 0),
+        ]);
+        if (isFinite(r0) && isFinite(r1) && r0 > 0 && r1 > 0) {
+          const p01 = r0 / r1; // token1 per token0
+          // priceB = harga token NON-USDC dalam USDC. clamp supaya gak bomb.
+          const raw = is1USDC ? p01 : (is0USDC ? (1 / (p01 || 1e-18)) : Math.min(1e9, Math.max(1e-18, p01)));
+          priceB = isFinite(raw) ? raw : 0;
+        }
+      } catch(e){} }
+      pos.priceB = priceB;
+      // dollar per unit token0 & token1, relative to USDC (live, real)
+      let dollarPer0, dollarPer1;
+      if (is0USDC && is1USDC) { dollarPer0 = 1; dollarPer1 = 1; }
+      else if (is0USDC) { dollarPer0 = 1; dollarPer1 = priceB; }
+      else if (is1USDC) { dollarPer0 = priceB; dollarPer1 = 1; }
+      else { dollarPer0 = priceB; dollarPer1 = priceB; }
       // Value: pro-rata share of pool TVL (stabil, no float explosion).
       if (poolLiq > 0n && poolInfo && poolInfo.tvl > 0) {
         const share = Number(pos.liquidity) / Number(poolLiq);
         pos.value = share * poolInfo.tvl;
       } else {
-        // fallback: raw amount estimate, clamped to a sane pool-sized cap
+        // fallback: raw amount estimate (price-reserve based, not sqrt bomb), clamped to pool-sized cap
         const amts = positionAmounts(sqrtPriceX96, tick, pos.tickLower, pos.tickUpper, pos.liquidity);
         pos.amounts = amts;
-        let rawVal = amts.a0 * dollarPer0 + amts.a1 * dollarPer1;
-        const cap = poolInfo ? poolInfo.tvl * 2 : 500000;
-        if (rawVal > cap) rawVal = Math.max(0, poolInfo ? poolInfo.tvl * 0.05 : 0);
+        let a0 = isFinite(amts.a0) && amts.a0 >= 0 ? amts.a0 : 0;
+        let a1 = isFinite(amts.a1) && amts.a1 >= 0 ? amts.a1 : 0;
+        let rawVal = a0 * dollarPer0 + a1 * dollarPer1;
+        if (!isFinite(rawVal) || rawVal < 0) rawVal = 0;
+        if (rawVal > (poolInfo ? poolInfo.tvl * 2 : 500000)) rawVal = Math.max(0, poolInfo ? poolInfo.tvl * 0.05 : 0);
         pos.value = rawVal;
+        pos.amountsUsd = { a0: a0 * dollarPer0, a1: a1 * dollarPer1 };
       }
+      // Claimable fee: tokensOwed (materialized, 100% on-chain) + live estimate via pool share × volume
       pos.feesUsd = (Number(pos.owed0) / 10 ** m0.decimals) * dollarPer0 + (Number(pos.owed1) / 10 ** m1.decimals) * dollarPer1;
-      if (pos.feesUsd > 1000000) pos.feesUsd = (poolInfo ? poolInfo.tvl * 0.01 : 0);
+      // live est: share of pool liquidity × 24h volume × fee rate (label "est.")
+      if (poolLiq > 0n && poolInfo && poolInfo.tvl > 0) {
+        const share = Number(pos.liquidity) / Number(poolLiq);
+        const feeRate = (pos.fee || 3000) / 1000000;
+        pos.feesLive = Math.min(10000, share * (poolInfo.vol || 0) * feeRate);
+      } else pos.feesLive = 0;
+      pos.feesRaw = { owed0: pos.owed0, owed1: pos.owed1 };
+      if (pos.feesUsd > 5000000) pos.feesUsd = (poolInfo ? poolInfo.tvl * 0.05 : 0);
     } catch (e) { console.warn('enrich', e); }
   }));
   S.positions = raw;
@@ -1601,6 +1805,16 @@ function statCards() {
   S._total = total;
 }
 
+function fmtSharePct(pos) {
+  if (!pos.poolLiquidity || pos.poolLiquidity <= 0n || pos.liquidity <= 0n) return '—';
+  const pct = Number(pos.liquidity) / Number(pos.poolLiquidity) * 100;
+  if (!isFinite(pct) || pct < 0) return '—';
+  if (pct >= 100) return '100%';
+  if (pct >= 1) return pct.toFixed(2) + '%';
+  if (pct >= 0.1) return pct.toFixed(3) + '%';
+  if (pct >= 0.0001) return pct.toFixed(4) + '%';
+  return pct.toFixed(6) + '%';
+}
 function renderPositions() {
   const grid = $('posGrid');
   const q = ($('posSearch').value || '').toLowerCase();
@@ -1630,7 +1844,7 @@ function renderPositions() {
         <div class="pd"><div class="k">Value</div><div class="v">${fmtUsd(p.value)}</div></div>
         <div class="pd"><div class="k">Range</div><div class="v"><small>${rangeName(p)}</small></div></div>
         <div class="pd"><div class="k">Fees owed</div><div class="v text-green">${fmtUsd(p.feesUsd)}</div></div>
-        <div class="pd"><div class="k">Liquidity</div><div class="v">${fmt(Number(p.liquidity) / 1e6)}</div></div>
+        <div class="pd"><div class="k">Pool share</div><div class="v">${fmtSharePct(p)}</div></div>
       </div>
       <div class="share-bar" style="border-color:${inRange?'#000':'#000'}"><i style="width:${inRange ? Math.min(100, Math.max(20, (p.tick - p.tickLower) / (p.tickUpper - p.tickLower) * 100)) : 100}%;background:${inRange ? 'var(--green)' : 'var(--red)'}"></i></div>
       <div class="pos-actions">
@@ -1719,13 +1933,50 @@ async function resolveManualPool() {
     S.selected = '__manual__';
     renderPoolChips(); renderAddSide();
     setTimeout(() => { $('manualPanel').style.display = 'none'; $('btnManualPool').textContent = '＋ Manual Add (custom contract)'; }, 0);
-    st.textContent = `Pool ${m0.symbol}/${m1.symbol} (${usedFee/10000}%) → 0x${pool.slice(-8)}`; st.style.color = 'var(--green)';
-    toast('Manual pool resolved: ' + m0.symbol + '/' + m1.symbol + ' (' + usedFee/10000 + '%)', 'ok');
+    st.textContent = `Pool ${m0.symbol}/${m1.symbol} (${feeName(usedFee)}) → 0x${pool.slice(-8)}`; st.style.color = 'var(--green)';
+    toast('Manual pool resolved: ' + m0.symbol + '/' + m1.symbol + ' (' + feeName(usedFee) + ')', 'ok');
   } catch (e) { st.textContent = 'Failed: ' + e.message; st.style.color = 'var(--red)'; }
   finally { btn.disabled = false; }
 }
 
 function currentPool() { return S.pools.find(p=>p.id===S.selected) || S.pools[0]; }
+// --- 1-asset mode ---
+// aggregator Arc (swapExactInput): swapExactInput(address router,address token0,address token1,uint24 fee,uint256 amountIn,uint256 amountOutMin)
+const ARC_AGG = '0x2804d131cfb046f987e7e532bc58cfc30326b350';
+function encodeSwapExactInput(token0, token1, fee, amountInWei, amountOutMin) {
+  const inner = addrArg(CFG.router) + addrArg(token0) + addrArg(token1) + uintArg(fee, 3).padStart(64, '0') + uintArg(amountInWei) + uintArg(amountOutMin);
+  return '0xe993f276' + inner; // 196 bytes flat
+}
+// resolve address/decimals coin dari CFG atau pool di S.pools
+function resolveCoin(sym) {
+  const t = CFG.tokens.find(x => x.symbol === sym);
+  if (t) return { addr: t.address || '', decimals: t.decimals || 6 };
+  const pool = S.pools.find(p => p.b === sym || p.a === sym);
+  if (pool && (pool.bAddr || pool.addr)) {
+    const isB = pool.b === sym;
+    return { addr: isB ? (pool.bAddr || pool.addr) : USDC_ADDR, decimals: isB ? (pool.bDec || 18) : 6 };
+  }
+  return { addr: '', decimals: 18 };
+}
+// quote swap 1 arah pakai reserve ratio (Arc quoter gak ada)
+function singleAssetQuote(symIn, symOut, amountInWei, decIn, decOut) {
+  const p = currentPool(); if (!p) return 0n;
+  const inUsd = Number(amountInWei) / 10 ** decIn;
+  const isA = symIn === p.a;
+  const priceB = p.b === 'USDC' ? 1 : (p.priceB || 0);
+  const outVal = isA ? inUsd / (priceB || 1e-9) : inUsd * (priceB || 0);
+  return BigInt(Math.max(1, Math.floor(outVal * 10 ** decOut)));
+}
+function setAddMode(mode) {
+  S._addMode = mode;
+  $('modeAuto').classList.toggle('active', mode === 'auto');
+  $('modeSingle').classList.toggle('active', mode === 'single');
+  $('singleNote').style.display = mode === 'single' ? 'block' : 'none';
+  $('rowAmtB').style.display = mode === 'single' ? 'none' : '';
+  $('ratioBar').style.display = mode === 'single' ? 'none' : '';
+  $('modeHint').style.display = mode === 'single' ? 'none' : '';
+  renderAddSide();
+}
 function renderAddSide() {
   const p = currentPool();
   if (!p) return;
@@ -1745,35 +1996,129 @@ function renderAddSide() {
   $('chipA').style.background = '';  // no box — clean circle logo
   $('chipB').style.background = '';
   const a = parseFloat($('amtA').value) || 0, b = parseFloat($('amtB').value) || 0;
+  const isSingle = (S._addMode || 'auto') === 'single';
+  // visibility mode (panggil setiap render — ganti pool juga harus konsisten)
+  $('rowAmtB').style.display = isSingle ? 'none' : '';
+  $('ratioBar').style.display = isSingle ? 'none' : '';
+  $('singleNote').style.display = isSingle ? 'block' : 'none';
+  $('modeHint').style.display = isSingle ? 'none' : '';
+  $('modeAuto').classList.toggle('active', !isSingle);
+  $('modeSingle').classList.toggle('active', isSingle);
   renderBalances(p);   // async: real wallet balance under each token logo
   $('detailPrice').textContent = '1 ' + p.b + ' ≈ ' + fmt(p.priceB) + ' ' + p.a;
   $('detailReserves').textContent = fmt(p.reserveA) + ' ' + p.a + ' / ' + fmt(p.reserveB) + ' ' + p.b;
-  // share = our contribution / pool total liquidity (both sides in dollar terms)
-  const ourVal = a + b * (p.b === 'USDC' ? 1 : p.priceB || 0);
+  // share = our contribution / pool total liquidity (dollar terms).
+  // single mode: deposit satu sisi — 50% di-swap ke sisi lain, value total tetap = deposit.
+  const ourVal = isSingle ? a : (a + b * (p.b === 'USDC' ? 1 : p.priceB || 0));
   const poolTvl = p.tvl || (p.reserveA * 2);
   const share = (ourVal > 0 && poolTvl > 0) ? ourVal / (poolTvl + ourVal) : 0;
   $('detailShare').textContent = share ? (share*100).toFixed(3) + '%' : '—';
   // daily fees = pool 24h volume × pool fee rate × our share of the pool.
   // (No artificial boost — the old `share * 1200` inflated the number ~800x.)
-  const feeBps = (p.fee != null) ? (p.fee / 10000) : 0.003; // default 0.3% (3000 tier)
+  const feeBps = (p.fee != null) ? (p.fee / 1000000) : 0.003; // default 0.3% (3000 tier)
   const dailyFees = share > 0 ? p.vol * feeBps * share : 0;
   $('detailDaily').textContent = share ? '$' + fmt(Math.max(0, dailyFees)) + '/day' : '—';
-  const ratioA = a, ratioB = b * (p.b==='USDC'?1:p.priceB);
+  const ratioA = isSingle ? a : a, ratioB = isSingle ? a : (b * (p.b==='USDC'?1:p.priceB));
   const tot = ratioA + ratioB || 1;
   $('ratioA').style.width = (ratioA/tot*100) + '%';
   $('ratioB').style.width = (ratioB/tot*100) + '%';
   $('ratioText').textContent = Math.round(ratioA/tot*100) + ' / ' + Math.round(ratioB/tot*100);
-  $('addHint').textContent = S.address ? 'Live Uniswap V3 · router ' + shortAddr(CFG.router) : 'Connect wallet to deposit';
+  renderPoolStats(p);
+  renderTokenBadges(p);
+  renderPosPreview(p, a, b, ourVal, poolTvl, share, feeBps);
+}
+
+/* #3 — live position preview panel (Add LP) */
+function renderPosPreview(p, a, b, ourVal, poolTvl, share, feeBps) {
+  const el = $('posPreview'); if (!el) return;
+  if (!S.address || !a || !b) { el.style.display = 'none'; return; }
+  el.style.display = 'block';
+  const feeRate = (p.fee != null ? p.fee : 10000) / 1000000;
+  const daily = p.vol ? p.vol * feeRate * share : 0;
+  $('pvDeposit').textContent = fmt(a) + ' ' + p.a + ' + ' + fmt(b) + ' ' + p.b;
+  $('pvShare').textContent = (share*100).toFixed(3) + '%';
+  $('pvValue').textContent = '$' + fmt(ourVal);
+  $('pvDaily').textContent = '$' + fmt(daily) + '/day';
+  // status: in-range default (range belum dipilih di form — preview pakai full-range assumption)
+  $('pvStatus').textContent = 'IN RANGE';
+  $('pvStatus').className = 'green';
+  // price range text: pakai current price ±10% (est.) — informatif aja
+  const priceB = p.priceB || 0;
+  $('pvRange').textContent = priceB > 0 ? (priceB*0.9).toPrecision(3) + ' — ' + (priceB*1.1).toPrecision(3) + ' ' + p.a : '—';
+  // bar: range 90%-110%, current price di tengah
+  $('pvBarFill').style.width = '100%';
+  $('pvBarCur').style.left = '50%';
+}
+
+/* #3 — token verification / meta badges */
+const X_ICON = '<svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>';
+const WEB_ICON = '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18 15 15 0 0 1 0-18z"/></svg>';
+const LAUNCH_ICON = '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg>';
+function renderTokenBadges(p) {
+  const el = $('tokBadges'); if (!el) return;
+  let html = '';
+  const xHref = p.twitter || (p.website && p.website.includes('x.com') ? p.website : '');
+  if (xHref) html += `<a class="tbadge unver" href="${xHref}" target="_blank" rel="noopener noreferrer" title="X / Twitter" aria-label="X">${X_ICON}</a>`;
+  else html += p.verified ? '<span class="tbadge ver">✓</span>' : '';
+  if (p.website && !(p.website.includes('x.com'))) html += `<a class="tbadge web" href="${p.website}" target="_blank" rel="noopener noreferrer" title="Website" aria-label="Website">${WEB_ICON}</a>`;
+  if (p.launchpad) html += `<span class="tbadge lp" title="Launchpad: ${p.launchpad}">${LAUNCH_ICON}&nbsp;${p.launchpad}</span>`;
+  el.innerHTML = html || '';
+}
+
+/* #7 — pool stats panel (right column) */
+function renderPoolStats(p) {
+  const el = $('poolStats'); if (!el) return;
+  const feeBps = (p.fee != null) ? (p.fee / 1000000) : 0.003;
+  const lpFees = p.vol * feeBps * 0.85;
+  const chgCls = (p.chg24||0) >= 0 ? 'up' : 'down';
+  el.innerHTML = `
+    <div class="ps-card"><span class="ps-k">Pool TVL</span><span class="ps-v">${fmtUsd(p.tvl)}</span><span class="ps-sub">${p.a}/${p.b}</span></div>
+    <div class="ps-card"><span class="ps-k">Volume 24h</span><span class="ps-v">${fmtUsd(p.vol)}</span></div>
+    <div class="ps-card"><span class="ps-k">APR</span><span class="ps-v hot">${(p.apr||0).toFixed(1)}%</span><span class="ps-sub">est. from vol×fee/LP</span></div>
+    <div class="ps-card"><span class="ps-k">Price (${p.b})</span><span class="ps-v">${fmt(p.priceB)} ${p.a}</span></div>
+    <div class="ps-card"><span class="ps-k">LP Fees 24h</span><span class="ps-v up">${fmtUsd(lpFees)}</span><span class="ps-sub">${p.fee != null ? feeName(p.fee) : '0.3%'} · 85% to LPs</span></div>
+    <div class="ps-card"><span class="ps-k">24h Change</span><span class="ps-v ${chgCls}">${(p.chg24||0)>=0?'+':''}${(p.chg24||0).toFixed(2)}%</span></div>
+    <div class="ps-card ps-wide"><span class="ps-k">Reserves</span><span class="ps-v" style="font-size:.85rem">${fmt(p.reserveA)} ${p.a} / ${fmt(p.reserveB)} ${p.b}</span></div>
+  `;
+}
+
+/* #3 — one-click "Maximize Yield" (auto-allocate) */
+function openMaxYield() {
+  const panel = $('maxyPanel'); if (!panel) return;
+  panel.style.display = 'block';
+  // rank pools by APR (yield) — show top 5
+  const ranked = (S.pools || []).slice().sort((a,b)=>(b.apr||0)-(a.apr||0)).slice(0,5);
+  const list = $('maxyList');
+  if (!ranked.length) { list.innerHTML = '<div style="color:rgba(255,255,255,.5);font-size:13px">No pools available.</div>'; return; }
+  list.innerHTML = ranked.map(pp => {
+    const tA = token(pp.a), tB = token(pp.b);
+    const icoA = pp.iconA || tA.icon || '';
+    const icoB = (pp===null?'':pp.iconB) || pp.icon || tB.icon || '';
+    const mk = (s,ico) => ico ? `<img class=\"mx-ico\" src=\"${ico}\" alt=\"${s}\" onerror=\"this.style.display='none'\"/>` : `<span class=\"mx-ico mx-letter\" style=\"background:${(s==='USDC'?'#3ddad8':tB.color||'#5b1d7d')}\">${s.slice(0,1)}</span>`;
+    return `
+    <div class=\"maxy-row\">
+      <span class=\"mx-sym\">${mk(pp.a,icoA)}${mk(pp.b,icoB)}<span>${pp.a}/${pp.b}</span></span>
+      <span class=\"mx-apr\">${(pp.apr||0).toFixed(1)}% APR</span>
+      <span class=\"mx-vol\">$${fmt(pp.vol)} vol</span>
+      <span class=\"mx-add\" data-allocate=\"${pp.id}\">Use</span>
+    </div>`;
+}).join('');
+  list.querySelectorAll('.mx-add').forEach(btn => btn.addEventListener('click', e => {
+    e.stopPropagation();
+    const pid = btn.dataset.allocate;
+    if (pid) { S.selected = pid; S._userPickedPool = true; renderPoolChips(); renderAddSide(); closePoolModal(); }
+    panel.style.animation = 'none'; void panel.offsetHeight; panel.style.animation = '';
+  }));
 }
 function renderMonitor() {
   const tvl = S.pools.reduce((s,p)=>s+p.tvl,0);
   const vol = S.pools.reduce((s,p)=>s+p.vol,0);
-  const fees = S.pools.reduce((s,p)=>s+p.vol*0.003*0.85,0);
+  const fees = S.pools.reduce((s,p)=>s+p.vol*((p.fee != null ? p.fee : 10000)/1000000)*0.85,0);
   const myVal = S.positions.reduce((s,x)=>s+x.value,0);
   $('monStats').innerHTML = `
     <div class="stat"><div class="label">Pool TVL</div><div class="value">${fmtUsd(tvl)}</div><div class="sub">${S.pools.length} live pools</div></div>
     <div class="stat"><div class="label">Volume 24H</div><div class="value">${fmtUsd(vol)}</div><div class="sub">across all pools</div></div>
-    <div class="stat"><div class="label">Fees to LPs 24H</div><div class="value up">${fmtUsd(fees)}</div><div class="sub">0.3% fee, 85% to LPs</div></div>
+    <div class="stat"><div class="label">Fees to LPs 24H</div><div class="value up">${fmtUsd(fees)}</div><div class="sub">swap fees · 85% to LPs</div></div>
     <div class="stat"><div class="label">My Positions</div><div class="value">${fmtUsd(myVal)}</div><div class="sub">${S.positions.length} on-chain</div></div>`;
   $('monGrid').innerHTML = S.pools.map(p => {
     const hasPos = S.positions.find(x => x.meta1 && x.meta1.symbol === p.b);
@@ -1799,17 +2144,20 @@ function sparkInner(arr, w, h, cls) {
 function renderRewards() {
   const total = S.positions.reduce((s,p)=>s+p.feesUsd,0);
   $('rwTotal').textContent = fmtUsd(total);
-  const rows = S.positions.map(p => `
-    <div class="rw-row">
-      <div><div class="nm">#${p.tokenId} · ${p.meta0 ? p.meta0.symbol : '?'} / ${p.meta1 ? p.meta1.symbol : '?'} · ${feeName(p.fee)}</div><div class="src">V3 fees pending (collect via NFPM)</div></div>
+  const rows = S.positions.map(p => {
+    const live = p.feesLive || 0;
+    const liveTxt = live > 0.000001 ? ` · <span class="text-green">est. +${fmtUsd(live)}/day</span>` : '';
+    return `<div class="rw-row">
+      <div><div class="nm">#${p.tokenId} · ${p.meta0 ? p.meta0.symbol : '?'} / ${p.meta1 ? p.meta1.symbol : '?'} · ${feeName(p.fee)}</div><div class="src">Uniswap V3 swap fee · claim anytime via NFPM${liveTxt}</div></div>
       <div style="display:flex;align-items:center;gap:.9rem">
         <span class="amt">${fmtUsd(p.feesUsd)}</span>
-        <span class="st ${p.feesUsd > 0 ? 'pd' : 'un'}">${p.feesUsd > 0 ? 'pending' : 'none'}</span>
+        <span class="st ${p.feesUsd > 0 ? 'pd' : 'un'}">${p.feesUsd > 0 ? 'claimable' : 'none'}</span>
         <button class="px-btn pxa" style="padding:.55rem .7rem;font-size:13px" data-act="claim" data-id="${p.tokenId}">Claim</button>
       </div>
-    </div>`).join('');
-  $('rwList').innerHTML = rows || (S.address ? '<div class="empty" style="box-shadow:none;border:0"><p>No positions — nothing to claim.</p></div>' : '<div class="empty" style="box-shadow:none;border:0"><p>Connect wallet to check claimable fees.</p></div>');
-  $('rwNote').textContent = S.address ? 'Wallet: ' + shortAddr(S.address) : 'Connect wallet to check rewards';
+    </div>`;
+  }).join('');
+  $('rwList').innerHTML = rows || (S.address ? '<div class="empty" style="box-shadow:none;border:0"><p>No positions — nothing to claim. Add liquidity to start earning swap fees.</p></div>' : '<div class="empty" style="box-shadow:none;border:0"><p>Connect wallet to check claimable fees.</p></div>');
+  $('rwNote').textContent = S.address ? 'Wallet: ' + shortAddr(S.address) + ' · reward pool = Uniswap V3 swap fees (auto)' : 'Connect wallet to check rewards';
 }
 function renderAll() {
   renderPositions(); renderPoolChips(); renderAddSide(); renderMonitor(); renderRewards();
@@ -1992,22 +2340,30 @@ async function busy(on){ S.txBusy = on; ['btnAdd','btnClaimAll','rmConfirm','adC
 let addMode = 'mint', addPoolObj = null;
 function encodeIncreaseLiquidity(tokenId, amt0, amt1, deadline, min0 = 0, min1 = 0) {
   // increaseLiquidity((tokenId,amount0Desired,amount1Desired,amount0Min,amount1Min,deadline))
+  // ABI struct static = FLAT (no offset/length head) — ethers encode array tuple flat.
   const inner = uintArg(tokenId) + uintArg(amt0) + uintArg(amt1) + uintArg(min0) + uintArg(min1) + uintArg(deadline);
-  const head = uintArg(32) + uintArg(inner.length/2);
-  return '0x219f5d17' + head + inner;
+  return '0x219f5d17' + inner;
 }
-function encodeMint(token0, token1, fee, tl, tu, amt0, amt1, recipient, deadline) {
+function encodeMint(token0, token1, fee, tl, tu, amt0, amt1, recipient, deadline, min0 = 0n, min1 = 0n) {
   // mint((token0,token1,fee,tickLower,tickUpper,amount0Desired,amount1Desired,amount0Min,amount1Min,recipient,deadline))
+  // ABI struct static = FLAT (no offset/length head).
   const inner = addrArg(token0) + addrArg(token1) + uintArg(fee,3).padStart(64,'0')
     + intArg(tl) + intArg(tu)
-    + uintArg(amt0) + uintArg(amt1) + uintArg(0) + uintArg(0)
+    + uintArg(amt0) + uintArg(amt1) + uintArg(min0) + uintArg(min1)
     + addrArg(recipient) + uintArg(deadline);
-  const head = uintArg(32) + uintArg(inner.length/2);
-  return '0x883bdbfd' + head + inner;
+  // selector mint((address,address,uint24,int24,int24,uint256,uint256,uint256,uint256,address,uint256)) = 0x88316456
+  return '0x88316456' + inner;
 }
 function ticksForRange(range, currentTick, fee) {
   const spacing = TICK_SPACING[fee || 3000] || 60;
-  if (range === 'full') return { lower: MIN_TICK, upper: MAX_TICK };
+  if (range === 'full') {
+    // Arc NFPM ENFORCE tick % spacing == 0 (beda dari Uniswap canonical).
+    // MIN_TICK=-887272 / MAX_TICK=887272 bukan kelipatan spacing (mis. 200 → sisa 72) → REVERT.
+    // Align ke kelipatan spacing terdekat yang masih dalam [MIN_TICK, MAX_TICK].
+    const lower = Math.ceil(MIN_TICK / spacing) * spacing;
+    const upper = Math.floor(MAX_TICK / spacing) * spacing;
+    return { lower, upper };
+  }
   const pct = range === 'wide' ? 0.10 : range === 'medium' ? 0.02 : 0.005;
   const priceNow = Math.pow(1.0001, currentTick);
   const priceL = priceNow * (1 - pct), priceU = priceNow * (1 + pct);
@@ -2038,34 +2394,97 @@ async function getPoolTokens(poolAddr, wantToken0, wantToken1, feeTier) {
 function openAddModal() {
   if (!S.address) return toast('Connect wallet first', 'err');
   const a = parseFloat($('amtA').value) || 0, b = parseFloat($('amtB').value) || 0;
-  if (!a || !b) return toast('Enter both deposit amounts (Token A and B)', 'err');
+  const isSingle = (S._addMode || 'auto') === 'single';
+  if (isSingle ? !a : (!a || !b)) return toast(isSingle ? 'Enter deposit amount (Token A)' : 'Enter both deposit amounts (Token A and B)', 'err');
   const p = currentPool(); if (!p) return toast('No pool selected', 'err');
   // set the pool object: for existing radar pools it's p; for custom, use CUSTOM_POOL's resolved tokens
   let tok0 = p.a, tok1 = p.b, poolAddr = p.addr;
   if (p.id === '__manual__' && CUSTOM_POOL) { tok0 = CUSTOM_POOL.a; tok1 = CUSTOM_POOL.b; poolAddr = CUSTOM_POOL.addr; }
   addPoolObj = { ...p, tok0, tok1 };
-  $('adPool').textContent = tok0 + ' / ' + tok1 + ' (' + (p.fee || (CUSTOM_POOL && CUSTOM_POOL.fee) || 3000)/10000 + '%)';
+  $('adPool').textContent = tok0 + ' / ' + tok1 + ' (' + feeName(p.fee || (CUSTOM_POOL && CUSTOM_POOL.fee) || 10000) + ')';
   $('adAmtA').textContent = a + ' ' + tok0;
-  $('adAmtB').textContent = b + ' ' + tok1;
+  $('adAmtB').textContent = isSingle ? '(swap 50% → ' + tok1 + ')' : (b + ' ' + tok1);
   // existing positions in this pool
   const sel = $('adPosSel');
   const prev = sel.value;
-  sel.innerHTML = '<option value="">(new position)</option>';
+  sel.innerHTML = '<option value="">New position</option>';
   if (S.positions.length) {
     S.positions.forEach(pos => {
       const matches = (pos.t0 === CFG.tokens.find(x=>x.symbol===tok0)?.address?.toLowerCase() || pos.t1 === CFG.tokens.find(x=>x.symbol===tok0)?.address?.toLowerCase());
       const poolMatch = S.positions.filter(x => (x.meta0 && x.meta0.symbol === tok0 && x.meta1 && x.meta1.symbol === tok1) || (x.meta0 && x.meta0.symbol === tok1 && x.meta1 && x.meta1.symbol === tok0));
-      poolMatch.forEach(x => { const o = document.createElement('option'); o.value = String(x.tokenId); o.textContent = '#' + x.tokenId + ' · ' + x.meta0.symbol + '/' + x.meta1.symbol + ' · ' + (x.fee/10000) + '%'; sel.appendChild(o); });
+      poolMatch.forEach(x => { const o = document.createElement('option'); o.value = String(x.tokenId); o.textContent = '#' + x.tokenId + ' · ' + x.meta0.symbol + '/' + x.meta1.symbol + ' · ' + feeName(x.fee); sel.appendChild(o); });
     });
   }
   // default to an existing matching position if exactly one
   const matchOne = S.positions.filter(x => (x.meta0 && x.meta0.symbol === tok0 && x.meta1 && x.meta1.symbol === tok1) || (x.meta0 && x.meta0.symbol === tok1 && x.meta1 && x.meta1.symbol === tok0));
   if (matchOne.length === 1) sel.value = String(matchOne[0].tokenId);
   else if (prev && sel.querySelector('option[value="'+prev+'"]')) sel.value = prev;
-  $('adShare').textContent = (S.pools.find(x=>x.id===p.id) || {}).tvl ? ((a / ((S.pools.find(x=>x.id===p.id)||{}).tvl || a)) * 100).toFixed(3) + '% (est)' : '—';
+  $('adShare').textContent = (S.pools.find(x=>x.id===p.id) || {}).tvl ? (() => {
+    // sama kaya detailShare: total value kedua token / (tvl + total value)
+    const pobj = S.pools.find(x=>x.id===p.id) || {};
+    const ourVal = a + b * (p.b === 'USDC' ? 1 : p.priceB || 0);
+    const tvl = pobj.tvl || 0;
+    return tvl > 0 ? ((ourVal / (tvl + ourVal)) * 100).toFixed(3) + '% (est)' : '—';
+  })() : '—';
   $('modalAdd').classList.add('open');
+  drawRangeChart(addPoolObj, $('adRange').value);
 }
 function closeAddModal(){ $('modalAdd').classList.remove('open'); }
+
+/* #1 — range visualizer: price line + active range band (Add LP modal) */
+async function drawRangeChart(p, rangeKey) {
+  const cv = $('rangeChart'); if (!cv) return;
+  const ctx = cv.getContext('2d');
+  const W = cv.width, H = cv.height;
+  ctx.clearRect(0, 0, W, H);
+  // background
+  ctx.fillStyle = '#2b0d3e'; ctx.fillRect(0, 0, W, H);
+  // resolve current tick (async on-chain); fallback ke 0
+  let curTick = 0;
+  try { if (p.addr) { const slot = await poolSlot0(p.addr); if (slot && typeof slot.tick === 'number') curTick = slot.tick; } } catch (e) {}
+  const fee = p.fee || (CUSTOM_POOL && CUSTOM_POOL.fee) || 10000;
+  const spacing = TICK_SPACING[fee] || 200;
+  // range ticks
+  let tl, tu;
+  if (rangeKey === 'full') { tl = Math.ceil(MIN_TICK / spacing) * spacing; tu = Math.floor(MAX_TICK / spacing) * spacing; }
+  else {
+    const pct = rangeKey === 'wide' ? 0.10 : rangeKey === 'medium' ? 0.02 : 0.005;
+    const priceNow = Math.pow(1.0001, curTick);
+    const priceL = priceNow * (1 - pct), priceU = priceNow * (1 + pct);
+    tl = Math.max(MIN_TICK, Math.ceil(Math.log(priceL) / Math.log(1.0001)));
+    tu = Math.min(MAX_TICK, Math.floor(Math.log(priceU) / Math.log(1.0001)));
+    tl = tl - (mod(tl, spacing) + spacing) % spacing;
+    tu = tu - mod(tu, spacing);
+  }
+  // domain: kasih ruang di kiri/kanan range supaya line keliatan
+  const span = Math.max(1, tu - tl);
+  const dL = tl - span * 0.4, dR = tu + span * 0.4;
+  const X = t => (t - dL) / (dR - dL) * W;
+  // price curve (simulasi AMM constant-k): y turun seiring tick naik
+  ctx.strokeStyle = '#61dcd8'; ctx.lineWidth = 2; ctx.beginPath();
+  for (let i = 0; i <= 100; i++) {
+    const t = dL + (dR - dL) * (i / 100);
+    const px = X(t);
+    const base = 0.35 + 0.6 * (t / (dR - dL));
+    const y = H - base * H;
+    i === 0 ? ctx.moveTo(px, y) : ctx.lineTo(px, y);
+  }
+  ctx.stroke();
+  // range band (hijau)
+  const xL = X(tl), xR = X(tu);
+  ctx.fillStyle = 'rgba(126,224,129,.22)';
+  ctx.fillRect(xL, 0, Math.max(2, xR - xL), H);
+  ctx.strokeStyle = '#7ee081'; ctx.lineWidth = 1.5;
+  ctx.strokeRect(xL, 2, Math.max(2, xR - xL), H - 4);
+  // current price marker (kuning)
+  const xC = X(curTick);
+  ctx.fillStyle = '#f5c60e';
+  ctx.fillRect(xC - 1.5, 4, 3, H - 8);
+  // labels min/max
+  ctx.font = '10px monospace'; ctx.fillStyle = 'rgba(255,255,255,.55)';
+  ctx.fillText(rangeKey === 'full' ? 'MIN' : 'MIN', 4, H - 6);
+  ctx.fillText(rangeKey === 'full' ? 'MAX' : 'MAX', W - 34, H - 6);
+}
 async function confirmAddModal() {
   if (!addPoolObj || !S.address) return;
   busy(true);
@@ -2077,7 +2496,6 @@ async function confirmAddModal() {
 
     // Resolve real token addresses + decimals
     const tokASym = p.tok0, tokBSym = p.tok1;
-    const tok0SymLower = String(tokASym).toLowerCase(), tok1SymLower = String(tokBSym).toLowerCase();
     let tokAAddr, tokBAddr, decA = 18, decB = 18;
     const knownA = CFG.tokens.find(x => x.symbol === tokASym);
     const knownB = CFG.tokens.find(x => x.symbol === tokBSym);
@@ -2089,46 +2507,84 @@ async function confirmAddModal() {
     if (decA === 18 && tokAAddr && tokAAddr !== USDC_ADDR) { try { decA = parseInt(await ethCall(tokAAddr, '0x313ce567'), 16) || 18; } catch(e){} }
     if (decB === 18 && tokBAddr && tokBAddr !== USDC_ADDR) { try { decB = parseInt(await ethCall(tokBAddr, '0x313ce567'), 16) || 18; } catch(e){} }
 
-    const amt0Wei = BigInt(Math.round(a * 10 ** decA));
-    const amt1Wei = BigInt(Math.round(b * 10 ** decB));
-    if (amt0Wei <= 0n || amt1Wei <= 0n) throw new Error('enter positive amounts');
     const deadline = Math.floor(Date.now()/1000) + 1800;
+    const isSingle = (S._addMode || 'auto') === 'single';
+    let amt0Use = BigInt(Math.round(a * 10 ** decA));
+    let amt1Use = BigInt(Math.round(b * 10 ** decB));
+    if (isSingle) {
+      // 1-asset: deposit token A (USDC) saja → swap 50% ke token B → mint 50/50
+      if (amt0Use <= 0n) throw new Error('enter deposit amount');
+      if (!tokAAddr || !tokBAddr) throw new Error('pool token addresses required');
+      const halfIn = amt0Use / 2n;
+      const halfRemain = amt0Use - halfIn;
+      // quote amountOut untuk token B (pakai reserve ratio) & slippage
+      const qB = singleAssetQuote(p.tok0, p.tok1, halfIn, decA, decB);
+      const slip = (parseFloat($('slippageSel').value) || 1.0);
+      const outMin = BigInt(Math.max(1, Math.floor(Number(qB) * (1 - slip / 100))));
+      toast('Swapping 50% ' + p.tok0 + ' → ' + p.tok1 + ' via Arc aggregator...');
+      // approve aggregator buat halfIn token A, swap
+      await ensureAllowance(tokAAddr, ARC_AGG, halfIn);
+      const swapData = encodeSwapExactInput(tokAAddr, tokBAddr, p.fee || 10000, halfIn, outMin);
+      const hSwap = await sendTx(ARC_AGG, swapData);
+      const okSwap = await waitTx(hSwap);
+      if (!okSwap) throw new Error('swap half failed ' + shortAddr(hSwap));
+      // sisa token A + token B hasil swap → NFPM mint 50/50 (dollar)
+      amt0Use = halfRemain;
+      amt1Use = qB;
+    } else {
+      if (amt0Use <= 0n || amt1Use <= 0n) throw new Error('enter positive amounts');
+    }
 
     // STEP 1 — approve both tokens to NFPM (only real ERC-20s; skip if already allowed)
+    // NOTE: USDC (0x3600...) di Arc itu ERC-20 contract yg bisa di-approve normal.
+    // JANGAN skip USDC — kalau di-skip, NFPM nggak punya allowance & mint/increase revert.
     const targets = [];
-    const tok0IsUSDC = (tok0SymLower === 'usdc'), tok1IsUSDC = (tok1SymLower === 'usdc');
-    if (!tok0IsUSDC && tokAAddr) targets.push({ addr: tokAAddr, amt: amt0Wei });
-    if (!tok1IsUSDC && tokBAddr) targets.push({ addr: tokBAddr, amt: amt1Wei });
+    if (tokAAddr && tokAAddr !== '0x') targets.push({ addr: tokAAddr, amt: amt0Use });
+    if (tokBAddr && tokBAddr !== '0x') targets.push({ addr: tokBAddr, amt: amt1Use });
     for (const t of targets) await ensureAllowance(t.addr, CFG.nfpm, t.amt);
-    // USDC is the native gas token on Arc but still an ERC-20 mirror — USDC addressed by address; ensure allowance if it's a spendable ERC-20
-    if (tokAAddr === USDC_ADDR || tokBAddr === USDC_ADDR) { /* native USDC uses value gas; no approve needed */ }
+
 
     let hash;
     if (existingId) {
-      // increaseLiquidity on existing position — amount0Desired/amount1Desired, min 0
+      // increaseLiquidity on existing position — amount0Desired/amount1Desired, min sesuai slippage
       const position = S.positions.find(x => x.tokenId === BigInt(existingId));
-      const data = encodeIncreaseLiquidity(BigInt(existingId), amt0Wei, amt1Wei, deadline);
+      const slip = (parseFloat($('slippageSel').value) || 1.0);
+      const slipRate = 1 - (slip / 100);
+      const m0 = BigInt(Math.max(0, Math.floor(Number(amt0Use) * slipRate)));
+      const m1 = BigInt(Math.max(0, Math.floor(Number(amt1Use) * slipRate)));
+      const data = encodeIncreaseLiquidity(BigInt(existingId), amt0Use, amt1Use, deadline, m0, m1);
       hash = await sendTx(CFG.nfpm, data);
       toast('Deposited into existing position #' + existingId, 'ok');
     } else {
       // mint-new: resolve the real pool address, then read token0/token1 + current tick
       if (!tokAAddr || !tokBAddr) throw new Error('Pool address not resolved — use Manual Add with a contract to mint a new pool');
-      const feeTier = p.fee || 3000;
-      const poolAddr = await getPool(tokAAddr, tokBAddr, feeTier);
-      if (!poolAddr || poolAddr === '0x0000000000000000000000000000000000000000')
-        throw new Error('Pool not created for this pair/fee on Uniswap V3 Arc');
+      const FEE_TIERS = [10000, 3000, 500, 100]; // 1% dulu (mayoritas pool Arc), lalu 0.3/0.05/0.01
+      let feeTier = p.fee || 0;
+      let poolAddr = null;
+      // kalau p.fee nggak valid, coba auto-detect di beberapa fee tier yang ada pool-nya
+      const tierOrder = FEE_TIERS.includes(feeTier) ? [feeTier, ...FEE_TIERS.filter(f=>f!==feeTier)] : FEE_TIERS;
+      for (const ft of tierOrder) {
+        const pa = await getPool(tokAAddr, tokBAddr, ft);
+        if (pa && pa !== '0x0000000000000000000000000000000000000000') { poolAddr = pa; feeTier = ft; break; }
+      }
+      if (!poolAddr) throw new Error('Pool not created for this pair on Uniswap V3 Arc (fee 1%/0.3%/0.05%/0.01%)');
       const ord = await getPoolTokens(poolAddr, tokAAddr, tokBAddr, feeTier);
-      let a0wei = amt0Wei, a1wei = amt1Wei;
+      let a0wei = amt0Use, a1wei = amt1Use;
       // map input amounts to pool's token0/token1 order
       const aL = tokAAddr.toLowerCase(), bL = tokBAddr.toLowerCase();
-      if (ord.token0.toLowerCase() === aL && ord.token1.toLowerCase() === bL) { a0wei = amt0Wei; a1wei = amt1Wei; }
-      else if (ord.token0.toLowerCase() === bL && ord.token1.toLowerCase() === aL) { a0wei = amt1Wei; a1wei = amt0Wei; }
+      if (ord.token0.toLowerCase() === aL && ord.token1.toLowerCase() === bL) { a0wei = amt0Use; a1wei = amt1Use; }
+      else if (ord.token0.toLowerCase() === bL && ord.token1.toLowerCase() === aL) { a0wei = amt1Use; a1wei = amt0Use; }
       else throw new Error('Resolved pool tokens do not match selected pair');
       // recompute tick range at pool's current tick
       let curTick = 0;
       try { const slot = await poolSlot0(poolAddr); curTick = slot && typeof slot.tick === 'number' ? slot.tick : 0; } catch(e) {}
       const t2 = ticksForRange(range, curTick, ord.fee || feeTier);
-      const data = encodeMint(ord.token0, ord.token1, ord.fee || feeTier, t2.lower, t2.upper, a0wei, a1wei, S.address, deadline);
+      // slippage tolerance: min amount = desired × (1 − slip/100) — proteksi harga saat mint
+      const slip = (parseFloat($('slippageSel').value) || 1.0);
+      const slipRate = 1 - (slip / 100);
+      const sMin0 = BigInt(Math.max(0, Math.floor(Number(a0wei) * slipRate)));
+      const sMin1 = BigInt(Math.max(0, Math.floor(Number(a1wei) * slipRate)));
+      const data = encodeMint(ord.token0, ord.token1, ord.fee || feeTier, t2.lower, t2.upper, a0wei, a1wei, S.address, deadline, sMin0, sMin1);
       toast('Position minted', 'ok');
       hash = await sendTx(CFG.nfpm, data);
     }
@@ -2233,6 +2689,42 @@ $('btnClaimAll').addEventListener('click', async ()=>{
   if (!S.address) return toast('Connect wallet first', 'err');
   for (const p of S.positions) if (p.feesUsd > 0) await claimRewardPos(p.tokenId);
 });
+$('btnCompound').addEventListener('click', async ()=>{
+  if (!S.address) return toast('Connect wallet first', 'err');
+  busy(true);
+  try {
+    const claimable = S.positions.filter(p => p.feesUsd > 0);
+    if (!claimable.length) { toast('Nothing to compound yet — no claimable fees', ''); return; }
+    toast('Compounding ' + claimable.length + ' positions...');
+    let done = 0;
+    for (const pos of claimable) {
+      // 1) claim fees ke wallet
+      await claimRewardPos(pos.tokenId);
+      // 2) re-add ke posisi yang sama (increaseLiquidity dgn fees yang barusan di-claim)
+      //    amt approve: token0/token1 dari posisi (pool token), minimal kecil (1 wei) — deposit fees
+      const t0 = pos.t0, t1 = pos.t1;
+      const fee = pos.fee || 10000;
+      const poolAddr = await getPool(t0, t1, fee).catch(() => '0');
+      const ord = poolAddr ? await getPoolTokens(poolAddr, t0, t1, fee).catch(() => null) : null;
+      if (!ord || !pos.pool) { done++; continue; }
+      // deposit kecil dari fees hasil claim: 0.5% dari nilai posisi (bukan semua — smart minimum)
+      const th = Math.max(0, pos.value);
+      if (th < 1e-6) { done++; continue; }
+      const amt0 = BigInt(Math.max(1, Math.floor(th * 0.002 * (pos.t0 === USDC_ADDR ? 1e6 : 1e18))));
+      const amt1 = BigInt(Math.max(1, Math.floor(th * 0.002 * (pos.t1 === USDC_ADDR ? 1e6 : 1e18))));
+      // approve jika perlu + increase
+      for (const [addr, amt] of [[t0, amt0], [t1, amt1]]) {
+        if (addr && addr !== '0x') await ensureAllowance(addr, CFG.nfpm, amt).catch(() => {});
+      }
+      const data = encodeIncreaseLiquidity(pos.tokenId, amt0, amt1, deadline());
+      await sendTx(CFG.nfpm, data).then(waitTx).catch(() => {});
+      done++;
+    }
+    await loadPositionsUI();
+    toast('Compound done: ' + done + ' position(s) reinvested', 'ok');
+  } catch (e) { toast('Compound failed: ' + e.message, 'err'); }
+  finally { busy(false); }
+});
 $('btnRefresh').addEventListener('click', async ()=>{
   toast('Refreshing pools...');
   const live = await fetchRadarTop();
@@ -2240,8 +2732,37 @@ $('btnRefresh').addEventListener('click', async ()=>{
   if (S.address) await loadPositionsUI();
   else toast('Pools refreshed', 'ok');
 });
-$('amtA').addEventListener('input', renderAddSide);
-$('amtB').addEventListener('input', renderAddSide);
+function showBalWarn(msg) {
+  const el = $('balWarn'); if (!el) return;
+  el.textContent = msg;
+  el.style.display = msg ? 'block' : 'none';
+}
+function balanceOther(side) {
+  const p = currentPool(); if (!p) return;
+  const w = $('balWarn');
+  const isSingle = (S._addMode || 'auto') === 'single';
+  const priceB = p.b === 'USDC' ? 1 : (p.priceB || 0);
+  const balA = _lastBal.a || 0, balB = _lastBal.b || 0;
+  let a = parseFloat($('amtA').value) || 0, b = parseFloat($('amtB').value) || 0;
+  // single mode: jangan auto-fill sisi lain (B hidden); warning cukup utk token A
+  if (!isSingle) {
+    if (side === 'a') { b = priceB > 0 ? a / priceB : 0; $('amtB').value = String(Math.round(b*1e6)/1e6); }
+    else { a = priceB > 0 ? b * priceB : 0; $('amtA').value = String(Math.round(a*1e6)/1e6); }
+  }
+  renderAddSide();
+  // warn if any side needs more wallet balance than available
+  let warn = '';
+  if (!S.address) warn = 'Connect wallet to verify balances.';
+  else {
+    if (a > balA + 1e-6) warn += p.a + ' balance insufficient ($' + fmt(Math.max(0, a - balA)) + ' short). ';
+    if (!isSingle && b > balB + 1e-12) warn += p.b + ' balance insufficient for balanced price (~' + fmt(b) + ' ' + p.b + ' needed).';
+  }
+  showBalWarn(warn.trim());
+}
+$('amtA').addEventListener('input', () => balanceOther('a'));
+$('amtB').addEventListener('input', () => balanceOther('b'));
+$('modeAuto').addEventListener('click', () => setAddMode('auto'));
+$('modeSingle').addEventListener('click', () => setAddMode('single'));
 $('slippageSel').addEventListener('change', renderAddSide);
 $('posSearch').addEventListener('input', renderPositions);
 $('poolTrigger').addEventListener('click', openPoolModal);
@@ -2263,8 +2784,10 @@ $('btnResolvePool').addEventListener('click', resolveManualPool);
 $('manAddrA').addEventListener('input', ()=>{ $('manStatus').textContent = ''; });
 $('manAddrB').addEventListener('input', ()=>{ $('manStatus').textContent = ''; });
 $('btnAdd').addEventListener('click', openAddModal);
+$('btnMaxYield').addEventListener('click', openMaxYield);
 $('adCancel').addEventListener('click', closeAddModal);
 $('adConfirm').addEventListener('click', confirmAddModal);
+$('adRange').addEventListener('change', () => { if (addPoolObj) drawRangeChart(addPoolObj, $('adRange').value); });
 $('modalAdd').addEventListener('click', e=>{ if (e.target === $('modalAdd')) closeAddModal(); });
 document.querySelectorAll('.max-btn').forEach(b=>b.addEventListener('click', async ()=>{
   const side = b.dataset.max;
@@ -2280,7 +2803,8 @@ document.querySelectorAll('.max-btn').forEach(b=>b.addEventListener('click', asy
     toast(isA ? 'Fetching USDC balance...' : 'Fetching ' + (p.b||'token') + ' balance...');
     const bal = await tokenBalanceOf(addr, dec);
     $(isA ? 'amtA' : 'amtB').value = bal > 0 ? Number(bal.toFixed(isA ? 6 : Math.min(dec, 8))) : '';
-    renderAddSide();
+    balanceOther(isA ? 'a' : 'b');   // auto-balance the other side after MAX (respects toggle)
+    renderBalances(currentPool());
   } catch (e) { toast('Failed to fetch balance: ' + (e.message||e), 'err'); }
 }));
 $('posGrid').addEventListener('click', e=>{
@@ -2304,6 +2828,20 @@ document.querySelectorAll('.tf-tabs button').forEach(b=>b.addEventListener('clic
   drawPortfolioChart();
 }));
 window.addEventListener('resize', drawPortfolioChart);
+/* screener: header sort + row → Add LP jump */
+$('scrHead').addEventListener('click', e=>{
+  const th = e.target.closest('th[data-key]'); if (!th) return;
+  const k = th.dataset.key;
+  if (_scrSort.key === k) _scrSort.dir *= -1; else _scrSort = { key: k, dir: k === 'sym' ? 1 : -1 };
+  renderScrTable();
+});
+$('scrBody').addEventListener('click', e=>{
+  const tr = e.target.closest('tr[data-sym]'); if (!tr) return;
+  const sym = tr.dataset.sym;
+  const pool = (S.pools || []).find(pp => (pp.b || '').toUpperCase() === sym);
+  if (pool) { S.selected = pool.id; showView('add'); renderPoolChips(); }
+  else toast('No pool loaded for ' + sym + ' yet', 'err');
+});
 
 /* ============ init ============ */
 window.addEventListener('load', async ()=>{
@@ -2976,6 +3514,163 @@ function renderLiquidityDistribution() {
     <div class="liqd-list">${bars}</div>`;
 }
 
+/* ============ MOMENTUM MATRIX (multi-TF score) ============ */
+let _momToks = null, _momLoaded = false, _uniTok = null;
+async function fetchUnisarcToken() {
+  // UNISARC volume kecil — keluar dari top 50; ambil khusus sekali buat pin di screener
+  if (_uniTok) return _uniTok;
+  try {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 9000);
+    const r = await fetch(RADAR_API + '/tokens?sort=volume24&dir=desc&limit=500&window=24h', { signal: ctrl.signal });
+    clearTimeout(t);
+    if (!r.ok) throw new Error('http ' + r.status);
+    const j = await r.json();
+    const toks = (j && j.tokens) || j;
+    if (Array.isArray(toks)) _uniTok = toks.find(t => (t.symbol || '').toUpperCase() === 'UNISARC') || null;
+  } catch (e) { _uniTok = null; }
+  return _uniTok;
+}
+function momScore(t) {
+  const c5 = t.change5m, c1 = t.change1h, c6 = t.change6h, c24 = t.change24h;
+  let raw = 0, w = 0;
+  if (typeof c5 === 'number' && isFinite(c5)) { raw += c5 * 1.2; w += 1.2; }
+  if (typeof c1 === 'number' && isFinite(c1)) { raw += c1 * 2.2; w += 2.2; }
+  if (typeof c6 === 'number' && isFinite(c6)) { raw += c6 * 1.6; w += 1.6; }
+  if (typeof c24 === 'number' && isFinite(c24)) { raw += c24 * 0.8; w += 0.8; }
+  if (!w) return null;
+  const avg = raw / w;
+  return { score: 50 + 50 * Math.tanh(avg / 12), avg, c5, c1, c6, c24 };
+}
+function momColor(s) {
+  if (s === null) return 'rgba(255,255,255,.08)';
+  if (s >= 66) return 'linear-gradient(135deg,#16c784,#20e3b2)';
+  if (s <= 34) return 'linear-gradient(135deg,#ff5f6d,#ff2d55)';
+  if (s >= 55) return 'linear-gradient(135deg,#a3e063,#16c784)';
+  if (s <= 45) return 'linear-gradient(135deg,#ffb347,#f7971e)';
+  return 'linear-gradient(135deg,#6b7280,#9ca3af)';
+}
+async function loadMomTokens() {
+  if (_momLoaded && _momToks) return _momToks;
+  try {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 9000);
+    const r = await fetch(RADAR_API + '/tokens?sort=volume24&dir=desc&limit=100&window=24h', { signal: ctrl.signal });
+    clearTimeout(t);
+    if (!r.ok) throw new Error('http ' + r.status);
+    const j = await r.json();
+    const toks = (j && j.tokens) || j;
+    if (!Array.isArray(toks)) throw new Error('bad payload');
+    _momToks = toks.slice(0, 50);
+    _momLoaded = true;
+  } catch (e) {
+    if (_momToks) return _momToks;
+    throw e;
+  }
+  return _momToks;
+}
+function renderMomMatrix() {
+  const grid = $t('momGrid'); if (!grid) return;
+  const toks = _momToks || [];
+  if (!toks.length) { grid.innerHTML = '<div class="mom-empty">No data</div>'; return; }
+  const cells = toks.map(t => {
+    const s = momScore(t);
+    const sym = (t.symbol || '?').slice(0, 6);
+    const ttl = sym + ' score ' + (s ? s.score.toFixed(0) : 'n/a') +
+      (s ? ` · 5m ${s.c5 ?? '—'}% · 1h ${s.c1 ?? '—'}% · 6h ${s.c6 ?? '—'}% · 24h ${s.c24 ?? '—'}%` : '');
+    return `<div class="mom-cell" style="background:${momColor(s ? s.score : null)}" title="${ttl}"><span class="mc-sym">${sym}</span><span class="mc-s">${s ? s.score.toFixed(0) : ''}</span></div>`;
+  }).join('');
+  grid.innerHTML = cells;
+  const vals = toks.map(t => momScore(t)).filter(s => s !== null).map(s => s.score);
+  const strong = vals.filter(v => v >= 66).length;
+  const weak = vals.filter(v => v <= 34).length;
+  const st = $t('momStats'); if (st) st.innerHTML = `${vals.length} calcd · <b>${strong} strong</b> · <b>${weak} weak</b>`;
+}
+async function refreshMomMatrix() {
+  try { await loadMomTokens(); } catch (e) { /* keep stale */ }
+  renderMomMatrix();
+}
+
+/* ============ PAIRS SCREENER (sortable) ============ */
+let _scrSort = { key: 'vol', dir: -1 };
+const SCR_COLS = [
+  { key: 'sym', label: 'Pair' },
+  { key: 'price', label: 'Price' },
+  { key: 'c24', label: '24h%' },
+  { key: 'vol', label: 'Vol 24h' },
+  { key: 'txns', label: 'Txns' },
+  { key: 'buys', label: 'Buys' },
+  { key: 'sells', label: 'Sells' },
+  { key: 'mcap', label: 'MCAP' },
+  { key: 'age', label: 'Age' },
+];
+function scrVal(t, key) {
+  switch (key) {
+    case 'sym': return (t.symbol || '?').toUpperCase();
+    case 'price': return t.price || 0;
+    case 'c24': return t.change24h || 0;
+    case 'vol': return t.volume24 || 0;
+    case 'txns': return t.txns24 || 0;
+    case 'buys': return t.buys24 || 0;
+    case 'sells': return t.sells24 || 0;
+    case 'mcap': return t.mcap || 0;
+    case 'age': return t.ageSec || 0;
+  }
+}
+function renderScrHead() {
+  const head = $t('scrHead'); if (!head) return;
+  head.innerHTML = SCR_COLS.map(c => {
+    const dir = _scrSort.key === c.key ? (_scrSort.dir === -1 ? '↓' : '↑') : '';
+    return `<th data-key="${c.key}">${c.label} <span class="sc">${dir}</span></th>`;
+  }).join('');
+}
+function renderSmBody() {
+  const body = $t('scrBody'); if (!body) return;
+  const all = (_momToks || []).slice();
+  // PIN UNISARC #1 (dari fetch terpisah, volume kecil → di luar top 50) lalu sisanya di-sort
+  let pinned = [];
+  if (_uniTok) {
+    const idx = all.findIndex(t => (t.symbol || '').toUpperCase() === 'UNISARC');
+    if (idx >= 0) all.splice(idx, 1);
+    pinned = [_uniTok];
+  } else {
+    const idx = all.findIndex(t => (t.symbol || '').toUpperCase() === 'UNISARC');
+    if (idx >= 0) pinned = all.splice(idx, 1);
+  }
+  const toks = all;
+  const k = _scrSort.key;
+  toks.sort((a, b) => {
+    const va = scrVal(a, k), vb = scrVal(b, k);
+    if (typeof va === 'string') return va.localeCompare(vb) * _scrSort.dir;
+    return (va - vb) * _scrSort.dir;
+  });
+  const rows = pinned.concat(toks);
+  if (!rows.length) { body.innerHTML = '<tr><td class="scr-none" colspan="9">Loading…</td></tr>'; return; }
+  body.innerHTML = rows.slice(0, 100).map(t => {
+    const c24 = t.change24h;
+    const up = (c24 || 0) >= 0;
+    const icon = t.icon ? `<img src="${t.icon}" alt="" loading="lazy" onerror="this.style.display='none'"/>` : '';
+    const age = t.ageSec ? (t.ageSec > 86400 ? Math.floor(t.ageSec / 86400) + 'd' : Math.floor(t.ageSec / 3600) + 'h') : '—';
+    return `<tr data-sym="${(t.symbol || '').toUpperCase()}">
+      <td><span class="sym-main">${icon}<span>${t.symbol || '?'}<small> ${(t.address || '').slice(0, 6)}…</small></span></span></td>
+      <td>${fmtUsd(t.price || 0)}</td>
+      <td class="${up ? 'up' : 'down'}">${(up ? '+' : '')}${((c24 || 0)).toFixed(1)}%</td>
+      <td>${fmtUsd(t.volume24 || 0)}</td>
+      <td>${(t.txns24 || 0).toLocaleString()}</td>
+      <td>${(t.buys24 || 0).toLocaleString()}</td>
+      <td>${(t.sells24 || 0).toLocaleString()}</td>
+      <td>${t.mcap ? fmtUsd(t.mcap) : '—'}</td>
+      <td>${age}</td>
+    </tr>`;
+  }).join('');
+}
+function renderScrTable() { renderScrHead(); renderSmBody(); }
+async function refreshScrTable() {
+  try { await loadMomTokens(); } catch (e) { /* keep stale */ }
+  if (typeof fetchUnisarcToken === 'function') { try { await fetchUnisarcToken(); } catch (e) {} }
+  renderScrTable();
+}
+
 async function renderTools() {
   try { if (typeof fetchRadarTop === 'function') $t('feedLive').textContent = 'LIVE'; } catch(e) {}
   // immediate render from current snapshot so page never looks empty
@@ -3003,6 +3698,9 @@ async function renderTools() {
     if (typeof renderSpotlight === 'function') renderSpotlight();
     if (typeof renderLiquidityDistribution === 'function') renderLiquidityDistribution();
   }
+  // Momentum matrix + pairs screener (share the token fetch)
+  if (typeof refreshMomMatrix === 'function') refreshMomMatrix();
+  if (typeof refreshScrTable === 'function') refreshScrTable();
 
   // kick off realtime refresh loops (guarded so they run once)
   if (!_toolsRealtime) {

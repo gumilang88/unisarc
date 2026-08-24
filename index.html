@@ -249,6 +249,33 @@ main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 5rem}
 .tools-grid > *{min-width:0}
 .tools-card{padding:1.3rem 1.4rem}
 .tools-sub{color:rgba(255,255,255,.65);font-size:15px;margin-bottom:1rem}
+/* ---- momentum matrix ---- */
+.mom-card{padding:.9rem 1rem}
+.mom-card .card-title{margin-bottom:.6rem}
+.mom-card .tools-sub{margin-bottom:.7rem;font-size:13px}
+.mom-grid{display:grid;grid-template-columns:repeat(10,1fr);grid-auto-rows:38px;gap:3px;margin-bottom:.7rem}
+.mom-cell{position:relative;border:2px solid #000;cursor:pointer;display:flex;align-items:flex-end;justify-content:flex-start;overflow:hidden;transition:transform .08s}
+.mom-cell:hover{transform:scale(1.28);z-index:5}
+.mom-cell .mc-sym{position:absolute;left:2px;top:1px;font-family:var(--px);font-size:10px;line-height:1;color:#000;text-shadow:0 1px 0 rgba(255,255,255,.6),1px 0 0 rgba(255,255,255,.6);max-width:100%;white-space:nowrap;overflow:hidden}
+.mom-cell .mc-s{position:absolute;right:1px;bottom:1px;font-family:var(--px);font-size:11px;line-height:1;color:#fff;text-shadow:1px 1px 0 #000}
+.mom-empty{grid-column:1/-1;color:rgba(255,255,255,.5);font-size:14px;padding:1.2rem 0;text-align:center}
+.mom-card .rsi-footer{align-items:flex-start}
+/* ---- pairs screener ---- */
+.scr-wrap{overflow-x:auto;max-height:560px;overflow-y:auto}
+.scr-table{width:100%;border-collapse:collapse;font-size:13px}
+.scr-table th{font-family:var(--px);font-size:11px;text-transform:uppercase;color:rgba(255,255,255,.6);text-align:right;padding:.5rem .5rem;border-bottom:3px solid #000;cursor:pointer;white-space:nowrap;user-select:none}
+.scr-table th:first-child{text-align:left}
+.scr-table th:hover{color:var(--yellow)}
+.scr-table th .sc{direction:rtl;unicode-bidi:plaintext}
+.scr-table td{padding:.45rem .5rem;border-bottom:2px solid rgba(0,0,0,.4);text-align:right;font-family:var(--vt);white-space:nowrap}
+.scr-table td:first-child{text-align:left;font-family:var(--px);font-size:12px;text-transform:uppercase;color:#fff}
+.scr-table tr{cursor:pointer}
+.scr-table tr:hover{background:rgba(61,218,216,.06)}
+.scr-table td.up{color:var(--green)}
+.scr-table td.down{color:var(--red)}
+.scr-table td.sym-main{display:flex;align-items:center;gap:.35rem}
+.scr-table td img{width:16px;height:16px;border:1px solid #000;background:#fff;object-fit:cover}
+.scr-table td small{color:rgba(255,255,255,.4);font-family:var(--vt);font-size:10px}
 /* ---- D: terminal header + stats pills ---- */
 .term-head{align-items:center}
 .term-pills{display:flex;gap:.6rem;flex-wrap:wrap}
@@ -1267,7 +1294,36 @@ a.px-btn{display:inline-block;text-align:center;text-decoration:none;width:auto}
           </div>
         </div>
       </div>
-    </div>
+      </div>
+
+      <!-- FEATURE 04 · PAIRS SCREENER (full width) -->
+      <div class="px-card tools-card scr-card">
+        <div class="card-title"><h2>Pairs Screener</h2><span class="hint" id="scrLive">TOP 50 · LIVE</span></div>
+        <p class="tools-sub">Sortable table of USDC pairs. Click a header to sort; click a row to jump to Add LP for that pool.</p>
+        <div class="scr-wrap">
+          <table class="scr-table" id="scrTable">
+            <thead><tr id="scrHead"></tr></thead>
+            <tbody id="scrBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- FEATURE 05 · MOMENTUM MATRIX (multi-TF score, compact) -->
+      <div class="px-card tools-card mom-card">
+        <div class="card-title"><h2>Momentum Matrix</h2><span class="hint" id="momLive">TOP 50 · est.</span></div>
+        <p class="tools-sub">Multi-timeframe momentum score (5m / 1h / 6h / 24h). Green = strong across all TFs, red = weak across all TFs. Hover for detail.</p>
+        <div class="mom-grid" id="momGrid">
+          <div class="mom-empty">Loading…</div>
+        </div>
+        <div class="rsi-footer">
+          <div class="rsi-legend">
+            <span class="lg"><span class="sw" style="background:linear-gradient(135deg,#16c784,#20e3b2)"></span>Strong</span>
+            <span class="lg"><span class="sw" style="background:linear-gradient(135deg,#6b7280,#9ca3af)"></span>Neutral</span>
+            <span class="lg"><span class="sw" style="background:linear-gradient(135deg,#ff5f6d,#ff2d55)"></span>Weak</span>
+          </div>
+          <div class="rsi-stats" id="momStats"></div>
+        </div>
+      </div>
   </section>
 
   <div class="footer-wrap">
@@ -2772,6 +2828,20 @@ document.querySelectorAll('.tf-tabs button').forEach(b=>b.addEventListener('clic
   drawPortfolioChart();
 }));
 window.addEventListener('resize', drawPortfolioChart);
+/* screener: header sort + row → Add LP jump */
+$('scrHead').addEventListener('click', e=>{
+  const th = e.target.closest('th[data-key]'); if (!th) return;
+  const k = th.dataset.key;
+  if (_scrSort.key === k) _scrSort.dir *= -1; else _scrSort = { key: k, dir: k === 'sym' ? 1 : -1 };
+  renderScrTable();
+});
+$('scrBody').addEventListener('click', e=>{
+  const tr = e.target.closest('tr[data-sym]'); if (!tr) return;
+  const sym = tr.dataset.sym;
+  const pool = (S.pools || []).find(pp => (pp.b || '').toUpperCase() === sym);
+  if (pool) { S.selected = pool.id; showView('add'); renderPoolChips(); }
+  else toast('No pool loaded for ' + sym + ' yet', 'err');
+});
 
 /* ============ init ============ */
 window.addEventListener('load', async ()=>{
@@ -3444,6 +3514,163 @@ function renderLiquidityDistribution() {
     <div class="liqd-list">${bars}</div>`;
 }
 
+/* ============ MOMENTUM MATRIX (multi-TF score) ============ */
+let _momToks = null, _momLoaded = false, _uniTok = null;
+async function fetchUnisarcToken() {
+  // UNISARC volume kecil — keluar dari top 50; ambil khusus sekali buat pin di screener
+  if (_uniTok) return _uniTok;
+  try {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 9000);
+    const r = await fetch(RADAR_API + '/tokens?sort=volume24&dir=desc&limit=500&window=24h', { signal: ctrl.signal });
+    clearTimeout(t);
+    if (!r.ok) throw new Error('http ' + r.status);
+    const j = await r.json();
+    const toks = (j && j.tokens) || j;
+    if (Array.isArray(toks)) _uniTok = toks.find(t => (t.symbol || '').toUpperCase() === 'UNISARC') || null;
+  } catch (e) { _uniTok = null; }
+  return _uniTok;
+}
+function momScore(t) {
+  const c5 = t.change5m, c1 = t.change1h, c6 = t.change6h, c24 = t.change24h;
+  let raw = 0, w = 0;
+  if (typeof c5 === 'number' && isFinite(c5)) { raw += c5 * 1.2; w += 1.2; }
+  if (typeof c1 === 'number' && isFinite(c1)) { raw += c1 * 2.2; w += 2.2; }
+  if (typeof c6 === 'number' && isFinite(c6)) { raw += c6 * 1.6; w += 1.6; }
+  if (typeof c24 === 'number' && isFinite(c24)) { raw += c24 * 0.8; w += 0.8; }
+  if (!w) return null;
+  const avg = raw / w;
+  return { score: 50 + 50 * Math.tanh(avg / 12), avg, c5, c1, c6, c24 };
+}
+function momColor(s) {
+  if (s === null) return 'rgba(255,255,255,.08)';
+  if (s >= 66) return 'linear-gradient(135deg,#16c784,#20e3b2)';
+  if (s <= 34) return 'linear-gradient(135deg,#ff5f6d,#ff2d55)';
+  if (s >= 55) return 'linear-gradient(135deg,#a3e063,#16c784)';
+  if (s <= 45) return 'linear-gradient(135deg,#ffb347,#f7971e)';
+  return 'linear-gradient(135deg,#6b7280,#9ca3af)';
+}
+async function loadMomTokens() {
+  if (_momLoaded && _momToks) return _momToks;
+  try {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 9000);
+    const r = await fetch(RADAR_API + '/tokens?sort=volume24&dir=desc&limit=100&window=24h', { signal: ctrl.signal });
+    clearTimeout(t);
+    if (!r.ok) throw new Error('http ' + r.status);
+    const j = await r.json();
+    const toks = (j && j.tokens) || j;
+    if (!Array.isArray(toks)) throw new Error('bad payload');
+    _momToks = toks.slice(0, 50);
+    _momLoaded = true;
+  } catch (e) {
+    if (_momToks) return _momToks;
+    throw e;
+  }
+  return _momToks;
+}
+function renderMomMatrix() {
+  const grid = $t('momGrid'); if (!grid) return;
+  const toks = _momToks || [];
+  if (!toks.length) { grid.innerHTML = '<div class="mom-empty">No data</div>'; return; }
+  const cells = toks.map(t => {
+    const s = momScore(t);
+    const sym = (t.symbol || '?').slice(0, 6);
+    const ttl = sym + ' score ' + (s ? s.score.toFixed(0) : 'n/a') +
+      (s ? ` · 5m ${s.c5 ?? '—'}% · 1h ${s.c1 ?? '—'}% · 6h ${s.c6 ?? '—'}% · 24h ${s.c24 ?? '—'}%` : '');
+    return `<div class="mom-cell" style="background:${momColor(s ? s.score : null)}" title="${ttl}"><span class="mc-sym">${sym}</span><span class="mc-s">${s ? s.score.toFixed(0) : ''}</span></div>`;
+  }).join('');
+  grid.innerHTML = cells;
+  const vals = toks.map(t => momScore(t)).filter(s => s !== null).map(s => s.score);
+  const strong = vals.filter(v => v >= 66).length;
+  const weak = vals.filter(v => v <= 34).length;
+  const st = $t('momStats'); if (st) st.innerHTML = `${vals.length} calcd · <b>${strong} strong</b> · <b>${weak} weak</b>`;
+}
+async function refreshMomMatrix() {
+  try { await loadMomTokens(); } catch (e) { /* keep stale */ }
+  renderMomMatrix();
+}
+
+/* ============ PAIRS SCREENER (sortable) ============ */
+let _scrSort = { key: 'vol', dir: -1 };
+const SCR_COLS = [
+  { key: 'sym', label: 'Pair' },
+  { key: 'price', label: 'Price' },
+  { key: 'c24', label: '24h%' },
+  { key: 'vol', label: 'Vol 24h' },
+  { key: 'txns', label: 'Txns' },
+  { key: 'buys', label: 'Buys' },
+  { key: 'sells', label: 'Sells' },
+  { key: 'mcap', label: 'MCAP' },
+  { key: 'age', label: 'Age' },
+];
+function scrVal(t, key) {
+  switch (key) {
+    case 'sym': return (t.symbol || '?').toUpperCase();
+    case 'price': return t.price || 0;
+    case 'c24': return t.change24h || 0;
+    case 'vol': return t.volume24 || 0;
+    case 'txns': return t.txns24 || 0;
+    case 'buys': return t.buys24 || 0;
+    case 'sells': return t.sells24 || 0;
+    case 'mcap': return t.mcap || 0;
+    case 'age': return t.ageSec || 0;
+  }
+}
+function renderScrHead() {
+  const head = $t('scrHead'); if (!head) return;
+  head.innerHTML = SCR_COLS.map(c => {
+    const dir = _scrSort.key === c.key ? (_scrSort.dir === -1 ? '↓' : '↑') : '';
+    return `<th data-key="${c.key}">${c.label} <span class="sc">${dir}</span></th>`;
+  }).join('');
+}
+function renderSmBody() {
+  const body = $t('scrBody'); if (!body) return;
+  const all = (_momToks || []).slice();
+  // PIN UNISARC #1 (dari fetch terpisah, volume kecil → di luar top 50) lalu sisanya di-sort
+  let pinned = [];
+  if (_uniTok) {
+    const idx = all.findIndex(t => (t.symbol || '').toUpperCase() === 'UNISARC');
+    if (idx >= 0) all.splice(idx, 1);
+    pinned = [_uniTok];
+  } else {
+    const idx = all.findIndex(t => (t.symbol || '').toUpperCase() === 'UNISARC');
+    if (idx >= 0) pinned = all.splice(idx, 1);
+  }
+  const toks = all;
+  const k = _scrSort.key;
+  toks.sort((a, b) => {
+    const va = scrVal(a, k), vb = scrVal(b, k);
+    if (typeof va === 'string') return va.localeCompare(vb) * _scrSort.dir;
+    return (va - vb) * _scrSort.dir;
+  });
+  const rows = pinned.concat(toks);
+  if (!rows.length) { body.innerHTML = '<tr><td class="scr-none" colspan="9">Loading…</td></tr>'; return; }
+  body.innerHTML = rows.slice(0, 100).map(t => {
+    const c24 = t.change24h;
+    const up = (c24 || 0) >= 0;
+    const icon = t.icon ? `<img src="${t.icon}" alt="" loading="lazy" onerror="this.style.display='none'"/>` : '';
+    const age = t.ageSec ? (t.ageSec > 86400 ? Math.floor(t.ageSec / 86400) + 'd' : Math.floor(t.ageSec / 3600) + 'h') : '—';
+    return `<tr data-sym="${(t.symbol || '').toUpperCase()}">
+      <td><span class="sym-main">${icon}<span>${t.symbol || '?'}<small> ${(t.address || '').slice(0, 6)}…</small></span></span></td>
+      <td>${fmtUsd(t.price || 0)}</td>
+      <td class="${up ? 'up' : 'down'}">${(up ? '+' : '')}${((c24 || 0)).toFixed(1)}%</td>
+      <td>${fmtUsd(t.volume24 || 0)}</td>
+      <td>${(t.txns24 || 0).toLocaleString()}</td>
+      <td>${(t.buys24 || 0).toLocaleString()}</td>
+      <td>${(t.sells24 || 0).toLocaleString()}</td>
+      <td>${t.mcap ? fmtUsd(t.mcap) : '—'}</td>
+      <td>${age}</td>
+    </tr>`;
+  }).join('');
+}
+function renderScrTable() { renderScrHead(); renderSmBody(); }
+async function refreshScrTable() {
+  try { await loadMomTokens(); } catch (e) { /* keep stale */ }
+  if (typeof fetchUnisarcToken === 'function') { try { await fetchUnisarcToken(); } catch (e) {} }
+  renderScrTable();
+}
+
 async function renderTools() {
   try { if (typeof fetchRadarTop === 'function') $t('feedLive').textContent = 'LIVE'; } catch(e) {}
   // immediate render from current snapshot so page never looks empty
@@ -3471,6 +3698,9 @@ async function renderTools() {
     if (typeof renderSpotlight === 'function') renderSpotlight();
     if (typeof renderLiquidityDistribution === 'function') renderLiquidityDistribution();
   }
+  // Momentum matrix + pairs screener (share the token fetch)
+  if (typeof refreshMomMatrix === 'function') refreshMomMatrix();
+  if (typeof refreshScrTable === 'function') refreshScrTable();
 
   // kick off realtime refresh loops (guarded so they run once)
   if (!_toolsRealtime) {
