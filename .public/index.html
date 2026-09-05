@@ -74,9 +74,6 @@ nav a{font-family:var(--px);font-size:13px;text-transform:uppercase;padding:.65r
 nav a:hover{color:var(--yellow)}
 nav a.active{color:#fff;background:#d8046a;border:3px solid #000;box-shadow:3px 3px 0 #000}
 .header-right{margin-left:auto;display:flex;align-items:center;gap:.75rem}
-.chain-pill{display:flex;align-items:center;gap:.45rem;padding:.4rem .7rem;border:3px solid #000;box-shadow:3px 3px 0 #000;
-       font-family:var(--px);font-size:14px;text-transform:uppercase;color:var(--white);background:var(--card)}
-.chain-pill .dot{width:9px;height:9px;background:var(--green);box-shadow:0 0 8px var(--green)}
 .wallet-btn{font-family:var(--px);font-size:13px;text-transform:uppercase;padding:.75rem 1rem;
        background:#d8046a;color:#fff;border:4px solid #000;box-shadow:5px 5px 0 #000}
 .wallet-btn:hover{background:#f2218b}
@@ -668,8 +665,6 @@ main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 5rem}
   .brand-logo{ width:32px; height:32px; border-width:3px; box-shadow:3px 3px 0 #000 }
   .brand span{ font-size:12px }
   .header-right{ margin-left:0; gap:.5rem; flex-wrap:wrap }
-  .chain-pill{ font-size:11px; padding:.3rem .5rem; border-width:2px; box-shadow:2px 2px 0 #000; gap:.3rem }
-  .chain-pill .dot{ width:7px; height:7px }
   .wallet-btn{ font-size:11px; padding:.55rem .7rem; border-width:3px; box-shadow:3px 3px 0 #000 }
 
   /* nav scroll-list */
@@ -1051,7 +1046,6 @@ a.px-btn{display:inline-block;text-align:center;text-decoration:none;width:auto}
     <a href="#tools" data-v="tools">Tools</a>
   </nav>
   <div class="header-right">
-    <div class="chain-pill" title="Connected chain"><span class="dot"></span><span id="chainName">ARC Mainnet</span></div>
     <button class="wallet-btn" id="walletBtn">Connect Wallet</button>
   </div>
 </header>
@@ -1723,6 +1717,33 @@ function applyPnlToPosition(pos) {
   pos.pnlStatus = 'tracked'; pos.costBasisUsd = p.contributedUsd; pos.pnlUsd = p.profitUsd; pos.pnlPct = p.profitPct;
   pos.pnlGrossUsd = p.grossValue; return pos;
 }
+// Existing positions minted before the PnL ledger existed have no cost basis on file.
+// Backfill them with an estimated baseline so PnL renders instead of showing "—".
+// Baseline = current value at first sighting; it is marked 'legacy' and only written once,
+// so profit is measured from the moment the wallet was first tracked (best available).
+function backfillPnlLedger(pos) {
+  if (!S.address) return pos;
+  const ledger = readPnlLedger(), key = String(pos.tokenId);
+  if (ledger[key] && saneUsd(ledger[key].contributedUsd) > 0) return pos;
+  if (!(saneUsd(pos.value) > 0)) return pos;
+  ledger[key] = {
+    ...(ledger[key] || {}),
+    contributedUsd: saneUsd(pos.value),
+    claimedUsd: saneUsd(ledger[key] && ledger[key].claimedUsd),
+    withdrawnUsd: saneUsd(ledger[key] && ledger[key].withdrawnUsd),
+    mode: ledger[key] && ledger[key].mode ? ledger[key].mode : 'legacy',
+    legacy: true,
+    lastDepositTx: (ledger[key] && ledger[key].lastDepositTx) || '',
+    updatedAt: Date.now(),
+  };
+  writePnlLedger(ledger);
+  return pos;
+}
+function applyBackfilledPnl(pos) {
+  backfillPnlLedger(pos);
+  applyPnlToPosition(pos);
+  return pos;
+}
 function recordPnlDeposit(tokenId, contributedUsd, txHash='', mode='mint') {
   contributedUsd = saneUsd(contributedUsd); if (!(contributedUsd > 0)) return;
   const ledger = readPnlLedger(), key = String(tokenId), old = ledger[key] || {};
@@ -2063,7 +2084,7 @@ async function loadPositionsUI() {
       if (pos.feesUsd > 5000000) pos.feesUsd = (poolInfo ? poolInfo.tvl * 0.05 : 0);
     } catch (e) { console.warn('enrich', e); }
   }));
-  raw.forEach(applyPnlToPosition);
+  raw.forEach(applyBackfilledPnl);
   S.positions = raw;
   renderPositions(); renderRewards(); renderMonitor();
   if (raw.length) toast('Found ' + raw.length + ' position(s) on-chain', 'ok');
@@ -4376,10 +4397,10 @@ function poolQuality(t) {
 }
 function poolQualityRows() {
   const all = (_momToks || []).slice();
-  if (_uniTok && !all.some(t => (t.symbol || '').toUpperCase() === 'UNISARC')) all.unshift(_uniTok);
+  // UNISARC volume is tiny (below top-50); merge it so it still shows, but rank by
+  // the active sort metric only — never force it to the top.
+  if (_uniTok && !all.some(t => (t.symbol || '').toUpperCase() === 'UNISARC')) all.push(_uniTok);
   return all.map(t => ({ t, q: poolQuality(t) })).sort((a,b) => {
-    if ((a.t.symbol || '').toUpperCase() === 'UNISARC') return -1;
-    if ((b.t.symbol || '').toUpperCase() === 'UNISARC') return 1;
     if (_poolqMode === 'yield') return b.q.efficiency - a.q.efficiency;
     if (_poolqMode === 'stable') return b.q.stability - a.q.stability;
     return b.q.score - a.q.score;
@@ -4462,24 +4483,16 @@ function renderScrHead() {
 function renderSmBody() {
   const body = $t('scrBody'); if (!body) return;
   const all = (_momToks || []).slice();
-  // PIN UNISARC #1 (dari fetch terpisah, volume kecil → di luar top 50) lalu sisanya di-sort
-  let pinned = [];
-  if (_uniTok) {
-    const idx = all.findIndex(t => (t.symbol || '').toUpperCase() === 'UNISARC');
-    if (idx >= 0) all.splice(idx, 1);
-    pinned = [_uniTok];
-  } else {
-    const idx = all.findIndex(t => (t.symbol || '').toUpperCase() === 'UNISARC');
-    if (idx >= 0) pinned = all.splice(idx, 1);
-  }
-  const toks = all;
+  // Merge the low-volume UNISARC token (it falls outside the top-50 fetch) so it still
+  // appears, but let it flow through the normal sort — never pin it to row #1.
+  if (_uniTok && !all.some(t => (t.symbol || '').toUpperCase() === 'UNISARC')) all.push(_uniTok);
   const k = _scrSort.key;
-  toks.sort((a, b) => {
+  all.sort((a, b) => {
     const va = scrVal(a, k), vb = scrVal(b, k);
     if (typeof va === 'string') return va.localeCompare(vb) * _scrSort.dir;
     return (va - vb) * _scrSort.dir;
   });
-  const rows = pinned.concat(toks);
+  const rows = all;
   if (!rows.length) { body.innerHTML = '<tr><td class="scr-none" colspan="9">Loading…</td></tr>'; return; }
   body.innerHTML = rows.slice(0, 100).map(t => {
     const c24 = t.change24h;
