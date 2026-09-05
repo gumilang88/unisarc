@@ -4618,11 +4618,14 @@ function initReveal() {
       });
     }, { threshold: 0.1, rootMargin: '0px 0px -6% 0px' });
   }
-  // tag common blocks on every page, then observe the untagged ones
+  // tag common blocks on every page, then observe the untagged ones.
+  // NOTE: data lists (.mon-card/.mon-grid/.pos-card/.pos-grid/.stat/.rw-row/.reward-hero)
+  // are re-rendered frequently and must NOT get .reveal — below-the-fold items stay
+  // stuck at opacity:0 (especially on mobile single-column) until scrolled.
   const sel = '.home-hero, .hero-inner, .hero-cta, .home-about, .pillar, .about-mission, ' +
               '.road-title, .road-card, .home-roadmap, ' +
-              '.page-head, .stat, .px-card, .pos-card, .mon-card, .rw-row, .reward-hero, ' +
-              '.toolbar, .dt-row, .chart-card, .add-panel, .pos-grid, .mon-grid, .empty';
+              '.page-head, .px-card, ' +
+              '.toolbar, .dt-row, .chart-card, .add-panel, .empty';
   document.querySelectorAll(sel).forEach(el => {
     if (!el.classList.contains('reveal')) { el.classList.add('reveal'); revealIO.observe(el); }
   });
