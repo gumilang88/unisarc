@@ -80,6 +80,23 @@ nav a.active{color:#fff;background:#d8046a;border:3px solid #000;box-shadow:3px 
 .wallet-btn:active{transform:translate(3px,3px);box-shadow:2px 2px 0 #000}
 .wallet-btn.connected{background:var(--card2);color:var(--cyan);font-size:13px}
 
+/* ---------- swap ---------- */
+.swap-shell{display:grid;grid-template-columns:minmax(0,590px) minmax(260px,1fr);gap:1.4rem;align-items:start;max-width:1020px;margin:0 auto}
+.swap-panel{position:relative;background:#4a1768;border:4px solid #000;box-shadow:9px 9px 0 #000;padding:1.25rem}
+.swap-panel:before{content:"";position:absolute;inset:7px;pointer-events:none;border:1px solid rgba(255,255,255,.09)}
+.swap-headline{display:flex;justify-content:space-between;align-items:center;gap:1rem;margin-bottom:1rem}.swap-headline h2{font-family:var(--px);font-size:14px;text-transform:uppercase}.swap-speed{display:flex;align-items:center;gap:.45rem;font-family:var(--px);font-size:11px;color:var(--green);text-transform:uppercase}.swap-speed i{width:8px;height:8px;background:var(--green);border:2px solid #000;box-shadow:1px 1px 0 #000}
+.swap-token-box{position:relative;background:#2a0d3e;border:3px solid #000;padding:.85rem .9rem;min-height:116px}.swap-token-top{display:flex;justify-content:space-between;color:rgba(255,255,255,.55);font-size:13px;margin-bottom:.5rem}.swap-token-main{display:flex;align-items:center;gap:.65rem}.swap-token-main input{min-width:0;flex:1;background:transparent;border:0;outline:0;color:#fff;font-family:var(--vt);font-size:2rem;font-weight:700;letter-spacing:-.03em}.swap-token-btn{display:flex;align-items:center;gap:.5rem;flex:0 0 auto;background:#5b1d7d;border:3px solid #000;color:#fff;padding:.55rem .7rem;font-family:var(--px);font-size:12px;text-transform:uppercase;box-shadow:3px 3px 0 #000}.swap-token-btn img{width:26px;height:26px;border-radius:50%;background:#fff;object-fit:cover}.swap-token-letter{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--yellow);color:#20102e;border:2px solid #000}.swap-usd{font-size:13px;color:rgba(255,255,255,.48);margin-top:.35rem;min-height:20px}
+.swap-pct-row{display:flex;gap:.35rem;margin-top:.55rem}.swap-pct-row button{background:transparent;border:2px solid #000;color:rgba(255,255,255,.6);font-family:var(--px);font-size:10px;text-transform:uppercase;padding:.18rem .45rem;cursor:pointer}.swap-pct-row button:hover{background:var(--pop);color:var(--cyan)}.swap-pct-row button.max{background:var(--cyan);color:#20102e}
+.swap-flip-row{height:20px;position:relative;z-index:2}.swap-flip{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:42px;height:42px;border:4px solid #000;background:var(--yellow);color:#20102e;font-size:21px;font-weight:900;display:grid;place-items:center;box-shadow:3px 3px 0 #000}.swap-flip:active{transform:translate(calc(-50% + 2px),calc(-50% + 2px));box-shadow:1px 1px 0 #000}
+.swap-meta{margin-top:1rem;border:3px solid #000;background:#351049;padding:.25rem .8rem}.swap-meta-row{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.55rem 0;border-bottom:1px solid rgba(255,255,255,.1);font-size:13px}.swap-meta-row:last-child{border-bottom:0}.swap-meta-row span:first-child{color:rgba(255,255,255,.55)}.swap-meta-row strong{text-align:right;color:#fff;font-weight:600}.swap-slips{display:flex;gap:.35rem}.swap-slip{border:2px solid #000;background:#2a0d3e;color:rgba(255,255,255,.65);padding:.25rem .42rem;font-size:11px}.swap-slip.active{background:var(--cyan);color:#20102e}
+.swap-cta{width:100%;margin-top:1rem;padding:.9rem 1rem;background:#d8046a;color:#fff;border:4px solid #000;box-shadow:5px 5px 0 #000;font-family:var(--px);font-size:14px;text-transform:uppercase}.swap-cta:disabled{opacity:.48;cursor:not-allowed}.swap-cta:not(:disabled):active{transform:translate(3px,3px);box-shadow:2px 2px 0 #000}.swap-status{display:flex;justify-content:space-between;gap:.75rem;align-items:center;margin-top:.8rem;font-size:12px;color:rgba(255,255,255,.55)}.swap-status b{color:var(--cyan)}
+.swap-side{display:grid;gap:1rem}.swap-info{background:#4a1768;border:4px solid #000;box-shadow:7px 7px 0 #000;padding:1rem 1.1rem}.swap-info h3{font-family:var(--px);font-size:12px;text-transform:uppercase;margin-bottom:.75rem}.swap-info p{color:rgba(255,255,255,.65);font-size:14px;line-height:1.6}.swap-steps{display:grid;gap:.6rem}.swap-step{display:grid;grid-template-columns:29px 1fr;gap:.7rem;align-items:start}.swap-step i{width:29px;height:29px;display:grid;place-items:center;background:var(--cyan);border:3px solid #000;color:#20102e;font-family:var(--px);font-style:normal;font-size:10px}.swap-step b{display:block;font-size:14px}.swap-step span{display:block;color:rgba(255,255,255,.5);font-size:12px;margin-top:.12rem}.swap-tx-link{color:var(--green);text-decoration:underline}
+.swap-chart-head{display:flex;align-items:center;justify-content:space-between;gap:.75rem;margin-bottom:.7rem}.swap-chart-token{display:flex;align-items:center;gap:.55rem;min-width:0}.swap-chart-token img,.swap-chart-token .swap-token-letter{width:28px;height:28px;flex:0 0 28px;border:2px solid #000;border-radius:5px;object-fit:contain;background:var(--pop)}.swap-chart-name{font-family:var(--px);font-size:10px;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.swap-chart-price{text-align:right}.swap-chart-price b{display:block;font-family:var(--vt);font-size:17px}.swap-chart-price span{font-size:11px}.swap-mini-chart{height:72px}.swap-chart-foot{display:flex;justify-content:space-between;margin-top:.45rem;color:rgba(255,255,255,.48);font-size:11px;text-transform:uppercase}
+.swap-picker{position:fixed;inset:0;z-index:320;display:none}.swap-picker.open{display:block}.swap-picker-bg{position:absolute;inset:0;background:rgba(18,4,30,.72);backdrop-filter:blur(3px);animation:pmFade .18s ease-out}.swap-picker-card{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(480px,92vw);max-height:82vh;background:var(--card);border:4px solid #000;box-shadow:12px 12px 0 #000;display:flex;flex-direction:column;animation:pmPop .22s cubic-bezier(.2,1.4,.4,1)}.swap-picker-head{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;padding:1.1rem 1.2rem;border-bottom:3px solid #000;background:var(--pop)}.swap-picker-head h3{font-family:var(--px);font-size:15px;text-transform:uppercase;text-shadow:2px 2px 0 #000}.swap-picker-head p{font-family:var(--vt);font-size:14px;color:rgba(255,255,255,.6);margin-top:.2rem}.swap-picker-close{width:34px;height:34px;flex:0 0 34px;cursor:pointer;background:var(--red);border:3px solid #000;color:#fff;font-size:15px;line-height:1}.swap-picker-search-wrap{display:flex;align-items:center;gap:.5rem;margin:.9rem 1.2rem;padding:.6rem .8rem;border:3px solid #000;background:var(--pop);color:rgba(255,255,255,.5)}.swap-picker-search{flex:1;min-width:0;border:0;background:transparent;color:var(--yellow);font-family:var(--vt);font-size:1.05rem;outline:0}.swap-picker-list{flex:1;overflow-y:auto;padding:.2rem 1.2rem 1rem;min-height:120px}.swap-pick-row{display:flex;align-items:center;gap:.8rem;width:100%;cursor:pointer;text-align:left;background:transparent;border:3px solid transparent;padding:.6rem;margin-bottom:.4rem;color:#fff;transition:.12s}.swap-pick-row:hover{background:var(--pop);border-color:#000;box-shadow:3px 3px 0 #000;transform:translate(-1px,-1px)}.swap-pick-row img,.swap-pick-row>.swap-token-letter{width:38px;height:38px;flex:0 0 38px;border:3px solid #000;border-radius:6px;object-fit:contain;background:var(--pop)}.swap-pick-main{flex:1;min-width:0}.swap-pick-main b{display:block;font-family:var(--px);font-size:14px;text-transform:uppercase}.swap-pick-main span{display:block;color:rgba(255,255,255,.55);font-size:12px;margin-top:.1rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.swap-pick-right{flex:0 0 auto;text-align:right}.swap-pick-price{display:block;color:var(--cyan);font-family:var(--vt);font-size:14px}.swap-pick-balance{display:block;color:rgba(255,255,255,.52);font-size:11px;margin-top:.18rem}.swap-picker-loading{padding:1.5rem;text-align:center;color:rgba(255,255,255,.55)}
+@media(max-width:640px){.swap-picker-card{width:94vw;max-height:86vh}.swap-pick-row{padding:.5rem}.swap-picker-head{padding:1rem}.swap-picker-search-wrap{margin:.75rem 1rem}.swap-picker-list{padding:0 1rem 1rem}}
+@media(max-width:840px){.swap-shell{grid-template-columns:1fr}.swap-side{grid-template-columns:1fr 1fr}}
+@media(max-width:640px){.swap-shell{gap:1rem}.swap-panel{padding:.8rem;box-shadow:5px 5px 0 #000;border-width:3px}.swap-token-main input{font-size:1.55rem}.swap-token-btn{font-size:10px;padding:.45rem}.swap-side{grid-template-columns:1fr}.swap-meta-row{font-size:12px}.swap-status{align-items:flex-start;flex-direction:column}}
+
 /* ---------- layout ---------- */
 main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 5rem}
 /* desktop-wide: expand content so cards fill the screen on large displays (mobile unaffected) */
@@ -1041,6 +1058,7 @@ a.px-btn{display:inline-block;text-align:center;text-decoration:none;width:auto}
     <a href="#home" data-v="home" class="active">Home</a>
     <a href="#positions" data-v="positions">Positions</a>
     <a href="#add" data-v="add">Add LP</a>
+    <a href="#swap" data-v="swap">Swap</a>
     <a href="#monitor" data-v="monitor">Monitor</a>
 
     <a href="#tools" data-v="tools">Tools</a>
@@ -1289,6 +1307,53 @@ a.px-btn{display:inline-block;text-align:center;text-decoration:none;width:auto}
           <div class="px-card" style="box-shadow:4px 4px 0 #000"><canvas id="ilChart" width="440" height="110" style="width:100%;height:100px;display:block"></canvas></div>
         </div>
       </div>
+    </div>
+  </section>
+
+  <!-- ============ SWAP ============ -->
+  <section class="view" id="view-swap">
+    <div class="page-head">
+      <div><h1 class="text-outline">Swap</h1><p>Direct Uniswap V3 execution on Arc. No off-chain orderbook.</p></div>
+    </div>
+    <div class="swap-shell">
+      <div class="swap-panel">
+        <div class="swap-headline"><h2>Swap tokens</h2><span class="swap-speed"><i></i>Live on-chain quote</span></div>
+        <div class="swap-token-box">
+          <div class="swap-token-top"><span>You pay</span><span id="swapBalIn">Balance —</span></div>
+          <div class="swap-token-main"><input id="swapAmountIn" type="text" inputmode="decimal" autocomplete="off" placeholder="0.00" /><button class="swap-token-btn" id="swapTokenInBtn" type="button"><span id="swapTokenInIcon"></span><b id="swapTokenInSym">USDC</b><span>▾</span></button></div>
+          <div class="swap-pct-row" id="swapPctIn"><button data-pct="25">25%</button><button data-pct="50">50%</button><button data-pct="75">75%</button><button data-pct="100" class="max">MAX</button></div>
+          <div class="swap-usd" id="swapUsdIn">$0.00</div>
+        </div>
+        <div class="swap-flip-row"><button class="swap-flip" id="swapFlip" type="button" aria-label="Reverse tokens">⇅</button></div>
+        <div class="swap-token-box">
+          <div class="swap-token-top"><span>You receive</span><span id="swapBalOut">Balance —</span></div>
+          <div class="swap-token-main"><input id="swapAmountOut" type="text" readonly placeholder="0.00" /><button class="swap-token-btn" id="swapTokenOutBtn" type="button"><span id="swapTokenOutIcon"></span><b id="swapTokenOutSym">UNISARC</b><span>▾</span></button></div>
+          <div class="swap-pct-row" id="swapPctOut" style="display:none"><button data-pct="25">25%</button><button data-pct="50">50%</button><button data-pct="75">75%</button><button data-pct="100" class="max">MAX</button></div>
+          <div class="swap-usd" id="swapUsdOut">$0.00</div>
+        </div>
+        <div class="swap-meta">
+          <div class="swap-meta-row"><span>Rate</span><strong id="swapRate">Enter an amount</strong></div>
+          <div class="swap-meta-row"><span>Price impact</span><strong id="swapImpact">—</strong></div>
+          <div class="swap-meta-row"><span>Pool fee</span><strong id="swapPoolFee">1.00%</strong></div>
+          <div class="swap-meta-row"><span>Minimum received</span><strong id="swapMinOut">—</strong></div>
+          <div class="swap-meta-row"><span>Slippage</span><div class="swap-slips" id="swapSlips"><button class="swap-slip" data-slip="0.5">0.5%</button><button class="swap-slip active" data-slip="1">1%</button><button class="swap-slip" data-slip="2.5">2.5%</button></div></div>
+        </div>
+        <button class="swap-cta" id="swapSubmit" type="button">Connect Wallet</button>
+        <div class="swap-status"><span id="swapQuoteStatus">Quotes are read directly from the Uniswap Quoter.</span><b id="swapRoute">USDC → UNISARC</b></div>
+      </div>
+      <aside class="swap-side">
+        <div class="swap-info"><h3>Fast execution</h3><div class="swap-steps"><div class="swap-step"><i>1</i><div><b>Parallel RPC race</b><span>The fastest healthy Arc endpoint wins every quote.</span></div></div><div class="swap-step"><i>2</i><div><b>Cached pool context</b><span>Pool and token metadata stay warm while you type.</span></div></div><div class="swap-step"><i>3</i><div><b>Direct router call</b><span>Your wallet sends straight to Uniswap V3.</span></div></div></div></div>
+        <div class="swap-info"><h3>Trade protection</h3><p>Every swap includes your minimum received amount. A fresh quote is required before your wallet opens.</p></div>
+        <div class="swap-info" id="swapMiniMonitor">
+          <h3>Market monitor</h3>
+          <div class="swap-chart-head">
+            <div class="swap-chart-token"><span id="swapChartIcon"></span><span class="swap-chart-name" id="swapChartName">USDC / UNISARC</span></div>
+            <div class="swap-chart-price"><b id="swapChartPrice">—</b><span id="swapChartChange">24H —</span></div>
+          </div>
+          <svg id="swapChartSvg" class="spark good swap-mini-chart" viewBox="0 0 120 58" preserveAspectRatio="none"></svg>
+          <div class="swap-chart-foot"><span>RadarDex</span><span>24H price</span></div>
+        </div>
+      </aside>
     </div>
   </section>
 
@@ -1572,6 +1637,15 @@ a.px-btn{display:inline-block;text-align:center;text-decoration:none;width:auto}
   </div>
 </div>
 
+<div class="swap-picker" id="swapPicker">
+  <div class="swap-picker-bg" data-close-swap-picker></div>
+  <div class="swap-picker-card">
+    <div class="swap-picker-head"><div><h3>Select Token</h3><p>Choose a token from your Arc wallet</p></div><button class="swap-picker-close" id="swapPickerClose">✕</button></div>
+    <div class="swap-picker-search-wrap"><span>⌕</span><input class="swap-picker-search" id="swapPickerSearch" placeholder="Search token..." /></div>
+    <div class="swap-picker-list" id="swapPickerList"></div>
+  </div>
+</div>
+
 <div id="toast-wrap"></div>
 
 <script>"use strict";
@@ -1585,8 +1659,8 @@ const CFG = {
   chainName: 'ARC Mainnet',
   nativeCurrency: { name: 'USDC', symbol: 'USDC', decimals: 6 },
   rpcUrls: [
-    'https://arc-mainnet.infura.io/v3/b6bf7d3508c941499b10025c0776eaf8',
     'https://rpc.arc-scan.org',
+    'https://arc-mainnet.infura.io/v3/b6bf7d3508c941499b10025c0776eaf8',
   ],
   blockExplorerUrls: ['https://arc-scan.org'],
   factory: '0xf0db7b58379503491d857db50ac9ece64c653918',  // Uniswap V3 Factory
@@ -1623,6 +1697,7 @@ const S = {
   tokenMeta: {},          // addr -> {symbol, decimals, icon} cache
   radarTokens: {},        // all Radar tokens by address (not limited by pool-card TVL filter)
   pendingPoolScan: false,
+  swap: { tokenIn: null, tokenOut: null, fee: 10000, slippage: 1, quote: null, quoteSeq: 0, pickerSide: 'in', _balSeq: 0, _allBalSeq: 0 },
 };
 
 /* ============ utils ============ */
@@ -1676,6 +1751,52 @@ async function rpc(method, params) {
 async function ethCall(to, data) { return rpc('eth_call', [{ to, data }, 'latest']); }
 async function ethGetCode(addr) { return rpc('eth_getCode', [addr, 'latest']); }
 async function ethRpcNode(method, params) { return rpc(method, params); }
+
+/* ---------- gas fee (EIP-1559) helpers ----------
+   Wallet defaults often over-estimate tip → popup shows a bloated gas number.
+   We pull the chain's real base fee + priority fee and a tight estimateGas so the
+   wallet popup shows a low, accurate figure. Amounts/destination/calldata untouched. */
+async function ethMaxPriorityFeePerGas() {
+  try { return BigInt(await rpc('eth_maxPriorityFeePerGas', [])); } catch (e) { return null; }
+}
+async function ethGasPrice() {
+  try { return BigInt(await rpc('eth_gasPrice', [])); } catch (e) { return null; }
+}
+async function ethBaseFeePerGas() {
+  try {
+    const b = await rpc('eth_getBlockByNumber', ['latest', false]);
+    return BigInt(b.baseFeePerGas || 0);
+  } catch (e) { return null; }
+}
+async function estimateSwapGas(tx) {
+  try {
+    const g = await rpc('eth_estimateGas', [tx]);
+    const est = BigInt(g);
+    // pad modestly so it never stalls, but keep the number shown low.
+    return est * 115n / 100n;
+  } catch (e) { return null; }
+}
+async function buildGasFields(tx) {
+  const priority = await ethMaxPriorityFeePerGas();
+  const gasPrice = await ethGasPrice();
+  const baseFee = await ethBaseFeePerGas();
+  const estGas = await estimateSwapGas(tx);
+  if (estGas) tx.gas = '0x' + estGas.toString(16);
+  if (priority != null && gasPrice != null) {
+    // Arc's RPC currently suggests a 20 gwei priority fee, which makes wallet previews
+    // look ~10x too high. Cap the tip at 1 gwei and leave 20% base-fee headroom.
+    const oneGwei = 1000000000n;
+    const tip = priority < oneGwei ? priority : oneGwei;
+    const base = baseFee != null ? baseFee : gasPrice;
+    const tightCap = base * 120n / 100n + tip;
+    const maxFee = tightCap < gasPrice ? tightCap : gasPrice;
+    tx.maxPriorityFeePerGas = '0x' + tip.toString(16);
+    tx.maxFeePerGas = '0x' + maxFee.toString(16);
+  } else if (gasPrice != null) {
+    tx.gasPrice = '0x' + gasPrice.toString(16);
+  }
+  return tx;
+}
 
 /* ============ automatic LP profit / loss ledger ============
    Every UNISARC mint/add/claim/remove updates this ledger automatically. Legacy
@@ -1952,6 +2073,7 @@ function buildPoolsFromRadar(list) {
       addr: tokenAddr, symbol: sym, priceB: Number(t.price) || 0,
       tvl: Number(t.liquidityUsdc) || 0, vol: Number(t.volume24) || 0,
       icon: t.icon || t.imageUrl || '', fee: 10000,
+      spark: Array.isArray(t.spark) ? t.spark : [], change24h: Number(t.change24h) || 0,
     };
     if (sym === 'USDC' || sym === 'USDUC' || seen.has(key)) continue;
     const liq = t.liquidityUsdc || 0, vol = t.volume24 || 0;
@@ -2263,6 +2385,238 @@ async function resolveManualPool() {
 }
 
 function currentPool() { return S.pools.find(p=>p.id===S.selected) || S.pools[0]; }
+
+/* ============ SWAP — direct Uniswap V3 ============ */
+const QUOTER_EXACT_INPUT_SINGLE = '0xc6a5026a'; // quoteExactInputSingle((address,address,uint256,uint24,uint160))
+const ROUTER_EXACT_INPUT_SINGLE = '0x04e45aaf'; // exactInputSingle((address,address,uint24,address,uint256,uint256,uint160))
+const MIN_SQRT_RATIO_PLUS_ONE = 4295128740n;
+const MAX_SQRT_RATIO_MINUS_ONE = 1461446703485210103287273052203988822378723970341n;
+const SWAP_QUOTE_TTL_MS = 12000;
+let _swapQuoteTimer = null;
+const _swapQuoteCache = new Map();
+
+function decimalToRaw(value, decimals) {
+  const s = String(value || '').trim();
+  if (!/^\d*(?:\.\d*)?$/.test(s) || !/\d/.test(s)) return 0n;
+  const [wholeRaw, fracRaw=''] = s.split('.');
+  const whole = wholeRaw || '0', frac = fracRaw.slice(0, decimals).padEnd(decimals, '0');
+  return BigInt((whole + frac).replace(/^0+(?=\d)/, '') || '0');
+}
+function rawToDecimal(raw, decimals, precision=8) {
+  raw = BigInt(raw || 0); const neg = raw < 0n; if (neg) raw = -raw;
+  const base = 10n ** BigInt(decimals), whole = raw / base;
+  let frac = (raw % base).toString().padStart(decimals, '0').slice(0, Math.min(decimals, precision)).replace(/0+$/, '');
+  return (neg ? '-' : '') + whole + (frac ? '.' + frac : '');
+}
+function swapTokenUniverse() {
+  const by = new Map();
+  const add = t => { const a=String(t.address||t.addr||'').toLowerCase(); if (!/^0x[0-9a-f]{40}$/.test(a)) return; by.set(a,{address:a,symbol:t.symbol||t.b||'?',name:t.name||t.symbol||t.b||'Token',decimals:Number.isFinite(Number(t.decimals))?Number(t.decimals):(Number(t.bDec)||18),icon:t.icon||t.imageUrl||'',priceUsd:Number(t.priceUsd||t.priceB||t.price)||0}); };
+  CFG.tokens.forEach(add);
+  S.pools.forEach(p=>add({address:p.addr,symbol:p.b,name:p.b,decimals:p.bDec||18,icon:p.icon,priceB:p.priceB}));
+  // ALL tokens from RadarDex (not just the TVL-filtered S.pools), so brand-new / tiny tokens appear too.
+  for (const a in (S.radarTokens||{})) {
+    const t=S.radarTokens[a];
+    add({address:t.addr,symbol:t.symbol,name:t.symbol,decimals:t.decimals||18,icon:t.icon,priceB:t.priceB});
+  }
+  add({address:USDC_ADDR,symbol:'USDC',name:'USD Coin',decimals:6,icon:USDC_ICON,priceUsd:1});
+  add({address:'0x1061d7f4934542b654e2a4ef7f04f101b4e8018d',symbol:'UNISARC',name:'UNISARC',decimals:18,icon:'assets/unisarc-logo.png',priceUsd:(S.pools.find(p=>(p.b||'').toUpperCase()==='UNISARC')||{}).priceB||0});
+  return [...by.values()];
+}
+function initSwapState() {
+  const u=swapTokenUniverse();
+  const keep = t => t && (u.find(x=>x.address===t.address) || (S.swap.resolvedTokens||{})[t.address]);
+  S.swap.tokenIn = keep(S.swap.tokenIn) || u.find(t=>t.symbol==='USDC') || u[0];
+  S.swap.tokenOut = keep(S.swap.tokenOut) || u.find(t=>t.symbol==='UNISARC') || u.find(t=>t.address!==S.swap.tokenIn.address) || u[0];
+  if (S.swap.tokenIn.address===S.swap.tokenOut.address) S.swap.tokenOut=u.find(t=>t.address!==S.swap.tokenIn.address)||u[0];
+}
+function swapTokenIcon(t) { return t.icon ? `<img src="${t.icon}" alt="" onerror="this.outerHTML='<span class=&quot;swap-token-letter&quot;>${(t.symbol||'?')[0]}</span>'">` : `<span class="swap-token-letter">${(t.symbol||'?')[0]}</span>`; }
+function swapSqrtLimit(tIn,tOut){ return tIn.address.toLowerCase()<tOut.address.toLowerCase()?MIN_SQRT_RATIO_PLUS_ONE:MAX_SQRT_RATIO_MINUS_ONE; }
+function encodeQuoterSwap(tIn,tOut,amount,fee){ return QUOTER_EXACT_INPUT_SINGLE+addrArg(tIn.address)+addrArg(tOut.address)+uintArg(amount)+uintArg(fee,3).padStart(64,'0')+uintArg(swapSqrtLimit(tIn,tOut)); }
+function decodeQuoterAmount(hex){ const raw=String(hex||'').replace(/^0x/,''); if(raw.length<64) throw new Error('invalid quote'); return BigInt('0x'+raw.slice(0,64)); }
+function encodeRouterSwap(tIn,tOut,fee,recipient,amountIn,minOut){ return ROUTER_EXACT_INPUT_SINGLE+addrArg(tIn.address)+addrArg(tOut.address)+uintArg(fee,3).padStart(64,'0')+addrArg(recipient)+uintArg(amountIn)+uintArg(minOut)+uintArg(0); }
+async function quoteUniswap(tIn,tOut,amountRaw,fee=S.swap.fee){
+  const key=[tIn.address,tOut.address,fee,amountRaw].join(':'); const hit=_swapQuoteCache.get(key);
+  if(hit&&Date.now()-hit.at<SWAP_QUOTE_TTL_MS) return hit.out;
+  const out=decodeQuoterAmount(await ethCall(CFG.quoter,encodeQuoterSwap(tIn,tOut,amountRaw,fee)));
+  if(out<=0n) throw new Error('no output from pool'); _swapQuoteCache.set(key,{at:Date.now(),out}); return out;
+}
+function swapPriceUsd(t){ if(t.symbol==='USDC') return 1; const p=radarTokenByAddress(t.address); return Number((p&&p.priceB)||t.priceUsd)||0; }
+function renderSwapMiniChart(a,b){
+  const t=b.symbol==='USDC'?a:b;
+  const market=radarTokenByAddress(t.address)||{};
+  const price=Number(market.priceB||t.priceUsd)||0;
+  let spark=Array.isArray(market.spark)?market.spark.map(Number).filter(Number.isFinite):[];
+  if(spark.length<2) spark=[price||1,price||1];
+  const change=Number(market.change24h)||0, cls=spark[spark.length-1]>=spark[0]?'good':'bad';
+  $('swapChartIcon').innerHTML=swapTokenIcon({...t,icon:market.icon||t.icon});
+  $('swapChartName').textContent='USDC / '+t.symbol;
+  $('swapChartPrice').textContent=price?swapPriceFive({...t,priceUsd:price}):'—';
+  $('swapChartChange').textContent='24H '+(change>=0?'+':'')+change.toFixed(2)+'%';
+  $('swapChartChange').style.color=change>=0?'var(--green)':'var(--red)';
+  const svg=$('swapChartSvg'); svg.classList.toggle('good',cls==='good');svg.classList.toggle('bad',cls==='bad');
+  svg.innerHTML=sparkInner(spark,120,58,cls);
+}
+function renderSwap(clearQuote=false, readBalance=false){
+  initSwapState(); const a=S.swap.tokenIn,b=S.swap.tokenOut;
+  $('swapTokenInSym').textContent=a.symbol; $('swapTokenOutSym').textContent=b.symbol; $('swapTokenInIcon').innerHTML=swapTokenIcon(a); $('swapTokenOutIcon').innerHTML=swapTokenIcon(b); renderSwapMiniChart(a,b);
+  $('swapRoute').textContent=a.symbol+' → '+b.symbol; $('swapPoolFee').textContent=feeName(S.swap.fee);
+  $('swapSlips').querySelectorAll('[data-slip]').forEach(x=>x.classList.toggle('active',Number(x.dataset.slip)===S.swap.slippage));
+  const amt=Number($('swapAmountIn').value)||0, out=Number($('swapAmountOut').value)||0;
+  $('swapUsdIn').textContent=swapPriceUsd(a)?'≈ '+fmtUsd(amt*swapPriceUsd(a)):'USD value unavailable'; $('swapUsdOut').textContent=swapPriceUsd(b)?'≈ '+fmtUsd(out*swapPriceUsd(b)):'USD value unavailable';
+  if(clearQuote){S.swap.quote=null;$('swapAmountOut').value='';$('swapRate').textContent='Enter an amount';$('swapImpact').textContent='—';$('swapMinOut').textContent='—';}
+  const btn=$('swapSubmit'); if(!S.address){btn.disabled=false;btn.textContent='Connect Wallet';}else if(!S.swap.quote){btn.disabled=true;btn.textContent=amt>0?'Fetching best quote…':'Enter an amount';}else{btn.disabled=false;btn.textContent='Swap '+a.symbol+' for '+b.symbol;}
+  const balances=S.swap.allBalances||{};
+  if(!S.address){$('swapBalIn').textContent='Balance —';$('swapBalOut').textContent='Balance —';}
+  else{
+    const cache=S.swap.balanceCache=S.swap.balanceCache||{};
+    const show=(el,t)=> el.textContent='Balance '+fmtCoin(cache[t.address]||0,t.decimals)+' '+t.symbol;
+    show($('swapBalIn'),a); show($('swapBalOut'),b);
+    if(readBalance) refreshSwapBalances();
+  }
+}
+async function refreshSwapBalances(){
+  initSwapState(); const seq=++S.swap._balSeq, a=S.swap.tokenIn, b=S.swap.tokenOut;
+  if(!S.address){$('swapBalIn').textContent='Balance —';$('swapBalOut').textContent='Balance —';return;}
+  const cache=S.swap.balanceCache=S.swap.balanceCache||{};
+  // Show cached value instantly; only fetch tokens not yet cached.
+  const show=(el,t)=> $(el).textContent='Balance '+fmtCoin(cache[t.address]||0,t.decimals)+' '+t.symbol;
+  show('swapBalIn',a); show('swapBalOut',b);
+  const need=[a,b].filter(t=>!(t.address in cache));
+  if(need.length){
+    const got=await Promise.all(need.map(t=>tokenBalanceOf(t.address,t.decimals).then(v=>[t.address,v]).catch(()=>[t.address,0])));
+    // Always persist what we read (never drop a fetched value), then re-render if still on the same pair.
+    got.forEach(([addr,v])=>{ cache[addr]=v; });
+    if(seq!==S.swap._balSeq||a.address!==S.swap.tokenIn.address||b.address!==S.swap.tokenOut.address)return;
+    show('swapBalIn',a); show('swapBalOut',b);
+  }
+}
+function scheduleSwapQuote(){ clearTimeout(_swapQuoteTimer); const seq=++S.swap.quoteSeq; S.swap.quote=null; renderSwap(true); _swapQuoteTimer=setTimeout(()=>runSwapQuote(seq),120); }
+async function runSwapQuote(seq){
+  const a=S.swap.tokenIn,b=S.swap.tokenOut; const amountIn=decimalToRaw($('swapAmountIn').value,a.decimals);
+  if(amountIn<=0n)return renderSwap(true); $('swapQuoteStatus').textContent='Reading Uniswap pool…';
+  try{
+    const baseIn=amountIn/1000n>0n?amountIn/1000n:1n;
+    const [out,baseOut]=await Promise.all([quoteUniswap(a,b,amountIn),quoteUniswap(a,b,baseIn)]); if(seq!==S.swap.quoteSeq)return;
+    const linear=baseOut*amountIn/baseIn; const impact=linear>0n?Math.max(0,Number((linear-out)*100000n/linear)/1000):0;
+    const minOut=out*BigInt(Math.max(0,Math.round((100-S.swap.slippage)*100)))/10000n;
+    S.swap.quote={amountIn,out,minOut,impact,at:Date.now(),tokenIn:a.address,tokenOut:b.address};
+    const outText=rawToDecimal(out,b.decimals,8); $('swapAmountOut').value=outText;
+    const rate=Number(outText)/(Number($('swapAmountIn').value)||1); $('swapRate').textContent='1 '+a.symbol+' ≈ '+fmt(rate,Math.abs(rate)<.01?6:4)+' '+b.symbol;
+    $('swapImpact').textContent=impact<.01?'< 0.01%':impact.toFixed(2)+'%'; $('swapImpact').style.color=impact>5?'var(--red)':impact>2?'var(--yellow)':'var(--green)';
+    $('swapMinOut').textContent=rawToDecimal(minOut,b.decimals,8)+' '+b.symbol; $('swapQuoteStatus').textContent='Fresh quote · just now'; renderSwap(false);
+  }catch(e){if(seq!==S.swap.quoteSeq)return;S.swap.quote=null;$('swapAmountOut').value='';$('swapQuoteStatus').textContent='Quote unavailable: '+(e.message||e);renderSwap(false);}
+}
+function swapPriceFive(t){
+  const p=swapPriceUsd(t); if(!(p>0)) return 'Price —';
+  const s=p>=1?Number(p).toFixed(5):Number(p).toFixed(Math.min(12,Math.max(5,Math.ceil(-Math.log10(p))+5)));
+  return '$'+s.replace(/0+$/,'').replace(/\.$/,'');
+}
+async function loadAllSwapBalances(){
+  const tokens=swapTokenUniverse(), seq=++S.swap._allBalSeq;
+  if(!S.address){S.swap.balanceCache={};return {};}
+  const cache=S.swap.balanceCache=S.swap.balanceCache||{};
+  const priority=[S.swap.tokenIn,S.swap.tokenOut].filter(Boolean);
+  const first=await Promise.all(priority.map(async t=>[t.address,await tokenBalanceOf(t.address,t.decimals)]));
+  if(seq!==S.swap._allBalSeq)return cache;
+  first.forEach(([a,v])=>{cache[a]=v;}); updateSwapPickerBalances(first);
+  const rest=tokens.filter(t=>!priority.some(p=>p.address===t.address));
+  for(let i=0;i<rest.length;i+=12){
+    const chunk=await Promise.all(rest.slice(i,i+12).map(async t=>[t.address,await tokenBalanceOf(t.address,t.decimals)]));
+    if(seq!==S.swap._allBalSeq)return cache;
+    chunk.forEach(([a,v])=>{cache[a]=v;}); updateSwapPickerBalances(chunk);
+  }
+  return cache;
+}
+async function openSwapPicker(side){
+  S.swap.pickerSide=side;$('swapPickerSearch').value='';$('swapPicker').classList.add('open');
+  renderSwapPicker(); loadAllSwapBalances();
+}
+function closeSwapPicker(){$('swapPicker').classList.remove('open');}
+const SWAP_PIN_BOTTOM=new Map([
+  ['0xbef5f6d51cb62b58e6a8f77868681825c6fe21c1',1], // EURC
+  ['0x171a4217b86a807a64eb94757db6849fb4bdbaa0',2], // cirBTC
+  ['0xe9185f0c5f296ed1797aae4238d26ccabeadb86c',3], // US Yield Coin
+  ['0xc5124c846c6e6307986988dfb7e743327aa05f19',4], // Synthra
+  ['0xbe7477bf91526fc9988c8f33e91b6db687119d45',5], // Swaparc
+]);
+function updateSwapPickerBalances(entries){
+  if(!$('swapPicker').classList.contains('open')||isAddressLike($('swapPickerSearch').value))return;
+  for(const [addr,val] of entries){
+    const row=$('swapPickerList').querySelector(`[data-addr="${addr}"]`);
+    if(!row)continue;
+    const t=swapTokenUniverse().find(x=>x.address===addr), el=row.querySelector('.swap-pick-balance');
+    if(t&&el)el.textContent='Balance '+fmtCoin(val,t.decimals)+' '+t.symbol;
+  }
+}
+function isAddressLike(q){ return /^0x[0-9a-fA-F]{40}$/.test(q.trim()); }
+async function resolveSwapTokenByAddress(addr){
+  addr=addr.trim().toLowerCase();
+  let t=swapTokenUniverse().find(x=>x.address===addr);
+  if(t && t.symbol && t.symbol!=='?') return t;
+  // not in universe (brand-new token) → read on-chain symbol + decimals, build a synthetic token.
+  try{
+    const meta=await tokenMeta(addr);
+    if(meta.symbol && meta.symbol!=='?') {
+      const tok={address:addr,symbol:meta.symbol,name:meta.symbol||'Token',decimals:meta.decimals||18,icon:meta.icon||'',priceUsd:0};
+      S.swap.resolvedTokens=S.swap.resolvedTokens||{}; S.swap.resolvedTokens[addr]=tok;
+      return tok;
+    }
+  }catch(e){}
+  return null;
+}
+function renderSwapPicker(){
+  const q=$('swapPickerSearch').value.trim().toLowerCase(), cache=S.swap.balanceCache||{};
+  const uni=swapTokenUniverse();
+  const listEl=$('swapPickerList');
+  const renderRow=(t,balOverride)=>{
+    const bal=S.address?(cache[t.address]??balOverride??0):0;
+    const balTxt=S.address?fmtCoin(bal,t.decimals):'—';
+    return `<button class="pool-opt swap-pick-row" data-addr="${t.address}" type="button">${swapTokenIcon(t)}<span class="po-main"><span class="po-sym">${t.symbol}</span><span class="po-a">${t.name}</span></span><span class="po-right"><span class="swap-pick-price">${swapPriceFive(t)}</span><span class="swap-pick-balance" data-balance-addr="${t.address}">${S.address?'Balance '+balTxt+' '+t.symbol:'—'}</span></span></button>`;
+  };
+  if(isAddressLike(q)){
+    // Already resolved? render instantly (no blinking).
+    const known=(S.swap.resolvedTokens||{})[q] || uni.find(x=>x.address===q);
+    if(known && known.symbol && known.symbol!=='?'){ listEl.innerHTML=renderRow(known); return; }
+    // First time resolving — show spinner once, guard against re-entry.
+    if(listEl.dataset.resolving===q) return;
+    listEl.dataset.resolving=q;
+    listEl.innerHTML='<div class="swap-picker-loading">Resolving contract…</div>';
+    resolveSwapTokenByAddress(q).then(res=>{
+      listEl.dataset.resolving='';
+      if(!res){ listEl.innerHTML='<div class="swap-picker-loading">No token found at this address</div>'; return; }
+      listEl.innerHTML=renderRow(res);
+    });
+    return;
+  }
+  listEl.dataset.resolving='';
+  const sorted=uni.filter(t=>!q||t.symbol.toLowerCase().includes(q)||t.name.toLowerCase().includes(q))
+    .sort((a,b)=>(SWAP_PIN_BOTTOM.get(a.address)||0)-(SWAP_PIN_BOTTOM.get(b.address)||0)||(cache[b.address]||0)-(cache[a.address]||0));
+  listEl.innerHTML=sorted.map(t=>renderRow(t)).join('')||'<div class="swap-picker-loading">No tokens found</div>';
+}
+function chooseSwapToken(addr){let t=(S.swap.resolvedTokens||{})[addr]||swapTokenUniverse().find(x=>x.address===addr);if(!t)return;const side=S.swap.pickerSide;if(side==='in'){if(t.address===S.swap.tokenOut.address)S.swap.tokenOut=S.swap.tokenIn;S.swap.tokenIn=t;}else{if(t.address===S.swap.tokenIn.address)S.swap.tokenIn=S.swap.tokenOut;S.swap.tokenOut=t;}closeSwapPicker();scheduleSwapQuote();refreshSwapBalances();}
+function applySwapPct(pct){
+  const t=S.swap.tokenIn, cache=S.swap.balanceCache||{}, bal=cache[t.address]||0;
+  const amt=bal*(pct/100);
+  // MAX / full amount must be a plain numeric string (no K/M abbreviation) so the quote parser reads it.
+  $('swapAmountIn').value=pct>=100
+    ? Number(bal).toFixed(Math.min(t.decimals,8)).replace(/0+$/,'').replace(/\.$/,'')
+    : Number(amt.toFixed(Math.min(t.decimals,8)));
+  scheduleSwapQuote();
+}
+async function submitSwap(){
+  if(!S.address)return connect(); const q=S.swap.quote,a=S.swap.tokenIn,b=S.swap.tokenOut;
+  if(!q||q.tokenIn!==a.address||q.tokenOut!==b.address)return scheduleSwapQuote();
+  if(Date.now()-q.at>SWAP_QUOTE_TTL_MS){toast('Quote refreshed before opening wallet');return runSwapQuote(++S.swap.quoteSeq);}
+  if(q.impact>10)return toast('Price impact too high — reduce the amount','err');
+  const btn=$('swapSubmit');btn.disabled=true;
+  try{
+    btn.textContent='Check allowance…'; await ensureAllowance(a.address,CFG.router,q.amountIn);
+    btn.textContent='Confirm in wallet…'; const hash=await sendTx(CFG.router,encodeRouterSwap(a,b,S.swap.fee,S.address,q.amountIn,q.minOut));
+    $('swapQuoteStatus').innerHTML=`Submitted · <a class="swap-tx-link" href="${CFG.blockExplorerUrls[0]}/tx/${hash}" target="_blank" rel="noopener">View transaction</a>`; btn.textContent='Confirming…';
+    const ok=await waitTx(hash); if(!ok)throw new Error('transaction reverted'); toast('Swap confirmed · '+shortAddr(hash),'ok'); $('swapAmountIn').value=''; S.swap.quote=null; renderSwap(true);
+  }catch(e){toast('Swap failed: '+(e.message||e),'err');renderSwap(false);}finally{if(S.address&&!S.swap.quote){btn.disabled=true;btn.textContent='Enter an amount';}}
+}
+
 // --- 1-asset mode ---
 // aggregator Arc (swapExactInput): swapExactInput(address router,address token0,address token1,uint24 fee,uint256 amountIn,uint256 amountOutMin)
 const ARC_AGG = '0x2804d131cfb046f987e7e532bc58cfc30326b350';
@@ -2532,18 +2886,24 @@ async function connect() {
       try { await window.ethereum.request({ method:'wallet_switchEthereumChain', params:[{chainId:CFG.chainIdHex}] }); }
       catch(e){ if (e.code===4902) await window.ethereum.request({ method:'wallet_addEthereumChain', params:[CFG] }); }
     }
-    window.ethereum.on('accountsChanged', a => { S.address = a[0]||null; syncWalletUI(); loadPositionsUI(); });
+    window.ethereum.on('accountsChanged', a => { S.address = a[0]||null; syncWalletUI(); loadPositionsUI(); refreshSwapBalances(); loadAllSwapBalances(); });
     window.ethereum.on('chainChanged', () => window.location.reload());
     syncWalletUI();
     toast('Wallet connected · ' + shortAddr(S.address), 'ok');
+    renderSwap(false, true);
+    refreshSwapBalances();
+    loadAllSwapBalances();
     await loadPositionsUI();
   } catch(e){ toast('Connect failed: ' + e.message, 'err'); }
 }
-function disconnect(){ S.address = null; S.positions = []; syncWalletUI(); renderAll(); toast('Disconnected'); }
+function disconnect(){ S.address = null; S.positions = []; S.swap.allBalances = {}; S.swap.balanceCache = {}; syncWalletUI(); renderAll(); toast('Disconnected'); }
 function syncWalletUI() {
   const btn = $('walletBtn');
   if (S.address) { btn.textContent = shortAddr(S.address); btn.classList.add('connected'); }
   else { btn.textContent = 'Connect Wallet'; btn.classList.remove('connected'); }
+  if ($('swapSubmit')) {
+    renderSwap(false, !!S.address);
+  }
 }
 
 /* ============ on-chain actions ============ */
@@ -2563,7 +2923,8 @@ async function sendTx(to, data, value='0x0') {
     if (m && m[1]) reason = m[1];
     if (reason) throw new Error('Simulation reverted: ' + reason.slice(0, 200));
   }
-  const hash = await window.ethereum.request({ method: 'eth_sendTransaction', params: [{ from: S.address, to, data, value }] });
+  const tx = await buildGasFields({ from: S.address, to, data, value });
+  const hash = await window.ethereum.request({ method: 'eth_sendTransaction', params: [tx] });
   return hash;
 }
 const TX_POLL_MS = 500;
@@ -3437,6 +3798,7 @@ function applyView(v) {
   $('view-'+v).classList.add('active');
   document.querySelectorAll('#nav a').forEach(x=>x.classList.toggle('active', x.dataset.v===v));
   if (v==='add') renderAddSide();
+  if (v==='swap') renderSwap(false, true);
   if (v==='monitor') ensureMonitorPools();
   if (v==='tools') renderTools();
   if (history.replaceState) history.replaceState(null, '', '#'+v);
@@ -3454,7 +3816,7 @@ function showView(v) {
     applyView(v);
   }
 }
-function validView(v){ return ['home','positions','add','monitor','tools'].includes(v); }
+function validView(v){ return ['home','positions','add','swap','monitor','tools'].includes(v); }
 
 /* ============ events ============ */
 document.querySelectorAll('#nav a').forEach(a=>a.addEventListener('click', e=>{
@@ -3470,6 +3832,18 @@ document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click', ()
 $('walletBtn').addEventListener('click', S.address ? openWalletModal : connect);
 $('wClose').addEventListener('click', closeWalletModal);
 $('wDisconnect').addEventListener('click', ()=>{ closeWalletModal(); disconnect(); });
+/* swap events */
+$('swapAmountIn').addEventListener('input', scheduleSwapQuote);
+$('swapFlip').addEventListener('click', ()=>{ const t=S.swap.tokenIn;S.swap.tokenIn=S.swap.tokenOut;S.swap.tokenOut=t;scheduleSwapQuote(); });
+$('swapTokenInBtn').addEventListener('click', ()=>openSwapPicker('in'));
+$('swapTokenOutBtn').addEventListener('click', ()=>openSwapPicker('out'));
+$('swapPickerClose').addEventListener('click', closeSwapPicker);
+$('swapPicker').querySelector('[data-close-swap-picker]').addEventListener('click', closeSwapPicker);
+$('swapPickerSearch').addEventListener('input', renderSwapPicker);
+$('swapPickerList').addEventListener('click', e=>{const b=e.target.closest('[data-addr]');if(b)chooseSwapToken(b.dataset.addr);});
+$('swapSlips').addEventListener('click', e=>{const b=e.target.closest('[data-slip]');if(!b)return;S.swap.slippage=Number(b.dataset.slip)||1;scheduleSwapQuote();});
+$('swapSubmit').addEventListener('click', submitSwap);
+$('swapPctIn').addEventListener('click', e=>{const b=e.target.closest('[data-pct]');if(!b)return;applySwapPct(Number(b.dataset.pct));});
 /* heat token picker events */
 $('heatPickBtn').addEventListener('click', openHeatOverlay);
 $('heatOvClose').addEventListener('click', closeHeatOverlay);
@@ -3654,6 +4028,7 @@ $('poolqGrid').addEventListener('click', e=>{
 window.addEventListener('load', async ()=>{
   S.pools = poolsFromSnapshot();
   S.selected = (S.pools.find(p => (p.b || '').toUpperCase() === 'UNISARC') || S.pools[0])?.id || '';
+  initSwapState(); renderSwap(true);
   // set the active view from the URL hash EARLY and render, then reveal —
   // so the page appears directly on the right tab with NO flash/jump to Positions.
   showView((location.hash || '').slice(1) || 'home');
@@ -3666,20 +4041,20 @@ window.addEventListener('load', async ()=>{
       if (accs && accs.length) {
         S.address = accs[0];
         S.chainId = await window.ethereum.request({ method: 'eth_chainId' });
-        window.ethereum.on('accountsChanged', a => { S.address = a[0]||null; syncWalletUI(); loadPositionsUI(); });
+        window.ethereum.on('accountsChanged', a => { S.address = a[0]||null; syncWalletUI(); loadPositionsUI(); refreshSwapBalances(); });
         window.ethereum.on('chainChanged', () => window.location.reload());
       }
     } catch (e) { /* wallet not accessible */ }
   }
   syncWalletUI();
-  if (S.address && currentPool) renderAddSide();
+  if (S.address && currentPool) { renderAddSide(); renderSwap(false); refreshSwapBalances(); loadAllSwapBalances(); }
   const live = await fetchRadarTop();
   if (live && live.length) {
     S.pools = buildPoolsFromRadar(live);
     // default-select the UNISARC/USDC pool on first live load (pinned to #1)
     const uni = S.pools.find(p => (p.b || '').toUpperCase() === 'UNISARC');
     if (uni && (!S.pools.find(p=>p.id===S.selected) || !S._userPickedPool)) S.selected = uni.id;
-    renderPoolChips(); renderAddSide(); renderMonitor();
+    renderPoolChips(); renderAddSide(); renderMonitor(); renderSwap(false);
   }
   // Position valuation starts only after the full 500-token address registry is
   // available, avoiding a first-render race against the stale embedded snapshot.
@@ -3690,7 +4065,7 @@ window.addEventListener('load', async ()=>{
     if (l && l.length) {
       S.pools = buildPoolsFromRadar(l);
       syncTokenMetaFromPools();
-      renderPoolChips(); renderAddSide(); renderMonitor();
+      renderPoolChips(); renderAddSide(); renderMonitor(); renderSwap(false);
       if (S.address) await loadPositionsUI();
     }
   }, 60000);
