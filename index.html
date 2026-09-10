@@ -1062,6 +1062,10 @@ a.px-btn{display:inline-block;text-align:center;text-decoration:none;width:auto}
   .reveal{opacity:1;transform:none;transition:none}
 }
 
+.position-health{margin:.7rem 0 .35rem;padding:.55rem .65rem;background:rgba(18,4,30,.28);border:1px solid rgba(255,255,255,.1);border-radius:3px}.health-head{display:flex;justify-content:space-between;gap:.6rem;align-items:baseline;font-size:10px;color:rgba(255,255,255,.48);text-transform:uppercase;letter-spacing:.04em}.health-head b{font-size:10px;color:var(--cyan);font-weight:600;text-transform:none;text-align:right}.health-track{position:relative;height:6px;margin:.55rem 0 .35rem;background:rgba(255,255,255,.1);border-radius:99px}.health-track i{display:block;height:100%;background:linear-gradient(90deg,var(--cyan),var(--green));border-radius:99px;transition:width .3s ease}.health-track em{position:absolute;top:50%;width:10px;height:10px;background:var(--yellow);border:2px solid var(--ink);border-radius:50%;transform:translate(-50%,-50%);box-shadow:0 0 0 2px rgba(246,210,77,.18);transition:left .3s ease}.health-axis{display:flex;justify-content:space-between;gap:.35rem;color:rgba(255,255,255,.38);font-size:9px;white-space:nowrap}.position-health:has(.health-head b){transition:border-color .2s ease}.out-range .position-health{border-color:rgba(255,95,109,.35)}.out-range .health-head b{color:var(--red)}
+.portfolio-summary{display:grid;grid-template-columns:minmax(260px,2fr) repeat(3,1fr);gap:1rem;margin-bottom:1.2rem}.portfolio-total,.portfolio-stat,.portfolio-panel{background:var(--card);border:3px solid #000;box-shadow:5px 5px 0 #000}.portfolio-total{padding:1.1rem 1.2rem}.portfolio-total span,.portfolio-stat span{display:block;color:rgba(255,255,255,.55);font-size:12px;text-transform:uppercase}.portfolio-total strong{display:block;margin:.35rem 0;font-family:var(--vt);font-size:2.1rem;color:var(--cyan)}.portfolio-total small{color:rgba(255,255,255,.45)}.portfolio-stat{padding:1rem}.portfolio-stat b{display:block;margin-top:.45rem;font-family:var(--vt);font-size:1.45rem;color:#fff}.portfolio-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem}.portfolio-panel{padding:1rem}.portfolio-panel .card-title{margin-bottom:.8rem}.portfolio-muted{font-size:11px;color:rgba(255,255,255,.45)}.portfolio-tokens,.portfolio-tx{display:grid;gap:.55rem}.portfolio-token,.portfolio-tx-row{display:flex;align-items:center;justify-content:space-between;gap:.8rem;padding:.7rem .75rem;background:var(--pop);border:1px solid rgba(255,255,255,.12)}.portfolio-token-main{display:flex;align-items:center;gap:.6rem;min-width:0}.portfolio-token-icon{width:28px;height:28px;border-radius:50%;object-fit:contain;background:var(--card2);border:2px solid rgba(255,255,255,.18)}.portfolio-token-name{font-weight:700}.portfolio-wallet-tag{font-size:9px;color:rgba(255,255,255,.38);text-transform:uppercase}.portfolio-section-label{padding:.25rem 0 .15rem;color:rgba(255,255,255,.45);font-size:10px;text-transform:uppercase;letter-spacing:.05em}.portfolio-token-amount{text-align:right;color:var(--cyan);font-family:var(--vt)}
+.recent-tx-panel{margin-top:1.5rem;padding:1rem 0 0;border-top:1px solid rgba(255,255,255,.14)}.recent-tx-panel .page-head{align-items:center;margin-bottom:.8rem}.recent-tx-panel .page-head p{font-size:14px;margin-top:.25rem}.recent-tx-panel .text-outline{font-size:16px}.recent-tx-panel .portfolio-tx{gap:.45rem}.recent-tx-panel .portfolio-tx-row{min-height:56px;padding:.65rem .8rem;border-color:rgba(255,255,255,.1);background:rgba(42,13,62,.72);transition:background .16s ease,border-color .16s ease}.recent-tx-panel .portfolio-tx-row:hover{background:#35104d;border-color:rgba(61,218,216,.28)}.portfolio-tx-type{font-size:13px}.portfolio-tx-meta{font-size:11px}.recent-tx-panel .portfolio-tx-row a{padding:.25rem .45rem;border:1px solid rgba(61,218,216,.3);border-radius:3px;text-decoration:none}.recent-tx-panel .portfolio-tx-row a:hover{background:rgba(61,218,216,.1)}
+@media(max-width:560px){.recent-tx-panel{margin-top:1.1rem;padding-top:.8rem}.recent-tx-panel .page-head{align-items:flex-start}.recent-tx-panel .portfolio-tx-row{padding:.6rem;gap:.5rem}.recent-tx-panel .portfolio-tx-row a{font-size:10px}.recent-tx-panel .portfolio-tx-meta{font-size:10px}}.portfolio-token-usd{display:block;color:rgba(255,255,255,.45);font-family:var(--vt);font-size:11px}.portfolio-tx-row{align-items:flex-start}.portfolio-tx-type{font-weight:700;color:#fff}.portfolio-tx-meta{font-size:11px;color:rgba(255,255,255,.48);margin-top:.2rem}.portfolio-tx-row a{color:var(--cyan);font-size:11px;white-space:nowrap}@media(max-width:760px){.portfolio-summary{grid-template-columns:1fr 1fr}.portfolio-total{grid-column:1/-1}.portfolio-grid{grid-template-columns:1fr}}@media(max-width:480px){.portfolio-summary{gap:.65rem}.portfolio-stat{padding:.75rem}.portfolio-stat b{font-size:1.2rem}.portfolio-panel{padding:.75rem}}
 </style>
 </head>
 <body>
@@ -1211,6 +1215,7 @@ a.px-btn{display:inline-block;text-align:center;text-decoration:none;width:auto}
         </div>
       </div>
       <div class="px-card" id="rwList"></div>
+      <section class="recent-tx-panel"><div class="page-head" style="margin-bottom:1rem"><div><h1 class="text-outline">Recent Transactions</h1><p>Recent wallet activity from LP actions.</p></div></div><div id="recentTxList" class="portfolio-tx"></div></section>
     </div>
   </section>
 
@@ -1365,7 +1370,7 @@ a.px-btn{display:inline-block;text-align:center;text-decoration:none;width:auto}
             <div class="swap-chart-price"><b id="swapChartPrice">—</b><span id="swapChartChange">24H —</span></div>
           </div>
           <svg id="swapChartSvg" class="spark good swap-mini-chart" viewBox="0 0 120 58" preserveAspectRatio="none"></svg>
-          <div class="swap-chart-foot"><span>RadarDex</span><span>24H price</span></div>
+          <div class="swap-chart-foot"><span>Market data</span><span>24H price</span></div>
         </div>
       </aside>
     </div>
@@ -1584,7 +1589,7 @@ a.px-btn{display:inline-block;text-align:center;text-decoration:none;width:auto}
       <label>Strategy</label>
       <div class="bin-toggle" id="binToggle">
         <button class="bintab active" data-mode="single" id="binTabSingle">Single Range</button>
-        <button class="bintab" data-mode="bins" id="binTabBins">Spot Grid ⚡</button>
+        <button class="bintab" data-mode="bins" id="binTabBins">BID/ASK ⚡</button>
       </div>
     </div>
     <div id="binBox" style="display:none">
@@ -2149,7 +2154,7 @@ const rangeName = (pos) => (pos.tickLower <= -880000 && pos.tickUpper >= 880000)
 
 async function loadPositionsUI(options={}) {
   const silent = !!options.silent;
-  if (!S.address) { S.positions = []; renderPositions(); renderRewards(); renderMonitor(); return; }
+  if (!S.address) { S.positions = []; renderPositions(); renderRewards(); renderMonitor(); renderRecentTransactions(); return; }
   ['stTotal','stFees','stShare','stApr'].forEach(id => { const el=$(id); if (el) el.classList.add('skeleton'); });
   if (!silent) toast('Reading on-chain positions...');
   const raw = await readPositions(S.address);
@@ -2234,7 +2239,7 @@ async function loadPositionsUI(options={}) {
   }));
   raw.forEach(applyBackfilledPnl);
   S.positions = raw;
-  renderPositions(); renderRewards(); renderMonitor();
+  renderPositions(); renderRewards(); renderMonitor(); renderRecentTransactions();
   ['stTotal','stFees','stShare','stApr'].forEach(id => { const el=$(id); if (el) el.classList.remove('skeleton'); });
   if (raw.length) toast('Found ' + raw.length + ' position(s) on-chain', 'ok');
   else toast('No LP positions on this wallet', '');
@@ -2309,6 +2314,42 @@ function positionStrategyStatus(p) {
   if (p.tick < p.tickLower) return { label: 'ASK READY', active: false, out: false, side: 'ask' };
   return { label: 'OUT RANGE', active: false, out: true, side: row.side || '' };
 }
+function healthPct(ticks) {
+  const n = Math.abs(Number(ticks || 0));
+  const pct = (Math.pow(1.0001, Math.min(n, 100000)) - 1) * 100;
+  if (!isFinite(pct)) return '—';
+  if (pct < 0.01) return pct.toFixed(4) + '%';
+  if (pct < 1) return pct.toFixed(2) + '%';
+  return pct.toFixed(1) + '%';
+}
+const SUBSCRIPT_DIGITS = '₀₁₂₃₄₅₆₇₈₉';
+function fmtCompactPrice(n) {
+  n = Number(n);
+  if (!isFinite(n) || n <= 0) return '—';
+  if (n >= 1) return n >= 1000 ? fmt(n, 2) : n.toFixed(n < 10 ? 4 : 2);
+  const exponent = Math.floor(Math.log10(n));
+  const zeros = Math.max(0, -exponent - 1);
+  if (zeros >= 2) {
+    const digits = Number((n * Math.pow(10, zeros + 1)).toPrecision(5)).toString().replace('.', '');
+    return '0.0' + String(zeros).split('').map(x => SUBSCRIPT_DIGITS[Number(x)]).join('') + digits;
+  }
+  return n.toPrecision(5).replace(/0+$/, '').replace(/\.$/, '');
+}
+function tickDisplayPrice(p, tick) {
+  const d0 = p.meta0 ? Number(p.meta0.decimals || 18) : 18;
+  const d1 = p.meta1 ? Number(p.meta1.decimals || 18) : 18;
+  return Math.pow(1.0001, Number(tick)) * Math.pow(10, d0 - d1);
+}
+function positionHealthHtml(p, status) {
+  const span = Math.max(1, p.tickUpper - p.tickLower);
+  const progress = Math.max(0, Math.min(100, (p.tick - p.tickLower) / span * 100));
+  let detail = '';
+  if (status.side === 'bid' && !status.active) detail = status.out ? healthPct(p.tickLower - p.tick) + ' below min' : healthPct(p.tick - p.tickUpper) + ' above max';
+  else if (status.side === 'ask' && !status.active) detail = status.out ? healthPct(p.tick - p.tickUpper) + ' above max' : healthPct(p.tickLower - p.tick) + ' below min';
+  else if (status.active) detail = healthPct(p.tick - p.tickLower) + ' from min · ' + healthPct(p.tickUpper - p.tick) + ' to max';
+  else detail = healthPct(p.tickLower - p.tick) + ' outside range';
+  return `<div class="position-health"><div class="health-head"><span>Position health</span><b>${detail}</b></div><div class="health-track"><i style="width:${progress}%"></i><em style="left:${progress}%"></em></div><div class="health-axis"><span>Min $${fmtCompactPrice(tickDisplayPrice(p, p.tickLower))}</span><span>Current $${fmtCompactPrice(tickDisplayPrice(p, p.tick))}</span><span>Max $${fmtCompactPrice(tickDisplayPrice(p, p.tickUpper))}</span></div></div>`;
+}
 function positionCardHtml(p) {
   const icon0 = p.meta0 && p.meta0.icon ? p.meta0.icon : USDC_ICON;
   const icon1 = p.meta1 && p.meta1.icon ? p.meta1.icon : (p.poolIcon || '');
@@ -2330,6 +2371,7 @@ function positionCardHtml(p) {
       <div class="pd"><div class="k">Fees owed</div><div class="v text-green">${fmtUsd(p.feesUsd)}</div></div>
       <div class="pd"><div class="k">Share</div><div class="v"><small>${fmtSharePct(p)}</small></div></div>
     </div>
+    ${positionHealthHtml(p, status)}
     <div class="share-bar"><i style="width:${inRange ? Math.min(100, Math.max(20, (p.tick - p.tickLower) / (p.tickUpper - p.tickLower) * 100)) : 100}%;background:${inRange ? 'var(--green)' : 'var(--red)'}"></i></div>
     <div class="pos-actions"><button class="px-btn pxa" data-act="add" data-id="${p.tokenId}">Add</button><button class="px-btn pxa" data-act="remove" data-id="${p.tokenId}">Remove</button><button class="px-btn pxa" data-act="claim" data-id="${p.tokenId}">Claim</button></div>
   </div>`;
@@ -2883,8 +2925,19 @@ function renderRewards() {
   $('rwList').innerHTML = rows || (S.address ? '<div class="empty" style="box-shadow:none;border:0"><p>No positions — nothing to claim. Add liquidity to start earning swap fees.</p></div>' : '<div class="empty" style="box-shadow:none;border:0"><p>Connect wallet to check claimable fees.</p></div>');
   $('rwNote').textContent = S.address ? 'Wallet: ' + shortAddr(S.address) + ' · reward pool = Uniswap V3 swap fees (auto)' : 'Connect wallet to check rewards';
 }
+function renderRecentTransactions() {
+  const ledger = readPnlLedger(), txs = [];
+  Object.entries(ledger).forEach(([tokenId,row]) => {
+    [['Add LP',row.lastDepositTx],['Remove',row.lastRemoveTx],['Claim',row.lastClaimTx]].forEach(([type,hash]) => {
+      if (hash) txs.push({type,hash,at:row.updatedAt||0,tokenId});
+    });
+  });
+  txs.sort((a,b)=>b.at-a.at);
+  const el = $('recentTxList');
+  if (el) el.innerHTML = txs.slice(0,8).map(x => `<div class="portfolio-tx-row"><div><div class="portfolio-tx-type">${x.type} · #${x.tokenId}</div><div class="portfolio-tx-meta">${x.at ? new Date(x.at).toLocaleString() : 'On-chain activity'}</div></div><a href="${CFG.blockExplorerUrls[0]}/tx/${x.hash}" target="_blank" rel="noopener">View tx ↗</a></div>`).join('') || '<div class="empty"><p>No recent transactions recorded.</p></div>';
+}
 function renderAll() {
-  renderPositions(); renderPoolChips(); renderAddSide(); renderMonitor(); renderRewards();
+  renderPositions(); renderPoolChips(); renderAddSide(); renderMonitor(); renderRewards(); renderRecentTransactions();
 }
 
 /* ============ reusable candle helpers ============ */
@@ -3036,7 +3089,21 @@ async function claimRewardPos(tokenId) {
   busy(false);
 }
 
-// REMOVE — decreaseLiquidity + collect + burn
+function encodeNfpmMulticall(calls) {
+  // multicall(bytes[]) selector: 0xac9650d8
+  const words = [uintArg(32), uintArg(calls.length)];
+  let offset = calls.length * 32;
+  const tails = [];
+  for (const call of calls) {
+    const body = call.replace(/^0x/, '');
+    const padded = body.padEnd(Math.ceil(body.length / 64) * 64, '0');
+    words.push(uintArg(offset));
+    tails.push(uintArg(body.length / 2) + padded);
+    offset += 32 + padded.length / 2;
+  }
+  return '0xac9650d8' + words.join('') + tails.join('');
+}
+// REMOVE — one NFPM multicall: decreaseLiquidity → collect → optional burn
 async function removeLiquidityPos(tokenId, pct) {
   if (!S.address) return toast('Connect wallet first', 'err');
   busy(true);
@@ -3044,28 +3111,20 @@ async function removeLiquidityPos(tokenId, pct) {
     tokenId = BigInt(tokenId);
     const pos = S.positions.find(x => x.tokenId === tokenId);
     if (!pos) throw new Error('position not found');
-    const liqToRemove = (pos.liquidity * BigInt(Math.round(pct*100))) / 10000n;
+    const liqToRemove = (pos.liquidity * BigInt(Math.round(pct * 100))) / 10000n;
+    if (liqToRemove <= 0n) throw new Error('nothing to remove');
     const withdrawnUsd = saneUsd(pos.value) * Math.max(0, Math.min(100, pct)) / 100;
-    const data = '0x0c49ccbe' + uintArg(tokenId) + uintArg(liqToRemove) + uintArg(0) + uintArg(0) + uintArg(deadline());
-    toast('Decreasing liquidity ' + pct + '%...');
-    const h1 = await sendTx(CFG.nfpm, data);
-    const ok1 = await waitTx(h1);
-    if (!ok1) throw new Error('decreaseLiquidity failed');
+    const decrease = '0x0c49ccbe' + uintArg(tokenId) + uintArg(liqToRemove) + uintArg(0) + uintArg(0) + uintArg(deadline());
     const maxU128 = (2n ** 128n - 1n).toString(16).padStart(64, '0');
-    const data2 = '0xfc6f7865' + uintArg(tokenId) + addrArg(S.address) + maxU128 + maxU128;
-    toast('Collecting assets...');
-    const h2 = await sendTx(CFG.nfpm, data2);
-    const ok2 = await waitTx(h2);
-    if (!ok2) throw new Error('collect after decrease failed');
-    // burn if fully removed
-    if (pct >= 99.5) {
-      toast('Burning position...');
-      const h3 = await sendTx(CFG.nfpm, '0x42966c68' + uintArg(tokenId));
-      await waitTx(h3);
-    }
-    reducePnlCost(tokenId, pct, withdrawnUsd, h2);
+    const collect = '0xfc6f7865' + uintArg(tokenId) + addrArg(S.address) + maxU128 + maxU128;
+    const calls = [decrease, collect];
+    if (pct >= 99.5) calls.push('0x42966c68' + uintArg(tokenId));
+    toast('Removing liquidity...');
+    const hash = await sendTx(CFG.nfpm, encodeNfpmMulticall(calls));
+    if (!await waitTx(hash)) throw new Error('remove transaction reverted');
+    reducePnlCost(tokenId, pct, withdrawnUsd, hash);
     toast('Liquidity removed ' + pct + '%', 'ok');
-    await loadPositionsUI();
+    try { await loadPositionsUI(); } catch (refreshErr) { toast('Liquidity removed; refresh Positions manually.', ''); }
   } catch (e) { toast('Remove failed: ' + e.message, 'err'); }
   busy(false);
 }
