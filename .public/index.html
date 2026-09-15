@@ -23,11 +23,14 @@
 *{margin:0;padding:0;box-sizing:border-box}
 html{background:var(--bg);scroll-behavior:smooth}
 body{
-  background:var(--bg);
-  background-image:
+  background:
+    radial-gradient(900px 600px at 12% -8%, rgba(61,218,216,.16), transparent 60%),
+    radial-gradient(900px 700px at 92% 8%, rgba(216,4,106,.20), transparent 55%),
+    radial-gradient(700px 500px at 50% 110%, rgba(255,190,57,.08), transparent 60%),
     linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
-  background-size:24px 24px;
+    linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px),
+    var(--bg);
+  background-size:auto, auto, auto, 24px 24px, 24px 24px, auto;
   color:var(--white); font-family:var(--vt); font-size:15px; line-height:1.5; letter-spacing:.02em;
   min-height:100vh;
 }
@@ -41,7 +44,7 @@ input{font-family:inherit}
 ::-webkit-scrollbar-thumb{background:var(--cyan);border:3px solid #000}
 
 /* ---------- pixel primitives ---------- */
-.px-card{background:var(--card);border:4px solid #000;box-shadow:8px 8px 0 #000;border-radius:0}
+.px-card{background:linear-gradient(160deg,#5b1d7d 0%,#4a1768 55%,#3c1154 100%);border:4px solid #000;box-shadow:8px 8px 0 #000,16px 16px 0 rgba(0,0,0,.22);border-radius:0;position:relative}
 .px-btn{
   font-family:var(--px);text-transform:uppercase;border:4px solid #000;box-shadow:5px 5px 0 #000;
   background:var(--cyan);color:var(--ink);font-size:13px;padding:.65rem 1rem;
@@ -63,7 +66,7 @@ input{font-family:inherit}
 
 /* ---------- header ---------- */
 header{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:1.25rem;
-       padding:.7rem 1.5rem;background:var(--pop);border-bottom:4px solid #000}
+       padding:.7rem 1.5rem;background:rgba(42,13,62,.82);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:4px solid #000}
 .brand{display:flex;align-items:center;gap:.7rem}
 .brand-logo{width:38px;height:38px;border-radius:6px;object-fit:contain;background:transparent;border:3px solid #000;box-shadow:3px 3px 0 #000;image-rendering:auto;padding:2px}
 .brand span{font-family:var(--px);font-size:14px;text-transform:uppercase;color:#fff;text-shadow:3px 3px 0 #000}
@@ -81,24 +84,24 @@ nav a.active{color:#fff;background:#d8046a;border:3px solid #000;box-shadow:3px 
 .wallet-btn.connected{background:var(--card2);color:var(--cyan);font-size:13px}
 
 /* ---------- swap ---------- */
-.swap-shell{display:grid;grid-template-columns:minmax(0,590px) minmax(260px,1fr);gap:1.4rem;align-items:start;max-width:1020px;margin:0 auto}
-.swap-panel{position:relative;background:#4a1768;border:4px solid #000;box-shadow:9px 9px 0 #000;padding:1.25rem}
+.swap-shell{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:1.4rem;align-items:start;width:100%;margin:0}
+.swap-panel{position:relative;background:linear-gradient(160deg,#5b1d7d 0%,#4a1768 55%,#3c1154 100%);border:4px solid #000;box-shadow:9px 9px 0 #000,18px 18px 0 rgba(0,0,0,.22);padding:1.25rem}
 .swap-panel:before{content:"";position:absolute;inset:7px;pointer-events:none;border:1px solid rgba(255,255,255,.09)}
 .swap-headline{display:flex;justify-content:space-between;align-items:center;gap:1rem;margin-bottom:1rem}.swap-headline h2{font-family:var(--px);font-size:14px;text-transform:uppercase}.swap-speed{display:flex;align-items:center;gap:.45rem;font-family:var(--px);font-size:11px;color:var(--green);text-transform:uppercase}.swap-speed i{width:8px;height:8px;background:var(--green);border:2px solid #000;box-shadow:1px 1px 0 #000}
-.swap-token-box{position:relative;background:#2a0d3e;border:3px solid #000;padding:.85rem .9rem;min-height:116px}.swap-token-top{display:flex;justify-content:space-between;color:rgba(255,255,255,.55);font-size:13px;margin-bottom:.5rem}.swap-token-main{display:flex;align-items:center;gap:.65rem}.swap-token-main input{min-width:0;flex:1;background:transparent;border:0;outline:0;color:#fff;font-family:var(--vt);font-size:2rem;font-weight:700;letter-spacing:-.03em}.swap-token-btn{display:flex;align-items:center;gap:.5rem;flex:0 0 auto;background:#5b1d7d;border:3px solid #000;color:#fff;padding:.55rem .7rem;font-family:var(--px);font-size:12px;text-transform:uppercase;box-shadow:3px 3px 0 #000}.swap-token-btn img{width:26px;height:26px;border-radius:50%;background:#fff;object-fit:cover}.swap-token-letter{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--yellow);color:#20102e;border:2px solid #000}.swap-usd{font-size:13px;color:rgba(255,255,255,.48);margin-top:.35rem;min-height:20px}
+.swap-token-box{position:relative;background:#2a0d3e;border:3px solid #000;padding:.7rem .85rem;min-height:96px}.swap-token-top{display:flex;justify-content:space-between;color:rgba(255,255,255,.55);font-size:12px;margin-bottom:.4rem}.swap-token-main{display:flex;align-items:center;gap:.65rem}.swap-token-main input{min-width:0;flex:1;background:transparent;border:0;outline:0;color:#fff;font-family:var(--vt);font-size:1.8rem;font-weight:700;letter-spacing:-.03em}.swap-token-btn{display:flex;align-items:center;gap:.5rem;flex:0 0 auto;background:#5b1d7d;border:3px solid #000;color:#fff;padding:.5rem .65rem;font-family:var(--px);font-size:12px;text-transform:uppercase;box-shadow:3px 3px 0 #000}.swap-token-btn img{width:24px;height:24px;border-radius:50%;background:#fff;object-fit:cover}.swap-token-letter{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:var(--yellow);color:#20102e;border:2px solid #000}.swap-usd{font-size:12px;color:rgba(255,255,255,.48);margin-top:.3rem;min-height:18px}
 .swap-pct-row{display:flex;gap:.35rem;margin-top:.55rem}.swap-pct-row button{background:transparent;border:2px solid #000;color:rgba(255,255,255,.6);font-family:var(--px);font-size:10px;text-transform:uppercase;padding:.18rem .45rem;cursor:pointer}.swap-pct-row button:hover{background:var(--pop);color:var(--cyan)}.swap-pct-row button.max{background:var(--cyan);color:#20102e}
 .swap-flip-row{height:20px;position:relative;z-index:2}.swap-flip{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:42px;height:42px;border:4px solid #000;background:var(--yellow);color:#20102e;font-size:21px;font-weight:900;display:grid;place-items:center;box-shadow:3px 3px 0 #000}.swap-flip:active{transform:translate(calc(-50% + 2px),calc(-50% + 2px));box-shadow:1px 1px 0 #000}
-.swap-meta{margin-top:1rem;border:3px solid #000;background:#351049;padding:.25rem .8rem}.swap-meta-row{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.55rem 0;border-bottom:1px solid rgba(255,255,255,.1);font-size:13px}.swap-meta-row:last-child{border-bottom:0}.swap-meta-row span:first-child{color:rgba(255,255,255,.55)}.swap-meta-row strong{text-align:right;color:#fff;font-weight:600}.swap-slips{display:flex;gap:.35rem}.swap-slip{border:2px solid #000;background:#2a0d3e;color:rgba(255,255,255,.65);padding:.25rem .42rem;font-size:11px}.swap-slip.active{background:var(--cyan);color:#20102e}
+.swap-meta{margin-top:.9rem;border:3px solid #000;background:#351049;padding:.25rem .8rem}.swap-meta-row{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.42rem 0;border-bottom:1px solid rgba(255,255,255,.1);font-size:13px}.swap-meta-row:last-child{border-bottom:0}.swap-meta-row span:first-child{color:rgba(255,255,255,.55)}.swap-meta-row strong{text-align:right;color:#fff;font-weight:600}.swap-slips{display:flex;gap:.35rem}.swap-slip{border:2px solid #000;background:#2a0d3e;color:rgba(255,255,255,.65);padding:.25rem .42rem;font-size:11px}.swap-slip.active{background:var(--cyan);color:#20102e}
 .swap-cta{width:100%;margin-top:1rem;padding:.9rem 1rem;background:#d8046a;color:#fff;border:4px solid #000;box-shadow:5px 5px 0 #000;font-family:var(--px);font-size:14px;text-transform:uppercase}.swap-cta:disabled{opacity:.48;cursor:not-allowed}.swap-cta:not(:disabled):active{transform:translate(3px,3px);box-shadow:2px 2px 0 #000}.swap-status{display:flex;justify-content:space-between;gap:.75rem;align-items:center;margin-top:.8rem;font-size:12px;color:rgba(255,255,255,.55)}.swap-status b{color:var(--cyan)}
-.swap-side{display:grid;gap:1rem}.swap-info{background:#4a1768;border:4px solid #000;box-shadow:7px 7px 0 #000;padding:1rem 1.1rem}.swap-info h3{font-family:var(--px);font-size:12px;text-transform:uppercase;margin-bottom:.75rem}.swap-info p{color:rgba(255,255,255,.65);font-size:14px;line-height:1.6}.swap-steps{display:grid;gap:.6rem}.swap-step{display:grid;grid-template-columns:29px 1fr;gap:.7rem;align-items:start}.swap-step i{width:29px;height:29px;display:grid;place-items:center;background:var(--cyan);border:3px solid #000;color:#20102e;font-family:var(--px);font-style:normal;font-size:10px}.swap-step b{display:block;font-size:14px}.swap-step span{display:block;color:rgba(255,255,255,.5);font-size:12px;margin-top:.12rem}.swap-tx-link{color:var(--green);text-decoration:underline}
-.swap-chart-head{display:flex;align-items:center;justify-content:space-between;gap:.75rem;margin-bottom:.7rem}.swap-chart-token{display:flex;align-items:center;gap:.55rem;min-width:0}.swap-chart-token img,.swap-chart-token .swap-token-letter{width:28px;height:28px;flex:0 0 28px;border:2px solid #000;border-radius:5px;object-fit:contain;background:var(--pop)}.swap-chart-name{font-family:var(--px);font-size:10px;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.swap-chart-price{text-align:right}.swap-chart-price b{display:block;font-family:var(--vt);font-size:17px}.swap-chart-price span{font-size:11px}.swap-mini-chart{height:72px}.swap-chart-foot{display:flex;justify-content:space-between;margin-top:.45rem;color:rgba(255,255,255,.48);font-size:11px;text-transform:uppercase}
-.swap-picker{position:fixed;inset:0;z-index:320;display:none}.swap-picker.open{display:block}.swap-picker-bg{position:absolute;inset:0;background:rgba(18,4,30,.72);backdrop-filter:blur(3px);animation:pmFade .18s ease-out}.swap-picker-card{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(480px,92vw);max-height:82vh;background:var(--card);border:4px solid #000;box-shadow:12px 12px 0 #000;display:flex;flex-direction:column;animation:pmPop .22s cubic-bezier(.2,1.4,.4,1)}.swap-picker-head{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;padding:1.1rem 1.2rem;border-bottom:3px solid #000;background:var(--pop)}.swap-picker-head h3{font-family:var(--px);font-size:15px;text-transform:uppercase;text-shadow:2px 2px 0 #000}.swap-picker-head p{font-family:var(--vt);font-size:14px;color:rgba(255,255,255,.6);margin-top:.2rem}.swap-picker-close{width:34px;height:34px;flex:0 0 34px;cursor:pointer;background:var(--red);border:3px solid #000;color:#fff;font-size:15px;line-height:1}.swap-picker-search-wrap{display:flex;align-items:center;gap:.5rem;margin:.9rem 1.2rem;padding:.6rem .8rem;border:3px solid #000;background:var(--pop);color:rgba(255,255,255,.5)}.swap-picker-search{flex:1;min-width:0;border:0;background:transparent;color:var(--yellow);font-family:var(--vt);font-size:1.05rem;outline:0}.swap-picker-list{flex:1;overflow-y:auto;padding:.2rem 1.2rem 1rem;min-height:120px}.swap-pick-row{display:flex;align-items:center;gap:.8rem;width:100%;cursor:pointer;text-align:left;background:transparent;border:3px solid transparent;padding:.6rem;margin-bottom:.4rem;color:#fff;transition:.12s}.swap-pick-row:hover{background:var(--pop);border-color:#000;box-shadow:3px 3px 0 #000;transform:translate(-1px,-1px)}.swap-pick-row img,.swap-pick-row>.swap-token-letter{width:38px;height:38px;flex:0 0 38px;border:3px solid #000;border-radius:6px;object-fit:contain;background:var(--pop)}.swap-pick-main{flex:1;min-width:0}.swap-pick-main b{display:block;font-family:var(--px);font-size:14px;text-transform:uppercase}.swap-pick-main span{display:block;color:rgba(255,255,255,.55);font-size:12px;margin-top:.1rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.swap-pick-right{flex:0 0 auto;text-align:right}.swap-pick-price{display:block;color:var(--cyan);font-family:var(--vt);font-size:14px}.swap-pick-balance{display:block;color:rgba(255,255,255,.52);font-size:11px;margin-top:.18rem}.swap-picker-loading{padding:1.5rem;text-align:center;color:rgba(255,255,255,.55)}
+.swap-side{display:grid;gap:1rem}.swap-info{background:linear-gradient(160deg,#5b1d7d 0%,#4a1768 55%,#3c1154 100%);border:4px solid #000;box-shadow:7px 7px 0 #000,14px 14px 0 rgba(0,0,0,.22);padding:1rem 1.1rem;position:relative}.swap-info h3{font-family:var(--px);font-size:12px;text-transform:uppercase;margin-bottom:.75rem}.swap-info p{color:rgba(255,255,255,.65);font-size:14px;line-height:1.6}.swap-steps{display:grid;gap:.6rem}.swap-step{display:grid;grid-template-columns:29px 1fr;gap:.7rem;align-items:start}.swap-step i{width:29px;height:29px;display:grid;place-items:center;background:var(--cyan);border:3px solid #000;color:#20102e;font-family:var(--px);font-style:normal;font-size:10px}.swap-step b{display:block;font-size:14px}.swap-step span{display:block;color:rgba(255,255,255,.5);font-size:12px;margin-top:.12rem}.swap-tx-link{color:var(--green);text-decoration:underline}
+.swap-chart-head{display:flex;align-items:center;justify-content:space-between;gap:.75rem;margin-bottom:.7rem}.swap-chart-token{display:flex;align-items:center;gap:.55rem;min-width:0}.swap-chart-token img,.swap-chart-token .swap-token-letter{width:28px;height:28px;flex:0 0 28px;border:2px solid #000;border-radius:5px;object-fit:contain;background:var(--pop)}.swap-chart-name{font-family:var(--px);font-size:10px;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.swap-chart-price{text-align:right}.swap-chart-price b{display:block;font-family:var(--vt);font-size:17px}.swap-chart-price span{font-size:11px}.swap-mini-chart{height:150px}.spark.swap-mini-chart{height:150px}.swap-chart-foot{display:flex;justify-content:space-between;margin-top:.45rem;color:rgba(255,255,255,.48);font-size:11px;text-transform:uppercase}
+.swap-picker{position:fixed;inset:0;z-index:320;display:none}.swap-picker.open{display:block}.swap-picker-bg{position:absolute;inset:0;background:rgba(18,4,30,.72);backdrop-filter:blur(3px);animation:pmFade .18s ease-out}.swap-picker-card{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(480px,92vw);max-height:82vh;background:linear-gradient(160deg,#5b1d7d 0%,#4a1768 55%,#3c1154 100%);border:4px solid #000;box-shadow:12px 12px 0 #000,20px 20px 0 rgba(0,0,0,.22);display:flex;flex-direction:column;animation:pmPop .22s cubic-bezier(.2,1.4,.4,1)}.swap-picker-head{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;padding:1.1rem 1.2rem;border-bottom:3px solid #000;background:var(--pop)}.swap-picker-head h3{font-family:var(--px);font-size:15px;text-transform:uppercase;text-shadow:2px 2px 0 #000}.swap-picker-head p{font-family:var(--vt);font-size:14px;color:rgba(255,255,255,.6);margin-top:.2rem}.swap-picker-close{width:34px;height:34px;flex:0 0 34px;cursor:pointer;background:var(--red);border:3px solid #000;color:#fff;font-size:15px;line-height:1}.swap-picker-search-wrap{display:flex;align-items:center;gap:.5rem;margin:.9rem 1.2rem;padding:.6rem .8rem;border:3px solid #000;background:var(--pop);color:rgba(255,255,255,.5)}.swap-picker-search{flex:1;min-width:0;border:0;background:transparent;color:var(--yellow);font-family:var(--vt);font-size:1.05rem;outline:0}.swap-picker-list{flex:1;overflow-y:auto;padding:.2rem 1.2rem 1rem;min-height:120px}.swap-pick-row{display:flex;align-items:center;gap:.8rem;width:100%;cursor:pointer;text-align:left;background:transparent;border:3px solid transparent;padding:.6rem;margin-bottom:.4rem;color:#fff;transition:.12s}.swap-pick-row:hover{background:var(--pop);border-color:#000;box-shadow:3px 3px 0 #000;transform:translate(-1px,-1px)}.swap-pick-row img,.swap-pick-row>.swap-token-letter{width:38px;height:38px;flex:0 0 38px;border:3px solid #000;border-radius:6px;object-fit:contain;background:var(--pop)}.swap-pick-main{flex:1;min-width:0}.swap-pick-main b{display:block;font-family:var(--px);font-size:14px;text-transform:uppercase}.swap-pick-main span{display:block;color:rgba(255,255,255,.55);font-size:12px;margin-top:.1rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.swap-pick-right{flex:0 0 auto;text-align:right}.swap-pick-price{display:block;color:var(--cyan);font-family:var(--vt);font-size:14px}.swap-pick-balance{display:block;color:rgba(255,255,255,.52);font-size:11px;margin-top:.18rem}.swap-picker-loading{padding:1.5rem;text-align:center;color:rgba(255,255,255,.55)}
 @media(max-width:640px){.swap-picker-card{width:94vw;max-height:86vh}.swap-pick-row{padding:.5rem}.swap-picker-head{padding:1rem}.swap-picker-search-wrap{margin:.75rem 1rem}.swap-picker-list{padding:0 1rem 1rem}}
 @media(max-width:840px){.swap-shell{grid-template-columns:1fr}.swap-side{grid-template-columns:1fr 1fr}}
 @media(max-width:640px){.swap-shell{gap:1rem}.swap-panel{padding:.8rem;box-shadow:5px 5px 0 #000;border-width:3px}.swap-token-main input{font-size:1.55rem}.swap-token-btn{font-size:10px;padding:.45rem}.swap-side{grid-template-columns:1fr}.swap-meta-row{font-size:12px}.swap-status{align-items:flex-start;flex-direction:column}}
 
 /* ---------- layout ---------- */
-main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 5rem}
+main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 3rem}
 /* desktop-wide: expand content so cards fill the screen on large displays (mobile unaffected) */
 @media(min-width:1360px){
   main{max-width:1600px}
@@ -118,7 +121,7 @@ main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 5rem}
 
 /* ---------- stat cards ---------- */
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1.1rem;margin-bottom:1.6rem}
-.stat{background:var(--card);border:4px solid #000;box-shadow:8px 8px 0 #000;border-radius:0;padding:1rem 1.2rem}
+.stat{background:linear-gradient(160deg,#5b1d7d 0%,#4a1768 55%,#3c1154 100%);border:4px solid #000;box-shadow:8px 8px 0 #000,16px 16px 0 rgba(0,0,0,.22);border-radius:0;padding:1rem 1.2rem;position:relative}
 .stat .label{font-family:var(--px);font-size:14px;text-transform:uppercase;color:rgba(255,255,255,.75);letter-spacing:.04em}
 .stat .value{font-family:var(--vt);font-size:1.75rem;font-weight:700;line-height:1.2;margin-top:.35rem;color:var(--cyan)}
 .stat .value.up{color:var(--green)} .stat .value.down{color:var(--red)}
@@ -131,10 +134,10 @@ main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 5rem}
 
 /* ---------- positions ---------- */
 .pos-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:1.3rem}
-.pos-card{background:var(--card);border:4px solid #000;box-shadow:8px 8px 0 #000;border-radius:0;padding:1.2rem 1.3rem;transition:.1s}
-.pos-card:hover{transform:translate(-2px,-2px);box-shadow:10px 10px 0 #000}
+.pos-card{background:linear-gradient(160deg,#5b1d7d 0%,#4a1768 55%,#3c1154 100%);border:4px solid #000;box-shadow:8px 8px 0 #000,16px 16px 0 rgba(0,0,0,.22);border-radius:0;padding:1.2rem 1.3rem;transition:.1s;position:relative}
+.pos-card:hover{transform:translate(-2px,-2px);box-shadow:10px 10px 0 #000,20px 20px 0 rgba(0,0,0,.18)}
 .position-groups{margin-bottom:1.5rem}
-.positions-box{background:var(--card);border:4px solid #000;box-shadow:7px 7px 0 #000;padding:1rem}
+.positions-box{background:linear-gradient(160deg,#5b1d7d 0%,#4a1768 55%,#3c1154 100%);border:4px solid #000;box-shadow:7px 7px 0 #000,14px 14px 0 rgba(0,0,0,.22);padding:1rem}
 .all-position-grid{display:grid;grid-template-columns:repeat(auto-fill,240px);gap:.85rem;align-items:stretch;justify-content:start}
 .positions-box .pos-card{display:flex;flex-direction:column;min-width:0;height:100%;padding:.8rem .85rem;background:var(--pop);border:3px solid #000;box-shadow:4px 4px 0 #000}
 .positions-box .pos-card:hover{transform:translate(-1px,-1px);box-shadow:5px 5px 0 #000}
@@ -182,7 +185,7 @@ main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 5rem}
 /* ---------- add LP ---------- */
 .add-wrap{display:grid;grid-template-columns:1.1fr .9fr;gap:1.6rem;align-items:start}
 .add-wrap > *{min-width:0}
-.add-panel{background:var(--card);border:4px solid #000;box-shadow:8px 8px 0 #000;border-radius:0;padding:1.3rem 1.4rem}
+.add-panel{background:linear-gradient(160deg,#5b1d7d 0%,#4a1768 55%,#3c1154 100%);border:4px solid #000;box-shadow:8px 8px 0 #000,16px 16px 0 rgba(0,0,0,.22);border-radius:0;padding:1.3rem 1.4rem;position:relative}
 .pool-select{display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:1.3rem}
 .pool-chip{font-family:var(--px);font-size:14px;text-transform:uppercase;padding:.6rem .7rem;
      border:3px solid #000;box-shadow:3px 3px 0 #000;background:var(--pop);color:rgba(255,255,255,.75);transition:.1s}
@@ -250,7 +253,7 @@ main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 5rem}
 .my-btn .mk{display:inline-block;width:14px;height:14px;border-radius:50%;background:var(--green);border:2px solid #000;margin-right:.35rem;vertical-align:-2px}
 /* token badges (#3) */
 .tok-badges{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.6rem}
-.tbadge{font-family:var(--px);font-size:9px;text-transform:uppercase;padding:.2rem .45rem;border:2px solid #000;background:var(--card);color:#fff;display:inline-flex;align-items:center;gap:.3rem}
+.tbadge{font-family:var(--px);font-size:9px;text-transform:uppercase;padding:.2rem .45rem;border:2px solid #000;background:linear-gradient(160deg,#5b1d7d,#3c1154);color:#fff;display:inline-flex;align-items:center;gap:.3rem;box-shadow:2px 2px 0 #000}
 .tbadge.ver{background:#123c1b;color:#7ee081}
 .tbadge.unver{background:#3a120f;color:#f8a3b8}
 .tbadge.lp{color:var(--yellow)}
@@ -271,7 +274,7 @@ main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 5rem}
 .maxy-panel{margin-top:.7rem;background:var(--pop);border:3px solid #000;padding:.7rem .8rem}
 .maxy-title{font-family:var(--px);font-size:10px;text-transform:uppercase;color:var(--yellow);margin-bottom:.5rem}
 .maxy-list{display:grid;gap:.4rem}
-.maxy-row{display:flex;align-items:center;justify-content:space-between;gap:.5rem;font-family:var(--px);font-size:11px;text-transform:uppercase;color:#fff;background:var(--card);border:2px solid #000;padding:.4rem .55rem}
+.maxy-row{display:flex;align-items:center;justify-content:space-between;gap:.5rem;font-family:var(--px);font-size:11px;text-transform:uppercase;color:#fff;background:linear-gradient(160deg,#5b1d7d,#3c1154);border:2px solid #000;box-shadow:2px 2px 0 #000;padding:.4rem .55rem}
 .maxy-row .mx-sym{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:inline-flex;align-items:center;gap:.25rem}
 .mx-ico{width:18px;height:18px;object-fit:contain;border-radius:3px;flex:0 0 18px;display:inline-block;vertical-align:-4px}
 .mx-ico.mx-letter{width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;font-family:var(--px);font-size:9px;color:#fff;border-radius:4px;flex:0 0 18px;vertical-align:-4px;border:1px solid #000}
@@ -295,8 +298,8 @@ main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 5rem}
 .poolq-filter.active{background:var(--cyan);color:var(--ink)}
 .poolq-method{margin-left:auto;font-family:var(--vt);font-size:11px;line-height:1.4;letter-spacing:0;color:rgba(255,255,255,.5)}
 .poolq-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.9rem}
-.poolq-row{position:relative;background:var(--pop);border:3px solid #000;padding:.85rem;transition:transform .1s,background .1s}
-.poolq-row:hover{transform:translate(-2px,-2px);background:#35104d}
+.poolq-row{position:relative;background:linear-gradient(160deg,#4a1768 0%,#3c1154 100%);border:3px solid #000;box-shadow:3px 3px 0 #000,6px 6px 0 rgba(0,0,0,.2);padding:.85rem;transition:transform .1s,background .1s}
+.poolq-row:hover{transform:translate(-2px,-2px);background:linear-gradient(160deg,#5b1d7d 0%,#4a1768 100%)}
 .poolq-row::after{content:"";position:absolute;right:-3px;bottom:-3px;width:52px;height:8px;background:var(--qcolor,var(--cyan));border:2px solid #000}
 .poolq-summary{display:grid;grid-template-columns:68px minmax(0,1fr);gap:.8rem;align-items:center}
 .poolq-score{width:60px;height:60px;border:4px solid #000;background:var(--qcolor,var(--cyan));color:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:4px 4px 0 #000;transform:rotate(-2deg)}
@@ -353,29 +356,31 @@ main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 5rem}
 /* ---- D: terminal header + stats pills ---- */
 .term-head{align-items:center}
 .term-pills{display:flex;gap:.6rem;flex-wrap:wrap}
-.term-pill{background:var(--card);border:3px solid #000;box-shadow:3px 3px 0 #000;padding:.4rem .7rem;min-width:96px}
+.term-pill{background:linear-gradient(160deg,#5b1d7d 0%,#4a1768 55%,#3c1154 100%);border:3px solid #000;box-shadow:3px 3px 0 #000,6px 6px 0 rgba(0,0,0,.22);padding:.4rem .7rem;min-width:96px}
 .term-pill .tp-k{font-family:var(--px);font-size:9px;text-transform:uppercase;color:rgba(255,255,255,.55);display:block}
 .term-pill .tp-v{font-family:var(--vt);font-size:1.15rem;font-weight:700;color:var(--cyan);display:block;margin-top:.15rem}
 /* net liquidity velocity ticker */
-.velo-ticker{border:4px solid #000;box-shadow:8px 8px 0 #000;background:var(--card);margin-bottom:1.4rem;overflow:hidden}
+.velo-ticker{border:4px solid #000;box-shadow:8px 8px 0 #000,16px 16px 0 rgba(0,0,0,.22);background:linear-gradient(160deg,#5b1d7d 0%,#4a1768 55%,#3c1154 100%);margin-bottom:1.4rem;overflow:hidden}
 .velo-bar{display:flex;align-items:center;gap:1rem;padding:.7rem 1.1rem;border-bottom:3px solid #000;flex-wrap:wrap}
-.velo-label{font-family:var(--px);font-size:13px;text-transform:uppercase;color:rgba(255,255,255,.75)}
+.velo-label{font-family:var(--px);font-size:13px;text-transform:uppercase;color:rgba(255,255,255,.75);display:flex;align-items:center;gap:.5rem}
+.velo-label::before{content:"";width:10px;height:10px;background:var(--cyan);box-shadow:0 0 10px rgba(61,218,216,.7);animation:pulse 2s ease-in-out infinite}
 .velo-flow{display:flex;align-items:center;gap:.7rem;margin-left:auto;flex-wrap:wrap}
-.velo-flow-item{display:flex;align-items:center;gap:.45rem}
-.velo-dir{padding:.25rem .5rem;border:3px solid #000;box-shadow:2px 2px 0 #000;font-family:var(--px);font-size:11px;text-transform:uppercase}
-.velo-dir.up{background:var(--green);color:var(--ink)}
-.velo-dir.down{background:var(--red);color:#fff}
-.velo-num{font-family:var(--vt);font-size:1.15rem;font-weight:700}
-.velo-num.up{color:var(--green)}
-.velo-num.down{color:var(--red)}
+.velo-flow-item{display:flex;align-items:center;gap:.45rem;padding:.2rem .5rem;background:rgba(18,4,30,.5);border:2px solid #000;box-shadow:2px 2px 0 #000}
+.velo-dir{padding:.2rem .45rem;border:2px solid #000;box-shadow:1px 1px 0 #000;font-family:var(--px);font-size:10px;text-transform:uppercase;letter-spacing:.05em}
+.velo-dir.up{background:linear-gradient(160deg,#8ee88a,#5ccf5c);color:var(--ink)}
+.velo-dir.down{background:linear-gradient(160deg,#ef2f7e,#c4025e);color:#fff}
+.velo-num{font-family:var(--vt);font-size:1.1rem;font-weight:700;font-variant-numeric:tabular-nums}
+.velo-num.up{color:var(--green);text-shadow:0 0 10px rgba(126,224,129,.45)}
+.velo-num.down{color:var(--red);text-shadow:0 0 10px rgba(216,4,106,.45)}
 .velo-net{font-family:var(--px);font-size:13px;text-transform:uppercase;padding:.35rem .6rem;border:3px solid #000;box-shadow:2px 2px 0 #000;background:var(--pop);color:#fff}
-.velo-net.pos{color:var(--green)}
-.velo-net.neg{color:var(--red)}
+.velo-net.pos{color:var(--green);background:linear-gradient(160deg,#2a4a2c,#20102e);text-shadow:0 0 10px rgba(126,224,129,.5)}
+.velo-net.neg{color:var(--red);background:linear-gradient(160deg,#4a1a30,#20102e);text-shadow:0 0 10px rgba(216,4,106,.5)}
 .velo-time{font-family:var(--px);font-size:11px;text-transform:uppercase;color:rgba(255,255,255,.5)}
-.velo-strip{display:flex;height:26px;overflow:hidden;background:var(--pop)}
-.velo-strip i{flex:1;height:100%;display:block;transition:opacity .4s}
-.velo-strip i.up{background:var(--green);opacity:.85}
-.velo-strip i.down{background:var(--red);opacity:.85}
+.velo-strip{display:flex;height:26px;overflow:hidden;background:var(--pop);gap:2px;padding:3px}
+.velo-strip i{flex:1;height:100%;display:block;border-radius:2px;transition:opacity .4s ease,transform .4s ease}
+.velo-strip i.up{background:linear-gradient(180deg,#7ee081,#3fa34d);box-shadow:0 0 8px rgba(126,224,129,.35)}
+.velo-strip i.down{background:linear-gradient(180deg,#ef2f7e,#a3024e);box-shadow:0 0 8px rgba(216,4,106,.35)}
+.velo-strip i:hover{transform:scaleY(1.25)}
 /* ---- C: live badge ---- */
 .live-badge{display:inline-flex;align-items:center;gap:.4rem;font-family:var(--px);font-size:10px;text-transform:uppercase;color:rgba(255,255,255,.7);background:var(--pop);border:2px solid #000;padding:.25rem .5rem}
 .live-dot{width:9px;height:9px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 1.6s ease-in-out infinite}
@@ -405,7 +410,7 @@ main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 5rem}
 .heat-overlay{position:fixed;inset:0;z-index:220;display:none;align-items:center;justify-content:center}
 .heat-overlay.open{display:flex}
 .heat-ov-bg{position:absolute;inset:0;background:rgba(0,0,0,.65)}
-.heat-ov-panel{position:relative;width:min(460px,92vw);max-height:74vh;display:flex;flex-direction:column;background:var(--card);border:4px solid #000;box-shadow:12px 12px 0 #000;padding:1.2rem 1.3rem}
+.heat-ov-panel{position:relative;width:min(460px,92vw);max-height:74vh;display:flex;flex-direction:column;background:linear-gradient(160deg,#5b1d7d 0%,#4a1768 55%,#3c1154 100%);border:4px solid #000;box-shadow:12px 12px 0 #000,20px 20px 0 rgba(0,0,0,.22);padding:1.2rem 1.3rem}
 .heat-ov-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:.8rem}
 .heat-ov-head h3{font-family:var(--px);font-size:13px;text-transform:uppercase;color:#fff}
 .heat-ov-head .heat-ov-count{font-family:var(--vt);font-size:12px;color:var(--yellow);text-transform:none}
@@ -430,11 +435,14 @@ main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 5rem}
 .legend .lg.bar{flex:1;height:10px;border:2px solid #000;background:linear-gradient(90deg,var(--cyan),var(--yellow),var(--red))}
 /* activity feed */
 .feed{display:flex;flex-direction:column;min-height:0}
-.feed-head{display:grid;grid-template-columns:1.3fr .9fr .6fr .5fr;gap:.4rem;padding:.4rem .3rem;border-bottom:3px solid #000;font-family:var(--px);font-size:11px;text-transform:uppercase;color:rgba(255,255,255,.55);flex:0 0 auto}
+.feed-head{display:grid;grid-template-columns:1.5fr .9fr .6fr .5fr;gap:.4rem;padding:.4rem .3rem;border-bottom:3px solid #000;font-family:var(--px);font-size:11px;text-transform:uppercase;color:rgba(255,255,255,.55);flex:0 0 auto}
 .feed-list{flex:1;overflow-y:auto;max-height:720px;min-height:0}
-.feed-row{display:grid;grid-template-columns:1.3fr .9fr .6fr .5fr;gap:.4rem;align-items:center;padding:.55rem .3rem;border-bottom:2px solid rgba(0,0,0,.4);font-size:14px;transition:background .2s;position:relative}
+.feed-row{display:grid;grid-template-columns:1.5fr .9fr .6fr .5fr;gap:.4rem;align-items:center;padding:.55rem .3rem;border-bottom:2px solid rgba(0,0,0,.4);font-size:14px;transition:background .2s;position:relative}
 .feed-row:hover{background:rgba(61,218,216,.06)}
-.feed-row .fp{font-family:var(--px);font-size:12px;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;flex-direction:column;line-height:1.25}
+.feed-row .fp{font-family:var(--px);font-size:12px;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:.5rem;line-height:1.25;min-width:0}
+.feed-row .fp-tok{width:26px;height:26px;flex:0 0 26px;border-radius:50%;border:2px solid #000;background:var(--card2);display:grid;place-items:center;overflow:hidden;font-family:var(--px);font-size:10px;font-weight:700;color:#fff;box-shadow:2px 2px 0 #000}
+.feed-row .fp-tok img{width:100%;height:100%;object-fit:cover}
+.feed-row .fp-txt{display:flex;flex-direction:column;min-width:0;overflow:hidden}
 .feed-row .fp-pair{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .feed-row .fp small{font-family:var(--vt);font-size:10px;color:rgba(255,255,255,.4);text-transform:none;white-space:nowrap}
 .feed-row .fv{font-family:var(--vt);color:var(--cyan);white-space:nowrap}
@@ -462,7 +470,7 @@ main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 5rem}
 .mig-agg.up{color:var(--green)}
 .mig-agg.down{color:var(--red)}
 .mig-list{display:grid;gap:.45rem}
-.mig-row{display:flex;align-items:center;gap:.5rem;background:var(--card);border:2px solid #000;padding:.45rem .5rem}
+.mig-row{display:flex;align-items:center;gap:.5rem;background:linear-gradient(160deg,#5b1d7d,#3c1154);border:2px solid #000;box-shadow:2px 2px 0 #000;padding:.45rem .5rem}
 .mig-row .ho-av{position:relative;width:26px;height:26px;flex:0 0 26px;border-radius:50%;border:2px solid #000;background:var(--pop);overflow:hidden;display:flex;align-items:center;justify-content:center}
 .mig-row .ho-av img{position:relative;z-index:2;width:100%;height:100%;object-fit:cover;border-radius:50%;background:var(--pop)}
 .mig-row .ho-av::after{content:attr(data-c);position:absolute;inset:0;z-index:1;display:flex;align-items:center;justify-content:center;font-family:var(--px);font-size:12px;color:#fff;background:var(--card2)}
@@ -474,7 +482,7 @@ main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 5rem}
 .mig-chg.down{color:var(--red)}
 @media(max-width:860px){.mig-flex{grid-template-columns:1fr}}
 /* ---- A: top gainers/losers strip (compact) ---- */
-.gl-strip{display:flex;align-items:stretch;border:4px solid #000;box-shadow:8px 8px 0 #000;background:var(--card);margin-bottom:1.4rem;overflow:hidden}
+.gl-strip{display:flex;align-items:stretch;border:4px solid #000;box-shadow:8px 8px 0 #000,16px 16px 0 rgba(0,0,0,.22);background:linear-gradient(160deg,#5b1d7d 0%,#4a1768 55%,#3c1154 100%);margin-bottom:1.4rem;overflow:hidden}
 .gl-side{flex:1;padding:.45rem .7rem}
 .gl-side.gainers{border-right:3px solid #000}
 .gl-label{font-family:var(--px);font-size:9px;text-transform:uppercase;color:rgba(255,255,255,.55);display:flex;align-items:center;gap:.35rem;margin-bottom:.3rem}
@@ -551,7 +559,7 @@ main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 5rem}
 /* ---------- monitor ---------- */
 .mon-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(285px,1fr));grid-auto-rows:1fr;gap:1.2rem;margin-top:1.2rem;align-items:stretch}
 .mon-grid > *{min-width:0;height:100%}
-.mon-card{background:var(--card);border:4px solid #000;box-shadow:8px 8px 0 #000;border-radius:0;padding:1.1rem 1.2rem;min-width:0;height:100%;box-sizing:border-box;display:grid;grid-template-rows:auto auto auto 64px auto auto;align-content:start}
+.mon-card{background:linear-gradient(160deg,#5b1d7d 0%,#4a1768 55%,#3c1154 100%);border:4px solid #000;box-shadow:8px 8px 0 #000,16px 16px 0 rgba(0,0,0,.22);border-radius:0;padding:1.1rem 1.2rem;min-width:0;height:100%;box-sizing:border-box;display:grid;grid-template-rows:auto auto auto 64px auto auto;align-content:start;position:relative}
 .mon-top{display:grid;grid-template-columns:minmax(0,1fr) auto;justify-content:space-between;align-items:center;min-height:30px;margin-bottom:.6rem;gap:.65rem;flex-wrap:nowrap}
 .mon-top .nm{font-family:var(--px);font-size:12px;text-transform:uppercase;display:flex;align-items:center;gap:.45rem;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
 .mon-top .nm .mon-name{display:block;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
@@ -567,8 +575,8 @@ main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 5rem}
 .spark.good{color:var(--green)} .spark.bad{color:var(--red)}
 
 /* ---------- rewards ---------- */
-.reward-hero{background:var(--card);background-image:repeating-linear-gradient(45deg,rgba(61,218,216,.07) 0 12px,transparent 12px 24px);
-     border:4px solid #000;box-shadow:8px 8px 0 #000;border-radius:0;padding:1.5rem;display:flex;align-items:center;
+.reward-hero{background:linear-gradient(160deg,#5b1d7d 0%,#4a1768 55%,#3c1154 100%);background-image:linear-gradient(160deg,#5b1d7d 0%,#4a1768 55%,#3c1154 100%),repeating-linear-gradient(45deg,rgba(61,218,216,.07) 0 12px,transparent 12px 24px);
+     border:4px solid #000;box-shadow:8px 8px 0 #000,16px 16px 0 rgba(0,0,0,.22);border-radius:0;padding:1.5rem;display:flex;align-items:center;
      justify-content:space-between;gap:1.5rem;flex-wrap:wrap;margin-bottom:1.3rem}
 .reward-hero .amt{font-family:var(--vt);font-size:2.25rem;font-weight:700;line-height:1.1;color:var(--yellow);text-shadow:3px 3px 0 #000}
 .reward-hero .lbl{font-family:var(--px);font-size:14px;text-transform:uppercase;color:rgba(255,255,255,.7);margin-bottom:.3rem}
@@ -604,7 +612,7 @@ main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 5rem}
 /* ---------- modals ---------- */
 .modal-bg{position:fixed;inset:0;background:rgba(20,4,32,.78);z-index:100;display:none;align-items:center;justify-content:center;padding:1rem}
 .modal-bg.open{display:flex}
-.modal{background:var(--card);border:4px solid #000;box-shadow:12px 12px 0 #000;border-radius:0;width:100%;max-width:460px;max-height:calc(100vh - 2rem);overflow-y:auto;padding:1.5rem;animation:pop .15s steps(3)}
+.modal{background:linear-gradient(160deg,#5b1d7d 0%,#4a1768 55%,#3c1154 100%);border:4px solid #000;box-shadow:12px 12px 0 #000,20px 20px 0 rgba(0,0,0,.22);border-radius:0;width:100%;max-width:460px;max-height:calc(100vh - 2rem);overflow-y:auto;padding:1.5rem;animation:pop .15s steps(3)}
 @keyframes pop{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:none}}
 .modal h3{font-family:var(--px);font-size:13px;text-transform:uppercase;margin-bottom:.4rem;text-shadow:2px 2px 0 #000}
 .modal .msub{font-family:var(--vt);font-size:17px;color:rgba(255,255,255,.65);margin-bottom:1.2rem}
@@ -618,15 +626,27 @@ main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 5rem}
 .bin-toggle{display:flex;gap:.5rem}
 .bin-toggle .bintab{flex:1;padding:.5rem .6rem;border:3px solid #000;background:var(--pop);color:rgba(255,255,255,.6);font-family:var(--px);font-size:12px;text-transform:uppercase;letter-spacing:.04em;cursor:pointer}
 .bin-toggle .bintab.active{background:var(--cyan);color:#001018;border-color:#000;box-shadow:3px 3px 0 #000}
-.bin-grid{display:grid;grid-template-columns:.72fr 1.14fr 1.14fr;gap:.65rem;align-items:end}
+.bin-grid{display:flex;flex-direction:column;gap:.85rem;align-items:stretch;padding:.2rem 0 .35rem}
 .bin-grid .mfield{margin:.45rem 0;min-width:0}
 .bin-grid .mfield label{min-height:27px;display:flex;align-items:flex-end;line-height:1.25;margin-bottom:.4rem}
-.bin-grid input{font-size:.86rem;padding:.55rem .55rem;height:39px;box-sizing:border-box}
-.pct-input{position:relative;display:flex;align-items:center;height:39px;box-sizing:border-box;border:3px solid #000;background:var(--pop)}
-.pct-input input{border:0!important;background:transparent!important;padding-left:1.7rem!important;padding-right:1.7rem!important;color:var(--cyan)}
+.bin-grid input{font-size:1rem;padding:.65rem .55rem;height:43px;box-sizing:border-box}
+.pct-input{position:relative;display:flex;align-items:center;height:43px;box-sizing:border-box;border:3px solid #000;background:var(--pop);box-shadow:3px 3px 0 #000;transition:border-color .16s,box-shadow .16s,background .16s}
+.pct-input:focus-within{border-color:var(--cyan);background:#32104b;box-shadow:4px 4px 0 #000,0 0 0 2px rgba(97,220,216,.18)}
+.pct-input input{border:0!important;background:transparent!important;padding-left:1.8rem!important;padding-right:1.8rem!important;color:var(--cyan);font-size:1rem;font-weight:800;min-width:0}
+.pct-input input:focus{box-shadow:none!important}
 .pct-sign,.pct-unit{position:absolute;z-index:1;font-family:var(--vt);font-weight:900;pointer-events:none}
-.pct-sign{left:.55rem;font-size:1rem}.pct-sign.minus{color:#ff5f6d}.pct-sign.plus{color:#7ee081}
+.pct-sign{left:.6rem;font-size:1.05rem}.pct-sign.minus{color:#ff7b8b}.pct-sign.plus{color:#7ee081}
 .pct-unit{right:.5rem;color:rgba(255,255,255,.55);font-size:.8rem}
+.range-dual{display:grid;grid-template-columns:minmax(0,1fr) 112px 28px;align-items:stretch;height:48px;border:3px solid #000;background:var(--pop);box-shadow:3px 3px 0 #000;overflow:hidden;transition:border-color .16s,box-shadow .16s,background .16s}
+.range-dual:focus-within{border-color:var(--cyan);background:#32104b;box-shadow:4px 4px 0 #000,0 0 0 2px rgba(97,220,216,.18)}
+.range-dual input{width:100%;min-width:0;height:100%;border:0!important;background:transparent!important;color:var(--cyan);font-family:var(--vt);font-size:1rem;font-weight:800;outline:0;box-shadow:none!important;padding:.45rem .7rem!important}
+.range-pct-wrap{display:flex;align-items:center;min-width:0;border-left:1px solid rgba(255,255,255,.2)}
+.range-pct-wrap .range-pct{border-left:0!important;padding-left:.25rem!important}
+.range-pct-sign{flex:0 0 auto;padding-left:.45rem;color:#ff7b8b;font-family:var(--vt);font-size:1rem;font-weight:900;pointer-events:none}
+.range-dual .range-step{display:grid;grid-template-rows:1fr 1fr;border-left:1px solid rgba(255,255,255,.18)}
+.range-step button{border:0;background:transparent;color:rgba(255,255,255,.65);font-size:12px;line-height:1;cursor:pointer}
+.range-step button+button{border-top:1px solid rgba(255,255,255,.18)}
+.range-step button:hover{background:rgba(97,220,216,.16);color:var(--cyan)}
 .bin-current{display:flex;align-items:baseline;justify-content:space-between;gap:.75rem;margin:.3rem 0 .65rem;padding:.15rem .1rem;border:0;background:transparent;font-family:var(--vt)}
 .bin-current span{font-family:var(--vt);font-size:12px;font-weight:700;letter-spacing:.08em;color:rgba(255,255,255,.5)}
 .bin-current strong{font-family:var(--vt);color:var(--cyan);font-size:16px;font-weight:800;letter-spacing:.01em}
@@ -639,7 +659,7 @@ main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 5rem}
 .bin-summary strong{display:block;max-width:100%;color:#fff;text-align:left;font-weight:700;line-height:1.2;overflow-wrap:anywhere}
 .bin-summary #binSummaryStatus.in-range{color:#7ee081}
 .bin-summary #binSummaryStatus.out-range{color:#ff5f6d}
-@media(max-width:640px){.bin-grid{grid-template-columns:1fr}.bin-grid .mfield label{min-height:0}.bin-summary{grid-template-columns:1fr 1fr}}
+@media(max-width:640px){.bin-grid{gap:.65rem}.bin-grid .mfield label{min-height:0}.bin-summary{grid-template-columns:1fr 1fr}.range-dual{grid-template-columns:minmax(0,1fr) 104px 28px}}
 .bin-bar svg{display:block;width:100%;height:auto}
 .bin-bar-labels{display:flex;justify-content:space-between;font-family:var(--vt);font-size:10px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.03em}
 .modal-actions{display:flex;gap:.6rem;margin-top:1.2rem}
@@ -651,9 +671,11 @@ main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 5rem}
 /* ---------- toast ---------- */
 #toast-wrap{position:fixed;bottom:1rem;right:1rem;z-index:200;display:flex;flex-direction:column;gap:.5rem;max-width:272px}
 .toast{background:var(--card2);border:2px solid #000;box-shadow:4px 4px 0 #000;padding:.65rem .85rem;
-     font-family:var(--vt);font-size:14.4px;color:#fff;border-left:6px solid var(--cyan);animation:tin .18s steps(3);line-height:1.35}
+      font-family:var(--vt);font-size:14.4px;color:#fff;border-left:6px solid var(--cyan);animation:tin .18s steps(3);line-height:1.35}
 .toast.ok{border-left-color:var(--green)} .toast.err{border-left-color:var(--red)}
 @keyframes tin{from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:none}}
+.skeleton{background:linear-gradient(90deg,rgba(255,255,255,.06) 25%,rgba(97,220,216,.16) 50%,rgba(255,255,255,.06) 75%);background-size:200% 100%;animation:shimmer 1.25s linear infinite;color:transparent!important;border-radius:2px}.skeleton *{visibility:hidden}@keyframes shimmer{to{background-position:-200% 0}}
+.pos-card{animation:cardIn .32s ease both}.pos-card:nth-child(2){animation-delay:.04s}.pos-card:nth-child(3){animation-delay:.08s}.pos-card:nth-child(4){animation-delay:.12s}.mon-card{animation:none;transition:border-color .2s ease,box-shadow .2s ease}.pos-card.out-range{border-color:var(--red);box-shadow:8px 8px 0 #000,0 0 0 2px rgba(255,95,109,.18)}@keyframes cardIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 
 /* ---------- misc ---------- */
 .empty{text-align:center;padding:3.5rem 1rem;color:rgba(255,255,255,.6);grid-column:1/-1}
@@ -661,8 +683,8 @@ main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 5rem}
 .toolbar{display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;margin-bottom:1.1rem}
 .search{flex:1;min-width:200px;display:flex;align-items:center;gap:.5rem;padding:.55rem .8rem;border:3px solid #000;background:var(--pop);color:rgba(255,255,255,.5)}
 .search input{flex:1;background:transparent;border:0;outline:0;color:var(--yellow);font-family:var(--vt);font-size:1.05rem}
-.footer{margin-top:3rem;text-align:center;font-family:var(--px);font-size:13px;text-transform:uppercase;color:rgba(255,255,255,.5)}
-.footer-wrap{text-align:center;max-width:820px;margin:3rem auto 0}
+.footer{margin-top:1.5rem;text-align:center;font-family:var(--px);font-size:13px;text-transform:uppercase;color:rgba(255,255,255,.5)}
+.footer-wrap{text-align:center;max-width:820px;margin:2rem auto 0}
 .rights{font-family:var(--vt);font-size:13px;color:rgba(255,255,255,.45);margin-top:.9rem;text-align:center}
 .x-link{display:inline-flex;align-items:center;gap:.5rem;color:var(--white);text-decoration:none;font-family:var(--px);font-size:12px;text-transform:none;padding:.5rem .9rem;border:2px solid rgba(255,255,255,.25);border-radius:0;background:rgba(255,255,255,.05);transition:.15s;letter-spacing:.02em}
 .x-link:hover{color:#fff;background:var(--red);border-color:var(--red)}
@@ -835,7 +857,7 @@ main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 5rem}
 .pool-trigger{
   width:100%;display:flex;align-items:center;gap:.75rem;cursor:pointer;
   font-family:var(--px);text-transform:uppercase;color:#fff;text-align:left;
-  padding:.8rem 1rem;background:var(--card);border:4px solid #000;
+  padding:.8rem 1rem;background:linear-gradient(160deg,#5b1d7d 0%,#4a1768 55%,#3c1154 100%);border:4px solid #000;
   box-shadow:6px 6px 0 #000;transition:.12s;letter-spacing:.02em;
 }
 .pool-trigger:hover{ transform:translate(-1px,-1px); box-shadow:7px 7px 0 #000; background:var(--card2) }
@@ -854,7 +876,7 @@ main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 5rem}
   animation:pmFade .18s ease-out }
 .pool-sheet{ position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
   width:min(480px,92vw);max-height:82vh;display:flex;flex-direction:column;
-  background:var(--card);border:4px solid #000;box-shadow:12px 12px 0 #000;
+  background:linear-gradient(160deg,#5b1d7d 0%,#4a1768 55%,#3c1154 100%);border:4px solid #000;box-shadow:12px 12px 0 #000,20px 20px 0 rgba(0,0,0,.22);
   animation:pmPop .22s cubic-bezier(.2,1.4,.4,1) }
 @keyframes pmFade{ from{opacity:0} to{opacity:1} }
 @keyframes pmPop{ from{opacity:0;transform:translate(-50%,-46%) scale(.94)} to{opacity:1;transform:translate(-50%,-50%) scale(1)} }
@@ -1016,7 +1038,7 @@ a.px-btn{display:inline-block;text-align:center;text-decoration:none;width:auto}
 .road-node{display:flex;align-items:center;gap:.55rem}
 .road-dot{width:11px;height:11px;border:2px solid #000;border-radius:50%;flex:0 0 auto}
 .road-num{font-family:var(--px);font-size:12px;color:rgba(255,255,255,.55);letter-spacing:.08em}
-.road-card{background:var(--card);border:3px solid #000;box-shadow:5px 5px 0 #000;padding:1.1rem 1.2rem;height:100%;display:flex;flex-direction:column;gap:.8rem}
+.road-card{background:linear-gradient(160deg,#5b1d7d 0%,#4a1768 55%,#3c1154 100%);border:3px solid #000;box-shadow:5px 5px 0 #000,10px 10px 0 rgba(0,0,0,.22);padding:1.1rem 1.2rem;height:100%;display:flex;flex-direction:column;gap:.8rem}
 .road-head{display:flex;align-items:center;justify-content:space-between;gap:.6rem}
 .road-head h3{font-family:var(--px);font-size:13px;text-transform:uppercase;color:#fff;line-height:1.35}
 .road-badge{font-family:var(--px);font-size:10px;text-transform:uppercase;padding:.22rem .5rem;border:2px solid #000;white-space:nowrap;flex:0 0 auto}
@@ -1048,6 +1070,148 @@ a.px-btn{display:inline-block;text-align:center;text-decoration:none;width:auto}
   .reveal{opacity:1;transform:none;transition:none}
 }
 
+.position-health{margin:.7rem 0 .35rem;padding:.55rem .65rem;background:rgba(18,4,30,.28);border:1px solid rgba(255,255,255,.1);border-radius:3px}.health-head{display:flex;justify-content:space-between;gap:.6rem;align-items:baseline;font-size:10px;color:rgba(255,255,255,.48);text-transform:uppercase;letter-spacing:.04em}.health-head b{font-size:10px;color:var(--cyan);font-weight:600;text-transform:none;text-align:right}.health-track{position:relative;height:6px;margin:.55rem 0 .35rem;background:rgba(255,255,255,.1);border-radius:99px}.health-track i{display:block;height:100%;background:linear-gradient(90deg,var(--cyan),var(--green));border-radius:99px;transition:width .3s ease}.health-track em{position:absolute;top:50%;width:10px;height:10px;background:var(--yellow);border:2px solid var(--ink);border-radius:50%;transform:translate(-50%,-50%);box-shadow:0 0 0 2px rgba(246,210,77,.18);transition:left .3s ease}.health-axis{display:flex;justify-content:space-between;gap:.35rem;color:rgba(255,255,255,.38);font-size:9px;white-space:nowrap}.position-health:has(.health-head b){transition:border-color .2s ease}.out-range .position-health{border-color:rgba(255,95,109,.35)}.out-range .health-head b{color:var(--red)}
+.portfolio-summary{display:grid;grid-template-columns:minmax(260px,2fr) repeat(3,1fr);gap:1rem;margin-bottom:1.2rem}.portfolio-total,.portfolio-stat,.portfolio-panel{background:linear-gradient(160deg,#5b1d7d 0%,#4a1768 55%,#3c1154 100%);border:3px solid #000;box-shadow:5px 5px 0 #000,10px 10px 0 rgba(0,0,0,.22)}.portfolio-total{padding:1.1rem 1.2rem}.portfolio-total span,.portfolio-stat span{display:block;color:rgba(255,255,255,.55);font-size:12px;text-transform:uppercase}.portfolio-total strong{display:block;margin:.35rem 0;font-family:var(--vt);font-size:2.1rem;color:var(--cyan)}.portfolio-total small{color:rgba(255,255,255,.45)}.portfolio-stat{padding:1rem}.portfolio-stat b{display:block;margin-top:.45rem;font-family:var(--vt);font-size:1.45rem;color:#fff}.portfolio-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem}.portfolio-panel{padding:1rem}.portfolio-panel .card-title{margin-bottom:.8rem}.portfolio-muted{font-size:11px;color:rgba(255,255,255,.45)}.portfolio-tokens,.portfolio-tx{display:grid;gap:.55rem}.portfolio-token,.portfolio-tx-row{display:flex;align-items:center;justify-content:space-between;gap:.8rem;padding:.7rem .75rem;background:var(--pop);border:1px solid rgba(255,255,255,.12)}.portfolio-token-main{display:flex;align-items:center;gap:.6rem;min-width:0}.portfolio-token-icon{width:28px;height:28px;border-radius:50%;object-fit:contain;background:var(--card2);border:2px solid rgba(255,255,255,.18)}.portfolio-token-name{font-weight:700}.portfolio-wallet-tag{font-size:9px;color:rgba(255,255,255,.38);text-transform:uppercase}.portfolio-section-label{padding:.25rem 0 .15rem;color:rgba(255,255,255,.45);font-size:10px;text-transform:uppercase;letter-spacing:.05em}.portfolio-token-amount{text-align:right;color:var(--cyan);font-family:var(--vt)}
+.recent-tx-panel{margin-top:1.5rem;padding:1rem 0 0;border-top:1px solid rgba(255,255,255,.14)}.recent-tx-panel .page-head{align-items:center;margin-bottom:.8rem}.recent-tx-panel .page-head p{font-size:14px;margin-top:.25rem}.recent-tx-panel .text-outline{font-size:16px}.recent-tx-panel .portfolio-tx{gap:.45rem}.recent-tx-panel .portfolio-tx-row{min-height:56px;padding:.65rem .8rem;border-color:rgba(255,255,255,.1);background:rgba(42,13,62,.72);transition:background .16s ease,border-color .16s ease}.recent-tx-panel .portfolio-tx-row:hover{background:#35104d;border-color:rgba(61,218,216,.28)}.portfolio-tx-type{font-size:13px}.portfolio-tx-meta{font-size:11px}.recent-tx-panel .portfolio-tx-row a{padding:.25rem .45rem;border:1px solid rgba(61,218,216,.3);border-radius:3px;text-decoration:none}.recent-tx-panel .portfolio-tx-row a:hover{background:rgba(61,218,216,.1)}
+@media(max-width:560px){.recent-tx-panel{margin-top:1.1rem;padding-top:.8rem}.recent-tx-panel .page-head{align-items:flex-start}.recent-tx-panel .portfolio-tx-row{padding:.6rem;gap:.5rem}.recent-tx-panel .portfolio-tx-row a{font-size:10px}.recent-tx-panel .portfolio-tx-meta{font-size:10px}}.portfolio-token-usd{display:block;color:rgba(255,255,255,.45);font-family:var(--vt);font-size:11px}.portfolio-tx-row{align-items:flex-start}.portfolio-tx-type{font-weight:700;color:#fff}.portfolio-tx-meta{font-size:11px;color:rgba(255,255,255,.48);margin-top:.2rem}.portfolio-tx-row a{color:var(--cyan);font-size:11px;white-space:nowrap}@media(max-width:760px){.portfolio-summary{grid-template-columns:1fr 1fr}.portfolio-total{grid-column:1/-1}.portfolio-grid{grid-template-columns:1fr}}@media(max-width:480px){.portfolio-summary{gap:.65rem}.portfolio-stat{padding:.75rem}.portfolio-stat b{font-size:1.2rem}.portfolio-panel{padding:.75rem}}
+
+/* ===================== UI polish: tabular-nums · hover · focus · flash ===================== */
+
+/* #3 — tabular numerals: aligned numeric columns (no jitter) */
+.stat .value, .stat .sub, .pd .v, .pos-card .value, .pos-card .big,
+.pool-apr, .portfolio-total strong, .portfolio-stat b,
+.swap-token-main input, .swap-meta-row strong, .swap-chart-price b,
+.term-pill .tp-v, .velo-num, .velo-net, .amount-row input,
+.dt-row .v, .pv-row .v, .scr-table td.num, .feed-list .value{
+  font-variant-numeric:tabular-nums;
+}
+
+/* #6 — uniform hover elevation across card types */
+.stat, .pos-card, .add-panel, .tools-card, .poolq-row, .pool-card, .mon-card{
+  transition:transform .15s ease, box-shadow .15s ease;
+}
+.stat:hover, .pool-card:hover, .tools-card:hover, .mon-card:hover{
+  transform:translate(-2px,-2px);
+  box-shadow:10px 10px 0 #000, 20px 20px 0 rgba(0,0,0,.18);
+}
+
+/* #7 — focus glow on amount/token inputs */
+.amount-row:focus-within, .swap-token-box:focus-within, .mfield input:focus,
+.swap-picker-search:focus{
+  border-color:var(--cyan);
+  box-shadow:0 0 0 2px rgba(61,218,216,.25), inset 0 0 0 1px rgba(61,218,216,.15);
+}
+.amount-row:focus-within input, .swap-token-main input:focus{outline:0}
+.swap-token-box:focus-within{background:#32104b}
+
+/* #8 — numeric change flash (live price/volume jitter highlights up/down) */
+@keyframes flashUp{0%{color:var(--green);text-shadow:0 0 12px rgba(126,224,129,.7)}100%{color:inherit;text-shadow:none}}
+@keyframes flashDown{0%{color:var(--red);text-shadow:0 0 12px rgba(216,4,106,.7)}100%{color:inherit;text-shadow:none}}
+.flash-up{animation:flashUp .6s ease}
+.flash-down{animation:flashDown .6s ease}
+
+/* velo strip segment pop-in (net liquidity index bars) */
+@keyframes veloPop{0%{opacity:0;transform:scaleY(.2)}60%{opacity:1;transform:scaleY(1.15)}100%{opacity:1;transform:scaleY(1)}}
+
+/* ===================== UNIFIED INNER-CARD SURFACE (Net Liquidity Index style) ===================== */
+/* Every inner surface (rows, boxes, meta, chips, inputs) shares one gradient surface,
+   a crisp black border, and a consistent offset shadow — smooth & uniform across ALL pages. */
+
+/* inner boxes / input fields — lift from flat dark to gradient surface */
+.swap-token-box, .amount-row, .swap-meta, .ps-card, .info-item,
+.detail-table, .pos-preview, .maxy-panel, .range-viz, .feed-head{
+  background:linear-gradient(160deg,#4a1768 0%,#3c1154 100%);
+}
+.swap-token-box, .amount-row, .ps-card, .info-item{
+  border:3px solid #000;
+  box-shadow:3px 3px 0 #000, 6px 6px 0 rgba(0,0,0,.2);
+}
+
+/* rows inside cards — subtle gradient + crisp separators */
+.dt-row, .pv-row, .swap-meta-row, .mon-top{
+  border-bottom:2px solid rgba(0,0,0,.35);
+}
+.dt-row:last-child, .pv-row:last-child, .swap-meta-row:last-child{border-bottom:0}
+
+/* chips / tabs / pill buttons — gradient surface + shadow (was flat card2/pop) */
+.pool-chip, .mode-chip, .bintab, .swap-slip, .swap-pct-row button,
+.poolq-filter, .range-pct-wrap input, .range-pct{
+  background:linear-gradient(160deg,#5b1d7d 0%,#4a1768 100%);
+}
+.pool-chip, .mode-chip, .bintab, .swap-slip{
+  box-shadow:2px 2px 0 #000, 4px 4px 0 rgba(0,0,0,.2);
+}
+.pool-chip.active, .mode-chip.active, .bintab.active,
+.swap-slip.active, .poolq-filter.active{
+  background:linear-gradient(160deg,#e5127b,#d8046a);
+  box-shadow:2px 2px 0 #000, 0 0 12px rgba(216,4,106,.35);
+}
+
+/* token pill / selector buttons — gradient surface */
+.swap-token-btn, .pool-trigger, .swap-pick-row:hover{
+  background:linear-gradient(160deg,#5b1d7d 0%,#4a1768 100%);
+}
+
+/* info list items (how it works) — gradient surface + shadow */
+.info-item{background:linear-gradient(160deg,#4a1768 0%,#3c1154 100%);border:3px solid #000;box-shadow:3px 3px 0 #000,6px 6px 0 rgba(0,0,0,.2)}
+
+/* range visualization + ratio bars — gradient surface */
+.range-viz, .ratio-bar .line, .pv-bar, .share-bar{background:linear-gradient(160deg,#3c1154 0%,#2a0d3e 100%)}
+
+/* stat / monitor / feed rows — consistent hover glow */
+.dt-row:hover, .feed-row:hover{background:rgba(61,218,216,.05)}
+
+/* spot / liqd / mig rows — gradient surface where flat */
+.spot-body .spot-row, .liqd-row, .mig-row{background:linear-gradient(160deg,#4a1768 0%,#3c1154 100%)}
+
+/* ===================== UNIFIED OVERLAY SURFACE (modals, pickers, sheets + their contents) ===================== */
+/* Every overlay inner surface shares the same gradient + crisp border + offset shadow,
+   matching the card/Net Liquidity Index language across all pages. */
+
+/* overlay inner boxes — gradient surface */
+.mfield input, .mfield select, .bin-toggle .bintab, .wallet-card,
+.swap-picker-search-wrap, .heat-ov-search, .toast{
+  background:linear-gradient(160deg,#4a1768 0%,#3c1154 100%);
+}
+.mfield input, .mfield select, .bin-toggle .bintab, .wallet-card,
+.swap-picker-search-wrap, .heat-ov-search{
+  border:3px solid #000;
+  box-shadow:3px 3px 0 #000, 6px 6px 0 rgba(0,0,0,.2);
+}
+
+/* bin toggle tabs — active state */
+.bin-toggle .bintab{background:linear-gradient(160deg,#5b1d7d 0%,#4a1768 100%);color:rgba(255,255,255,.7)}
+.bin-toggle .bintab.active{
+  background:linear-gradient(160deg,#e5127b,#d8046a);
+  color:#fff;
+  box-shadow:2px 2px 0 #000, 0 0 12px rgba(216,4,106,.35);
+}
+
+/* modal rows — crisp separators (last row no border) */
+.mrow, .heat-ov-item, .swap-pick-row{
+  border-bottom:2px solid rgba(0,0,0,.35);
+}
+.mrow:last-child{border-bottom:0}
+
+/* picker list rows — gradient surface on hover/active */
+.swap-pick-row, .heat-ov-item{
+  background:transparent;
+}
+.swap-pick-row:hover, .heat-ov-item:hover{
+  background:linear-gradient(160deg,#4a1768 0%,#3c1154 100%);
+  box-shadow:3px 3px 0 #000, 6px 6px 0 rgba(0,0,0,.2);
+  transform:translate(-1px,-1px);
+}
+.heat-ov-item.active{
+  background:linear-gradient(160deg,#5b1d7d 0%,#4a1768 100%);
+  box-shadow:inset 3px 0 0 var(--red), 3px 3px 0 #000;
+}
+
+/* toast — gradient surface + colored left accent */
+.toast{
+  background:linear-gradient(160deg,#5b1d7d 0%,#4a1768 100%);
+  box-shadow:4px 4px 0 #000, 8px 8px 0 rgba(0,0,0,.22);
+}
 </style>
 </head>
 <body>
@@ -1197,6 +1361,7 @@ a.px-btn{display:inline-block;text-align:center;text-decoration:none;width:auto}
         </div>
       </div>
       <div class="px-card" id="rwList"></div>
+      <section class="recent-tx-panel"><div class="page-head" style="margin-bottom:1rem"><div><h1 class="text-outline">Recent Transactions</h1><p>Recent wallet activity from LP actions.</p></div></div><div id="recentTxList" class="portfolio-tx"></div></section>
     </div>
   </section>
 
@@ -1351,7 +1516,7 @@ a.px-btn{display:inline-block;text-align:center;text-decoration:none;width:auto}
             <div class="swap-chart-price"><b id="swapChartPrice">—</b><span id="swapChartChange">24H —</span></div>
           </div>
           <svg id="swapChartSvg" class="spark good swap-mini-chart" viewBox="0 0 120 58" preserveAspectRatio="none"></svg>
-          <div class="swap-chart-foot"><span>RadarDex</span><span>24H price</span></div>
+          <div class="swap-chart-foot"><span>Market data</span><span>24H price</span></div>
         </div>
       </aside>
     </div>
@@ -1570,22 +1735,22 @@ a.px-btn{display:inline-block;text-align:center;text-decoration:none;width:auto}
       <label>Strategy</label>
       <div class="bin-toggle" id="binToggle">
         <button class="bintab active" data-mode="single" id="binTabSingle">Single Range</button>
-        <button class="bintab" data-mode="bins" id="binTabBins">Spot Grid ⚡</button>
+        <button class="bintab" data-mode="bins" id="binTabBins">BID/ASK ⚡</button>
       </div>
     </div>
     <div id="binBox" style="display:none">
       <div class="bin-grid">
-        <div class="mfield">
+        <div class="mfield" style="display:none">
           <label># Bins</label>
-          <input id="binCount" type="number" min="2" max="40" value="10" />
+          <input id="binCount" type="number" min="2" max="40" value="2" />
         </div>
         <div class="mfield">
-          <label>Support below current (%)</label>
-          <div class="pct-input"><span class="pct-sign minus">−</span><input id="binSupport" type="number" min="0.1" max="95" step="0.1" value="10" inputmode="decimal" /><span class="pct-unit">%</span></div>
+          <label>Min Price</label>
+          <div class="range-dual"><input id="binSupportPrice" type="number" step="any" inputmode="decimal" placeholder="Price" /><span class="range-pct-wrap"><span class="range-pct-sign minus">−</span><input id="binSupport" class="range-pct" type="number" min="0.1" max="95" step="0.1" value="10" inputmode="decimal" aria-label="Support percentage" /></span><span class="range-step"><button type="button" data-range-step="support" data-step="up">＋</button><button type="button" data-range-step="support" data-step="down">−</button></span></div>
         </div>
         <div class="mfield">
-          <label>Resistance above current (%)</label>
-          <div class="pct-input"><span class="pct-sign plus">+</span><input id="binResist" type="number" min="0.1" max="1000" step="0.1" value="10" inputmode="decimal" /><span class="pct-unit">%</span></div>
+          <label>Max Price</label>
+          <div class="range-dual"><input id="binResistPrice" type="number" step="any" inputmode="decimal" placeholder="Price" /><span class="range-pct-wrap"><span class="range-pct-sign plus">＋</span><input id="binResist" class="range-pct" type="number" min="0.1" max="1000" step="0.1" value="10" inputmode="decimal" aria-label="Resistance percentage" /></span><span class="range-step"><button type="button" data-range-step="resist" data-step="up">＋</button><button type="button" data-range-step="resist" data-step="down">−</button></span></div>
         </div>
       </div>
       <div class="bin-current" id="binCurrent"><span>CURRENT PRICE</span><strong>—</strong></div>
@@ -1659,8 +1824,11 @@ const CFG = {
   chainName: 'ARC Mainnet',
   nativeCurrency: { name: 'USDC', symbol: 'USDC', decimals: 6 },
   rpcUrls: [
+    '/api/rpc',                                                       // local retry proxy (handles arc-scan rate-limit)
     'https://rpc.arc-scan.org',
     'https://arc-mainnet.infura.io/v3/b6bf7d3508c941499b10025c0776eaf8',
+    'https://thecusp.io/api/arc-rpc',
+    'https://warp-arc-production.up.railway.app/rpc',
   ],
   blockExplorerUrls: ['https://arc-scan.org'],
   factory: '0xf0db7b58379503491d857db50ac9ece64c653918',  // Uniswap V3 Factory
@@ -1713,13 +1881,23 @@ const fmtUsd = n => '$' + fmt(n);
 const shortAddr = a => a ? a.slice(0,6) + '…' + a.slice(-4) : '';
 const seedy = (s) => { let h = 2166136261; for (let i=0;i<s.length;i++){ h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return () => { h = Math.imul(h ^ (h>>>15), 2246822507); h = Math.imul(h ^ (h>>>13), 3266489909); h ^= h>>>16; return (h>>>0)/4294967296; }; };
 
+let toastQueue = [], toastActive = false;
 function toast(msg, type='') {
-  const t = document.createElement('div');
-  t.className = 'toast ' + type;
-  t.textContent = msg;
-  $('toast-wrap').appendChild(t);
-  setTimeout(() => t.remove(), 5000);
+  toastQueue.push({msg, type});
+  if (toastActive) return;
+  toastActive = true;
+  const next = () => {
+    const item = toastQueue.shift();
+    if (!item) { toastActive = false; return; }
+    const t = document.createElement('div');
+    t.className = 'toast ' + (item.type || '');
+    t.textContent = item.msg;
+    $('toast-wrap').appendChild(t);
+    setTimeout(() => { t.remove(); next(); }, item.type === 'err' ? 7000 : 4200);
+  };
+  next();
 }
+
 
 /* ============ chain ABI helpers (no CDN, manual encode) ============ */
 const pad = (hex, bytes=32) => hex.slice(2).padStart(bytes*2, '0');
@@ -1729,7 +1907,7 @@ const intArg = (n, bytes=32) => { let b = BigInt(n); if (b < 0n) b = b + (1n << 
 const tupleHead = fields => { const head = fields.map(f => f.length/2).reduce((a,b)=>a+b,0); let out = '', dyn = []; fields.forEach(f => { out += uintArg(head + 32 * dyn.length); dyn.push(f); }); return out + dyn.join(''); };
 const hexAddr = hex => '0x' + hex.slice(-40);
 
-const RPC_TIMEOUT_MS = 3500;
+const RPC_TIMEOUT_MS = 2200;
 async function rpcFrom(rpcUrl, method, params) {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), RPC_TIMEOUT_MS);
@@ -1739,13 +1917,34 @@ async function rpcFrom(rpcUrl, method, params) {
       body: JSON.stringify({ jsonrpc: '2.0', id: 1, method, params }) });
     if (!r.ok) throw new Error('RPC HTTP ' + r.status);
     const j = await r.json();
-    if (j.error) throw new Error(j.error.message);
+    // Arc's public node returns a structured JSON-RPC error ("unreachable") with a
+    // retry_after_seconds hint when it throttles state reads. Surface the hint so the
+    // caller can back off instead of failing instantly.
+    if (j.error) {
+      const retryAfter = Number((j.error.data && j.error.data.retry_after_seconds) || 0);
+      const err = new Error(j.error.message || 'rpc error');
+      err.retryAfter = retryAfter;
+      throw err;
+    }
     return j.result;
   } finally { clearTimeout(timer); }
 }
+// Retry a single RPC call across all endpoints. Kept deliberately light so a down node
+// doesn't stall the UI: 2 attempts, short timeout, small backoff. When arc-scan is fully
+// unreachable every call fails fast instead of hanging the page for tens of seconds.
+async function rpcWithRetry(method, params, attempts = 2) {
+  let lastErr = new Error('all RPC endpoints failed');
+  for (let i = 0; i < attempts; i++) {
+    try {
+      return await Promise.any(CFG.rpcUrls.map(url => rpcFrom(url, method, params)));
+    } catch (e) { lastErr = e; }
+    // short backoff between rounds; don't wait longer than ~1.2s total
+    await new Promise(r => setTimeout(r, Math.min(1200, 250 * (i + 1))));
+  }
+  throw lastErr;
+}
 async function rpc(method, params) {
-  // Race both public endpoints: one slow/rate-limited node must not stall the UI.
-  try { return await Promise.any(CFG.rpcUrls.map(url => rpcFrom(url, method, params))); }
+  try { return await rpcWithRetry(method, params, 2); }
   catch (e) { throw new Error('all RPC endpoints failed'); }
 }
 async function ethCall(to, data) { return rpc('eth_call', [{ to, data }, 'latest']); }
@@ -1865,12 +2064,12 @@ function applyBackfilledPnl(pos) {
   applyPnlToPosition(pos);
   return pos;
 }
-function recordPnlDeposit(tokenId, contributedUsd, txHash='', mode='mint') {
+function recordPnlDeposit(tokenId, contributedUsd, txHash='', mode='mint', side='') {
   contributedUsd = saneUsd(contributedUsd); if (!(contributedUsd > 0)) return;
   const ledger = readPnlLedger(), key = String(tokenId), old = ledger[key] || {};
   ledger[key] = { ...old, contributedUsd: saneUsd(old.contributedUsd) + contributedUsd,
     claimedUsd: saneUsd(old.claimedUsd), withdrawnUsd: saneUsd(old.withdrawnUsd),
-    mode: old.mode || mode, lastDepositTx: txHash || old.lastDepositTx || '', updatedAt: Date.now() };
+    mode: old.mode || mode, side: old.side || side || '', lastDepositTx: txHash || old.lastDepositTx || '', updatedAt: Date.now() };
   writePnlLedger(ledger);
 }
 
@@ -1891,6 +2090,15 @@ function reducePnlCost(tokenId, pct, withdrawnUsd=0, txHash='') {
 }
 function fmtSignedUsd(n) { return (n >= 0 ? '+' : '-') + fmtUsd(Math.abs(n)); }
 function fmtPnlPct(n) { return (n >= 0 ? '+' : '') + Number(n).toFixed(2) + '%'; }
+
+// #8 — flash a numeric element green/red when its value changes (live jitter feedback).
+// prev/next are raw numbers; direction is derived from the sign of the delta.
+function flashNum(el, prev, next) {
+  if (!el || prev == null || next == null || prev === next) return;
+  el.classList.remove('flash-up', 'flash-down');
+  void el.offsetWidth; // restart animation
+  el.classList.add(next > prev ? 'flash-up' : 'flash-down');
+}
 
 // IERC20 metadata (cached)
 function hexToString(hex) {
@@ -2120,12 +2328,14 @@ function syncTokenMetaFromPools() {
 
 /* ============ RENDERING ============ */
 const token = s => CFG.tokens.find(t=>t.symbol===s) || { symbol:s, decimals:6, color:'#3ddad8', icon:'' };
-const feeName = f => f === 100 ? '0.01%' : f === 500 ? '0.05%' : f === 3000 ? '0.3%' : f === 10000 ? '1%' : (f/10000)+'%';
+const feeName = f => f === 100 ? '0.01%' : f === 500 ? '0.05%' : f === 3000 ? '0.3%' : f === 10000 ? '1%' : ((Number(f || 0) / 10000).toFixed(4).replace(/0+$/, '').replace(/\.$/, '')) + '%';
 const rangeName = (pos) => (pos.tickLower <= -880000 && pos.tickUpper >= 880000) ? 'FULL RANGE' : 'RANGE';
 
-async function loadPositionsUI() {
-  if (!S.address) { S.positions = []; renderPositions(); renderRewards(); renderMonitor(); return; }
-  toast('Reading on-chain positions...');
+async function loadPositionsUI(options={}) {
+  const silent = !!options.silent;
+  if (!S.address) { S.positions = []; renderPositions(); renderRewards(); renderMonitor(); renderRecentTransactions(); return; }
+  ['stTotal','stFees','stShare','stApr'].forEach(id => { const el=$(id); if (el) el.classList.add('skeleton'); });
+  if (!silent) toast('Reading on-chain positions...');
   const raw = await readPositions(S.address);
   syncTokenMetaFromPools();
   // enrich in parallel
@@ -2199,7 +2409,7 @@ async function loadPositionsUI() {
       // live est: share of pool liquidity × 24h volume × fee rate (label "est.")
       if (poolLiq > 0n && poolInfo && poolInfo.tvl > 0) {
         const share = Number(pos.liquidity) / Number(poolLiq);
-        const feeRate = (pos.fee || 3000) / 1000000;
+        const feeRate = Number(pos.fee || 10000) / 1000000;
         pos.feesLive = Math.min(10000, share * (poolInfo.vol || 0) * feeRate);
       } else pos.feesLive = 0;
       pos.feesRaw = { owed0: pos.owed0, owed1: pos.owed1 };
@@ -2208,7 +2418,8 @@ async function loadPositionsUI() {
   }));
   raw.forEach(applyBackfilledPnl);
   S.positions = raw;
-  renderPositions(); renderRewards(); renderMonitor();
+  renderPositions(); renderRewards(); renderMonitor(); renderRecentTransactions();
+  ['stTotal','stFees','stShare','stApr'].forEach(id => { const el=$(id); if (el) el.classList.remove('skeleton'); });
   if (raw.length) toast('Found ' + raw.length + ' position(s) on-chain', 'ok');
   else toast('No LP positions on this wallet', '');
 }
@@ -2219,6 +2430,7 @@ function statCards() {
   const pnl = tracked.reduce((s,x)=>s+x.pnlUsd,0);
   const inRangeCount = S.positions.filter(x => x.tick >= x.tickLower && x.tick < x.tickUpper).length;
   const apr = S.positions.length ? S.positions.reduce((s,x)=>s+x.apr*x.value,0)/Math.max(1,total) : 0;
+  flashNum($('stTotal'), S._total, total);
   $('stTotal').textContent = fmtUsd(total);
   $('stTotalSub').textContent = S.positions.length + ' position' + (S.positions.length===1?'':'s') + (S.address ? '' : ' · connect wallet');
   $('stFees').textContent = tracked.length ? fmtSignedUsd(pnl) : '—';
@@ -2263,26 +2475,83 @@ function groupPositions(list) {
     return bv - av;
   });
 }
+function positionStrategyStatus(p) {
+  const ledger = readPnlLedger();
+  const row = ledger[String(p.tokenId)] || {};
+  if (row.mode !== 'spot-grid') {
+    const active = p.tick >= p.tickLower && p.tick < p.tickUpper;
+    return { label: active ? 'IN RANGE' : 'OUT RANGE', active, out: !active, side: '' };
+  }
+  const active = p.tick >= p.tickLower && p.tick < p.tickUpper;
+  if (active) return { label: row.side ? row.side.toUpperCase() + ' IN RANGE' : 'ACTIVE', active: true, out: false, side: row.side || '' };
+  if (row.side === 'bid') return p.tick >= p.tickUpper
+    ? { label: 'BID READY', active: false, out: false, side: 'bid' }
+    : { label: 'BID OUT RANGE', active: false, out: true, side: 'bid' };
+  if (row.side === 'ask') return p.tick < p.tickLower
+    ? { label: 'ASK READY', active: false, out: false, side: 'ask' }
+    : { label: 'ASK OUT RANGE', active: false, out: true, side: 'ask' };
+  if (p.tick >= p.tickUpper) return { label: 'BID READY', active: false, out: false, side: 'bid' };
+  if (p.tick < p.tickLower) return { label: 'ASK READY', active: false, out: false, side: 'ask' };
+  return { label: 'OUT RANGE', active: false, out: true, side: row.side || '' };
+}
+function healthPct(ticks) {
+  const n = Math.abs(Number(ticks || 0));
+  const pct = (Math.pow(1.0001, Math.min(n, 100000)) - 1) * 100;
+  if (!isFinite(pct)) return '—';
+  if (pct < 0.01) return pct.toFixed(4) + '%';
+  if (pct < 1) return pct.toFixed(2) + '%';
+  return pct.toFixed(1) + '%';
+}
+const SUBSCRIPT_DIGITS = '₀₁₂₃₄₅₆₇₈₉';
+function fmtCompactPrice(n) {
+  n = Number(n);
+  if (!isFinite(n) || n <= 0) return '—';
+  if (n >= 1) return n >= 1000 ? fmt(n, 2) : n.toFixed(n < 10 ? 4 : 2);
+  const exponent = Math.floor(Math.log10(n));
+  const zeros = Math.max(0, -exponent - 1);
+  if (zeros >= 2) {
+    const digits = Number((n * Math.pow(10, zeros + 1)).toPrecision(5)).toString().replace('.', '');
+    return '0.0' + String(zeros).split('').map(x => SUBSCRIPT_DIGITS[Number(x)]).join('') + digits;
+  }
+  return n.toPrecision(5).replace(/0+$/, '').replace(/\.$/, '');
+}
+function tickDisplayPrice(p, tick) {
+  const d0 = p.meta0 ? Number(p.meta0.decimals || 18) : 18;
+  const d1 = p.meta1 ? Number(p.meta1.decimals || 18) : 18;
+  return Math.pow(1.0001, Number(tick)) * Math.pow(10, d0 - d1);
+}
+function positionHealthHtml(p, status) {
+  const span = Math.max(1, p.tickUpper - p.tickLower);
+  const progress = Math.max(0, Math.min(100, (p.tick - p.tickLower) / span * 100));
+  let detail = '';
+  if (status.side === 'bid' && !status.active) detail = status.out ? healthPct(p.tickLower - p.tick) + ' below min' : healthPct(p.tick - p.tickUpper) + ' above max';
+  else if (status.side === 'ask' && !status.active) detail = status.out ? healthPct(p.tick - p.tickUpper) + ' above max' : healthPct(p.tickLower - p.tick) + ' below min';
+  else if (status.active) detail = healthPct(p.tick - p.tickLower) + ' from min · ' + healthPct(p.tickUpper - p.tick) + ' to max';
+  else detail = healthPct(p.tickLower - p.tick) + ' outside range';
+  return `<div class="position-health"><div class="health-head"><span>Position health</span><b>${detail}</b></div><div class="health-track"><i style="width:${progress}%"></i><em style="left:${progress}%"></em></div><div class="health-axis"><span>Min $${fmtCompactPrice(tickDisplayPrice(p, p.tickLower))}</span><span>Current $${fmtCompactPrice(tickDisplayPrice(p, p.tick))}</span><span>Max $${fmtCompactPrice(tickDisplayPrice(p, p.tickUpper))}</span></div></div>`;
+}
 function positionCardHtml(p) {
   const icon0 = p.meta0 && p.meta0.icon ? p.meta0.icon : USDC_ICON;
   const icon1 = p.meta1 && p.meta1.icon ? p.meta1.icon : (p.poolIcon || '');
   const nm = (p.meta0 ? p.meta0.symbol : '?') + ' / ' + (p.meta1 ? p.meta1.symbol : '?');
-  const inRange = p.tick >= p.tickLower && p.tick < p.tickUpper;
+  const status = positionStrategyStatus(p);
+  const inRange = status.active;
   const hasPnl = p.pnlStatus === 'tracked';
   const pnlClass = hasPnl ? (p.pnlUsd >= 0 ? 'text-green' : 'text-red') : 'text-dim';
   const pnlText = hasPnl ? (fmtSignedUsd(p.pnlUsd) + ' · ' + fmtPnlPct(p.pnlPct)) : '—';
-  return `<div class="pos-card" data-tid="${p.tokenId}">
+  return `<div class="pos-card ${status.out ? 'out-range' : ''}" data-tid="${p.tokenId}">
     <div class="pos-top"><div class="pool-id">
       <img class="tkimg" src="${icon0}" alt="" onerror="this.style.display='none'"/>
       <img class="tkimg tk-img-b" src="${icon1}" alt="" onerror="this.style.display='none'; this.outerHTML='<span class=&quot;tk t1&quot;>${(p.meta1?p.meta1.symbol:'?').slice(0,1)}</span>'"/>
       <div><div class="nm">${nm}</div><div class="sub">#${p.tokenId} · ${feeName(p.fee)}</div></div></div>
-      <span class="pool-apr ${inRange ? 'hot' : 'cold'}">${inRange ? 'IN RANGE' : 'OUT RANGE'}</span></div>
+      <span class="pool-apr ${status.out ? 'cold' : 'hot'}">${status.label}</span></div>
     <div class="pos-detail">
       <div class="pd"><div class="k">Value</div><div class="v">${fmtUsd(p.value)}</div></div>
       <div class="pd"><div class="k">PnL</div><div class="v ${pnlClass}"><small>${pnlText}</small></div></div>
       <div class="pd"><div class="k">Fees owed</div><div class="v text-green">${fmtUsd(p.feesUsd)}</div></div>
       <div class="pd"><div class="k">Share</div><div class="v"><small>${fmtSharePct(p)}</small></div></div>
     </div>
+    ${positionHealthHtml(p, status)}
     <div class="share-bar"><i style="width:${inRange ? Math.min(100, Math.max(20, (p.tick - p.tickLower) / (p.tickUpper - p.tickLower) * 100)) : 100}%;background:${inRange ? 'var(--green)' : 'var(--red)'}"></i></div>
     <div class="pos-actions"><button class="px-btn pxa" data-act="add" data-id="${p.tokenId}">Add</button><button class="px-btn pxa" data-act="remove" data-id="${p.tokenId}">Remove</button><button class="px-btn pxa" data-act="claim" data-id="${p.tokenId}">Claim</button></div>
   </div>`;
@@ -2692,7 +2961,7 @@ function renderAddSide() {
   $('detailShare').textContent = share ? (share*100).toFixed(3) + '%' : '—';
   // daily fees = pool 24h volume × pool fee rate × our share of the pool.
   // (No artificial boost — the old `share * 1200` inflated the number ~800x.)
-  const feeBps = (p.fee != null) ? (p.fee / 1000000) : 0.003; // default 0.3% (3000 tier)
+  const feeBps = Number(p.fee != null ? p.fee : 10000) / 1000000;
   const dailyFees = share > 0 ? p.vol * feeBps * share : 0;
   $('detailDaily').textContent = share ? '$' + fmt(Math.max(0, dailyFees)) + '/day' : '—';
   const ratioA = isSingle ? a : a, ratioB = isSingle ? a : (b * (p.b==='USDC'?1:p.priceB));
@@ -2710,7 +2979,7 @@ function renderPosPreview(p, a, b, ourVal, poolTvl, share, feeBps) {
   const el = $('posPreview'); if (!el) return;
   if (!S.address || !a || !b) { el.style.display = 'none'; return; }
   el.style.display = 'block';
-  const feeRate = (p.fee != null ? p.fee : 10000) / 1000000;
+  const feeRate = Number(p.fee != null ? p.fee : 10000) / 1000000;
   const daily = p.vol ? p.vol * feeRate * share : 0;
   $('pvDeposit').textContent = fmt(a) + ' ' + p.a + ' + ' + fmt(b) + ' ' + p.b;
   $('pvShare').textContent = (share*100).toFixed(3) + '%';
@@ -2745,7 +3014,7 @@ function renderTokenBadges(p) {
 /* #7 — pool stats panel (right column) */
 function renderPoolStats(p) {
   const el = $('poolStats'); if (!el) return;
-  const feeBps = (p.fee != null) ? (p.fee / 1000000) : 0.003;
+  const feeBps = Number(p.fee != null ? p.fee : 10000) / 1000000;
   const lpFees = p.vol * feeBps * 0.85;
   const chgCls = (p.chg24||0) >= 0 ? 'up' : 'down';
   el.innerHTML = `
@@ -2753,7 +3022,7 @@ function renderPoolStats(p) {
     <div class="ps-card"><span class="ps-k">Volume 24h</span><span class="ps-v">${fmtUsd(p.vol)}</span></div>
     <div class="ps-card"><span class="ps-k">APR</span><span class="ps-v hot">${(p.apr||0).toFixed(1)}%</span><span class="ps-sub">est. from vol×fee/LP</span></div>
     <div class="ps-card"><span class="ps-k">Price (${p.b})</span><span class="ps-v">${fmt(p.priceB)} ${p.a}</span></div>
-    <div class="ps-card"><span class="ps-k">LP Fees 24h</span><span class="ps-v up">${fmtUsd(lpFees)}</span><span class="ps-sub">${p.fee != null ? feeName(p.fee) : '0.3%'} · 85% to LPs</span></div>
+    <div class="ps-card"><span class="ps-k">LP Fees 24h</span><span class="ps-v up">${fmtUsd(lpFees)}</span><span class="ps-sub">${feeName(Number(p.fee != null ? p.fee : 10000))} · 85% to LPs</span></div>
     <div class="ps-card"><span class="ps-k">24h Change</span><span class="ps-v ${chgCls}">${(p.chg24||0)>=0?'+':''}${(p.chg24||0).toFixed(2)}%</span></div>
     <div class="ps-card ps-wide"><span class="ps-k">Reserves</span><span class="ps-v" style="font-size:.85rem">${fmt(p.reserveA)} ${p.a} / ${fmt(p.reserveB)} ${p.b}</span></div>
   `;
@@ -2836,8 +3105,19 @@ function renderRewards() {
   $('rwList').innerHTML = rows || (S.address ? '<div class="empty" style="box-shadow:none;border:0"><p>No positions — nothing to claim. Add liquidity to start earning swap fees.</p></div>' : '<div class="empty" style="box-shadow:none;border:0"><p>Connect wallet to check claimable fees.</p></div>');
   $('rwNote').textContent = S.address ? 'Wallet: ' + shortAddr(S.address) + ' · reward pool = Uniswap V3 swap fees (auto)' : 'Connect wallet to check rewards';
 }
+function renderRecentTransactions() {
+  const ledger = readPnlLedger(), txs = [];
+  Object.entries(ledger).forEach(([tokenId,row]) => {
+    [['Add LP',row.lastDepositTx],['Remove',row.lastRemoveTx],['Claim',row.lastClaimTx]].forEach(([type,hash]) => {
+      if (hash) txs.push({type,hash,at:row.updatedAt||0,tokenId});
+    });
+  });
+  txs.sort((a,b)=>b.at-a.at);
+  const el = $('recentTxList');
+  if (el) el.innerHTML = txs.slice(0,8).map(x => `<div class="portfolio-tx-row"><div><div class="portfolio-tx-type">${x.type} · #${x.tokenId}</div><div class="portfolio-tx-meta">${x.at ? new Date(x.at).toLocaleString() : 'On-chain activity'}</div></div><a href="${CFG.blockExplorerUrls[0]}/tx/${x.hash}" target="_blank" rel="noopener">View tx ↗</a></div>`).join('') || '<div class="empty"><p>No recent transactions recorded.</p></div>';
+}
 function renderAll() {
-  renderPositions(); renderPoolChips(); renderAddSide(); renderMonitor(); renderRewards();
+  renderPositions(); renderPoolChips(); renderAddSide(); renderMonitor(); renderRewards(); renderRecentTransactions();
 }
 
 /* ============ reusable candle helpers ============ */
@@ -2926,7 +3206,7 @@ async function sendTx(to, data, value='0x0') {
   const tx = await buildGasFields({ from: S.address, to, data, value });
   const hash = await window.ethereum.request({ method: 'eth_sendTransaction', params: [tx] });
   return hash;
-}
+  }
 const TX_POLL_MS = 500;
 async function txReceipt(hash) {
   for (let i=0;i<360;i++) {
@@ -2989,7 +3269,21 @@ async function claimRewardPos(tokenId) {
   busy(false);
 }
 
-// REMOVE — decreaseLiquidity + collect + burn
+function encodeNfpmMulticall(calls) {
+  // multicall(bytes[]) selector: 0xac9650d8
+  const words = [uintArg(32), uintArg(calls.length)];
+  let offset = calls.length * 32;
+  const tails = [];
+  for (const call of calls) {
+    const body = call.replace(/^0x/, '');
+    const padded = body.padEnd(Math.ceil(body.length / 64) * 64, '0');
+    words.push(uintArg(offset));
+    tails.push(uintArg(body.length / 2) + padded);
+    offset += 32 + padded.length / 2;
+  }
+  return '0xac9650d8' + words.join('') + tails.join('');
+}
+// REMOVE — one NFPM multicall: decreaseLiquidity → collect → optional burn
 async function removeLiquidityPos(tokenId, pct) {
   if (!S.address) return toast('Connect wallet first', 'err');
   busy(true);
@@ -2997,28 +3291,20 @@ async function removeLiquidityPos(tokenId, pct) {
     tokenId = BigInt(tokenId);
     const pos = S.positions.find(x => x.tokenId === tokenId);
     if (!pos) throw new Error('position not found');
-    const liqToRemove = (pos.liquidity * BigInt(Math.round(pct*100))) / 10000n;
+    const liqToRemove = (pos.liquidity * BigInt(Math.round(pct * 100))) / 10000n;
+    if (liqToRemove <= 0n) throw new Error('nothing to remove');
     const withdrawnUsd = saneUsd(pos.value) * Math.max(0, Math.min(100, pct)) / 100;
-    const data = '0x0c49ccbe' + uintArg(tokenId) + uintArg(liqToRemove) + uintArg(0) + uintArg(0) + uintArg(deadline());
-    toast('Decreasing liquidity ' + pct + '%...');
-    const h1 = await sendTx(CFG.nfpm, data);
-    const ok1 = await waitTx(h1);
-    if (!ok1) throw new Error('decreaseLiquidity failed');
+    const decrease = '0x0c49ccbe' + uintArg(tokenId) + uintArg(liqToRemove) + uintArg(0) + uintArg(0) + uintArg(deadline());
     const maxU128 = (2n ** 128n - 1n).toString(16).padStart(64, '0');
-    const data2 = '0xfc6f7865' + uintArg(tokenId) + addrArg(S.address) + maxU128 + maxU128;
-    toast('Collecting assets...');
-    const h2 = await sendTx(CFG.nfpm, data2);
-    const ok2 = await waitTx(h2);
-    if (!ok2) throw new Error('collect after decrease failed');
-    // burn if fully removed
-    if (pct >= 99.5) {
-      toast('Burning position...');
-      const h3 = await sendTx(CFG.nfpm, '0x42966c68' + uintArg(tokenId));
-      await waitTx(h3);
-    }
-    reducePnlCost(tokenId, pct, withdrawnUsd, h2);
+    const collect = '0xfc6f7865' + uintArg(tokenId) + addrArg(S.address) + maxU128 + maxU128;
+    const calls = [decrease, collect];
+    if (pct >= 99.5) calls.push('0x42966c68' + uintArg(tokenId));
+    toast('Removing liquidity...');
+    const hash = await sendTx(CFG.nfpm, encodeNfpmMulticall(calls));
+    if (!await waitTx(hash)) throw new Error('remove transaction reverted');
+    reducePnlCost(tokenId, pct, withdrawnUsd, hash);
     toast('Liquidity removed ' + pct + '%', 'ok');
-    await loadPositionsUI();
+    try { await loadPositionsUI(); } catch (refreshErr) { toast('Liquidity removed; refresh Positions manually.', ''); }
   } catch (e) { toast('Remove failed: ' + e.message, 'err'); }
   busy(false);
 }
@@ -3027,8 +3313,8 @@ async function busy(on){ S.txBusy = on; ['btnAdd','btnClaimAll','rmConfirm','adC
 
 /* ============ Add Liquidity modal (real V3 mint/increaseLiquidity) ============ */
 let addMode = 'mint', addPoolObj = null;
-let binMode = false;   // true = BINS grid strategy
-let binPlan = [];      // [{tl, tu, amt0, amt1}] generated plan
+let binMode = false;   // true = continuous BID/ASK strategy
+let binPlan = [];      // [{tl, tu, amt0, amt1, side}] — max two V3 positions
 const SPOT_PLAN_CACHE_MS = 12000;
 const SPOT_LIVE_POLL_MS = 1000;
 const spotPoolCache = new Map();
@@ -3079,7 +3365,28 @@ async function getSpotPoolContext(tokenA, tokenB, feeHint=0, poolHint=null, forc
 function spotBinSide(tl, tu, currentTick) {
   if (tu <= currentTick) return 'bid';
   if (tl > currentTick) return 'ask';
-  return 'active';
+  return (currentTick - tl) < (tu - currentTick) ? 'bid' : 'ask';
+}
+function spotContinuousPlan(tickS, tickR, currentTick, spacing, amtUsd, poolInfo, priceNow, tokenDecimals, usdcIsToken0) {
+  const current = Math.max(tickS + spacing, Math.min(tickR - spacing, currentTick - mod(currentTick, spacing)));
+  const ranges = [
+    { tl: tickS, tu: current, side: 'bid' },
+    { tl: current, tu: tickR, side: 'ask' }
+  ].filter(x => x.tl < x.tu);
+  const perSideUsd = amtUsd / Math.max(1, ranges.length);
+  return ranges.map(sg => {
+    const oneL = spotRangeAmounts(1, sg.tl, sg.tu, currentTick);
+    const token0Usd = usdcIsToken0 ? 1 : priceNow;
+    const token1Usd = usdcIsToken0 ? priceNow : 1;
+    const valuePerL = oneL.amount0 / Math.pow(10, poolInfo.token0.toLowerCase() === USDC_ADDR ? 6 : tokenDecimals) * token0Usd
+      + oneL.amount1 / Math.pow(10, poolInfo.token1.toLowerCase() === USDC_ADDR ? 6 : tokenDecimals) * token1Usd;
+    const liquidity = valuePerL > 0 ? perSideUsd / valuePerL : 0;
+    const amounts = spotRangeAmounts(liquidity, sg.tl, sg.tu, currentTick);
+    let pool0 = BigInt(Math.max(0, Math.floor(amounts.amount0)));
+    let pool1 = BigInt(Math.max(0, Math.floor(amounts.amount1)));
+    return { ...sg, amt0: usdcIsToken0 ? pool0 : pool1, amt1: usdcIsToken0 ? pool1 : pool0,
+      midTick: Math.floor((sg.tl + sg.tu) / 2), poolToken0: poolInfo.token0, poolToken1: poolInfo.token1 };
+  });
 }
 function spotWeights(tl, tu, currentTick) {
   const side = spotBinSide(tl, tu, currentTick);
@@ -3106,6 +3413,25 @@ function spotRangeAmounts(liquidity, tl, tu, currentTick) {
   if (currentTick <= tl) return { amount0: liquidity * (sb - sa) / (sa * sb), amount1: 0 };
   if (currentTick >= tu) return { amount0: 0, amount1: liquidity * (sb - sa) };
   return { amount0: liquidity * (sb - sp) / (sp * sb), amount1: liquidity * (sp - sa) };
+}
+// Build exactly two non-overlapping continuous V3 ranges: BID below spot and ASK above spot.
+function spotContinuousPlan(tickS, tickR, curTick, spacing, totalUsd, poolInfo, priceNow, tokenDecimals, usdcIsToken0) {
+  const pivot = Math.max(tickS + spacing, Math.min(tickR - spacing, Math.round(curTick / spacing) * spacing));
+  const ranges = [{ tl: tickS, tu: pivot, side: 'bid' }, { tl: pivot, tu: tickR, side: 'ask' }];
+  const token0Usd = usdcIsToken0 ? 1 : priceNow, token1Usd = usdcIsToken0 ? priceNow : 1;
+  const dec0 = usdcIsToken0 ? 6 : tokenDecimals, dec1 = usdcIsToken0 ? tokenDecimals : 6;
+  const halfUsd = Math.max(0, Number(totalUsd) / 2);
+  return ranges.map(r => {
+    const one = spotRangeAmounts(1, r.tl, r.tu, pivot);
+    const valuePerL = one.amount0 / 10 ** dec0 * token0Usd + one.amount1 / 10 ** dec1 * token1Usd;
+    const L = valuePerL > 0 ? halfUsd / valuePerL : 0;
+    const amounts = spotRangeAmounts(L, r.tl, r.tu, pivot);
+    const pool0 = BigInt(Math.max(0, Math.floor(amounts.amount0)));
+    const pool1 = BigInt(Math.max(0, Math.floor(amounts.amount1)));
+    const amt0 = usdcIsToken0 ? pool0 : pool1;
+    const amt1 = usdcIsToken0 ? pool1 : pool0;
+    return { ...r, midTick: pivot, amt0, amt1, poolToken0: poolInfo.token0, poolToken1: poolInfo.token1 };
+  });
 }
 function fitSpotPlanToDeposits(plan, availableA, availableB, allowPartial=false) {
   if (allowPartial) {
@@ -3137,8 +3463,8 @@ function setAddBinMode(mode) {
   $('binBox').style.display = binMode ? '' : 'none';
   $('adPosWrap').style.display = binMode ? 'none' : '';
   $('adRangeWrap').style.display = binMode ? 'none' : '';
-  $('adSub').textContent = binMode ? 'Spot Grid splits capital across consecutive V3 ranges' : 'Uniswap V3 · deposit both tokens';
-  $('adConfirm').textContent = binMode ? 'Mint N Positions' : 'Mint Position';
+  $('adSub').textContent = binMode ? 'Two continuous ranges around the current price' : 'Uniswap V3 · deposit both tokens';
+  $('adConfirm').textContent = binMode ? 'Mint BID + ASK Positions' : 'Mint Position';
   if (binMode) { planBins({ forceLive: true }); startSpotLivePricing(); }
   else { stopSpotLivePricing(); if (addPoolObj) drawRangeChart(addPoolObj, $('adRange').value); }
 }
@@ -3158,7 +3484,7 @@ async function planBins(options={}) {
   };
   const a = parseFloat($('amtA').value) || 0, b = parseFloat($('amtB').value) || 0;
   if (a <= 0 && b <= 0) { resetBinSummary('Enter amount'); $('binHint').textContent = 'Enter your deposit amount (Amount A / B) first.'; renderBinsBar([], 0); return; }
-  const count = Math.max(2, Math.min(40, parseInt($('binCount').value) || 10));
+  const count = 2;
   // Resolve the real pool first: ticks and token order must come from chain, never from indexer price.
   const feeHint = p.fee || (CUSTOM_POOL && CUSTOM_POOL.fee) || 10000;
   const knownToken = CFG.tokens.find(x => x.symbol === p.tok1 || x.symbol === p.b);
@@ -3176,10 +3502,17 @@ async function planBins(options={}) {
   p.poolToken0 = poolInfo.token0; p.poolToken1 = poolInfo.token1; p.tokenDecimals = tokenDecimals; p.usdcIsToken0 = usdcIsToken0;
   // User enters distance from current price in percent; prices are derived automatically.
   const sVal = parseFloat($('binSupport').value), rVal = parseFloat($('binResist').value);
+  const enteredSPrice = parseFloat($('binSupportPrice').value), enteredRPrice = parseFloat($('binResistPrice').value);
   const supportPct = isNaN(sVal) || sVal <= 0 ? 10 : Math.min(95, sVal);
   const resistancePct = isNaN(rVal) || rVal <= 0 ? 10 : Math.min(1000, rVal);
-  const sPrice = priceNow * (1 - supportPct / 100);
-  const rPrice = priceNow * (1 + resistancePct / 100);
+  const sPrice = Number.isFinite(enteredSPrice) && enteredSPrice > 0 ? enteredSPrice : priceNow * (1 - supportPct / 100);
+  const rPrice = Number.isFinite(enteredRPrice) && enteredRPrice > 0 ? enteredRPrice : priceNow * (1 + resistancePct / 100);
+  const syncedSupportPct = Math.max(0.1, Math.min(95, (1 - sPrice / priceNow) * 100));
+  const syncedResistancePct = Math.max(0.1, Math.min(1000, (rPrice / priceNow - 1) * 100));
+  $('binSupport').value = syncedSupportPct.toFixed(2).replace(/\.00$/, '');
+  $('binResist').value = syncedResistancePct.toFixed(2).replace(/\.00$/, '');
+  $('binSupportPrice').value = priceFull(sPrice);
+  $('binResistPrice').value = priceFull(rPrice);
   if ($('binCurrent')) $('binCurrent').querySelector('strong').textContent = '$' + priceFull(priceNow);
   if (!(priceNow > 0) || !(sPrice > 0) || sPrice >= rPrice) { resetBinSummary('Invalid range'); $('binHint').textContent = 'Unable to calculate this range from the current price.'; renderBinsBar([], curTick); return; }
   const rawSupportTick = tokenUsdToTick(sPrice, tokenDecimals, usdcIsToken0);
@@ -3191,20 +3524,8 @@ async function planBins(options={}) {
   const tickS = tickS0 - mod(tickS0, spacing);
   let tickR = tickR0 - mod(tickR0, spacing);
   if (tickR <= tickS) tickR = tickS + spacing;
-  // split log-space jadi N segmen, align ke spacing (Arc NFPM enforce tick % spacing == 0)
-  const span = tickR - tickS;
-  const step = Math.max(spacing, Math.floor(span / count / spacing) * spacing);
-  const segs = [];
-  let t = tickS;
-  while (t < tickR && segs.length < count) {
-    let u = Math.min(tickR, t + step);
-    // align lower ke spacing (Arc enforce)
-    u = u - mod(u, spacing);
-    if (u - t < spacing) u = Math.min(tickR, t + spacing - mod(t + spacing, spacing));
-    if (u <= t) break;
-    segs.push({ tl: t, tu: Math.min(tickR, u) });
-    t = Math.min(tickR, u);
-  }
+  // Continuous two-range plan: one BID range and one ASK range. No bins.
+  const segs = [{ tl: tickS, tu: tickR }];
   if (!segs.length) { $('binHint').textContent = 'Failed to generate bins.'; renderBinsBar([], curTick); return; }
   // Build each V3 range from liquidity math, then fit the entire plan to the exact entered deposits.
   const tokASym = p.tok0, tokBSym = p.tok1;
@@ -3214,7 +3535,9 @@ async function planBins(options={}) {
   const availableB = BigInt(Math.floor(b * 10 ** decB));
   const totalUsd = (tokASym.toLowerCase() === 'usdc' ? a : a * priceNow) + (tokBSym.toLowerCase() === 'usdc' ? b : b * priceNow);
   const perBinUsd = totalUsd / segs.length;
-  const provisional = segs.map(sg => {
+  const provisional = spotContinuousPlan(tickS, tickR, curTick, spacing, totalUsd, poolInfo, priceNow, tokenDecimals, usdcIsToken0);
+  /* legacy per-bin planner disabled */
+  const legacyProvisional = []; /* segs.map(sg => {
     const midTick = Math.floor((sg.tl + sg.tu) / 2);
     const side = spotBinSide(sg.tl, sg.tu, curTick);
     const oneL = spotRangeAmounts(1, sg.tl, sg.tu, curTick);
@@ -3232,10 +3555,11 @@ async function planBins(options={}) {
     if (side === 'bid') amt0 = 0n;
     else if (side === 'ask') amt1 = 0n;
     return { tl: sg.tl, tu: sg.tu, amt0, amt1, midTick, side, poolToken0: poolInfo.token0, poolToken1: poolInfo.token1 };
-  });
-  // Preserve the amounts the user entered. If only one token side can fund this range,
-  // keep the compatible BID/ASK bins instead of rejecting the entire grid as a bad mix.
-  const fit = fitSpotPlanToDeposits(provisional, availableA, availableB, true);
+  }); */
+  // Preserve the entered deposit while funding the two continuous ranges.
+  // BID/ASK positions are deliberately one-sided at the current price. Keep
+  // both legs in the plan instead of dropping the inactive-side range.
+  const fit = fitSpotPlanToDeposits(provisional, availableA, availableB, false);
   binPlan = fit.fitted.filter(x => x.amt0 > 0n || x.amt1 > 0n);
   if (binPlan.length < 1) { resetBinSummary('No fundable ranges'); $('binHint').textContent = 'Cannot fund any position with the entered token amounts.'; renderBinsBar([], curTick); return; }
   const { requiredA, requiredB } = validateSpotPlan(binPlan, availableA, availableB, spacing);
@@ -3245,10 +3569,9 @@ async function planBins(options={}) {
   $('binHint').textContent = 'Uses ' + fmtCoin(usedA, decA) + ' ' + tokASym + ' + ' + fmtCoin(usedB, decB) + ' ' + tokBSym
     + (unusedA > 0n || unusedB > 0n ? ' · Unused ' + fmtCoin(unusedAText, decA) + ' ' + tokASym + ' + ' + fmtCoin(unusedBText, decB) + ' ' + tokBSym : ' · Fully allocated');
   $('binSummaryRange').textContent = '$' + priceFull(sPrice) + ' → $' + priceFull(rPrice);
-  const activeCount = binPlan.filter(x => x.side === 'active').length;
   const bidCount = binPlan.filter(x => x.side === 'bid').length;
   const askCount = binPlan.filter(x => x.side === 'ask').length;
-  $('binSummaryPositions').textContent = bidCount + ' BID · ' + activeCount + ' ACTIVE · ' + askCount + ' ASK';
+  $('binSummaryPositions').textContent = bidCount + ' BID RANGE · ' + askCount + ' ASK RANGE';
   const effectiveUsd = (tokASym.toLowerCase() === 'usdc' ? usedA : usedA * priceNow) + (tokBSym.toLowerCase() === 'usdc' ? usedB : usedB * priceNow);
   $('binSummaryEach').textContent = '$' + effectiveUsd.toFixed(2) + ' total';
   const inRange = priceNow >= sPrice && priceNow <= rPrice;
@@ -3300,7 +3623,7 @@ function renderBinsBar(segs, curTick, sPct, rPct, priceNow) {
     const spanD = Math.max(1, tu - tl);
     const dL = tl - spanD * 0.22, dR = tu + spanD * 0.22;
     const X = t => (t - dL) / (dR - dL) * W;
-    // bin blocks
+    // BID and ASK continuous range bands (no per-bin blocks)
     segs.forEach((sg, i) => {
       const isLast = i === segs.length - 1;
       const inRange = isLast ? (curTick >= sg.tl && curTick <= sg.tu) : (curTick >= sg.tl && curTick < sg.tu);
@@ -3315,21 +3638,16 @@ function renderBinsBar(segs, curTick, sPct, rPct, priceNow) {
       rect.setAttribute('stroke-width', '1');
       const ttl = document.createElementNS(NS, 'title');
       const zone = spotBinSide(sg.tl, sg.tu, curTick);
-      ttl.textContent = zone === 'bid' ? 'BID · USDC only' : zone === 'ask' ? 'ASK · Token only' : 'ACTIVE · both assets';
-      ttl.textContent += ' · bin ' + (i + 1) + ' · tick ' + sg.tl + ' → ' + sg.tu + (inRange ? ' · CURRENT PRICE' : '');
+      ttl.textContent = zone === 'bid' ? 'BID · USDC only' : 'ASK · Token only';
+      ttl.textContent += ' · continuous range · tick ' + sg.tl + ' → ' + sg.tu + (inRange ? ' · CURRENT PRICE' : '');
       rect.appendChild(ttl);
       svg.appendChild(rect);
     });
-    // kurva harga + area gradient
-    let pathD = '', areaD = '';
-    for (let i = 0; i <= 60; i++) {
-      const t = dL + (dR - dL) * (i / 60);
-      const x = X(t);
-      const y = CH - (0.18 + 0.64 * (t - dL) / (dR - dL)) * CH;
-      pathD += (i === 0 ? 'M' : 'L') + x.toFixed(1) + ' ' + y.toFixed(1) + ' ';
-      areaD += (i === 0 ? 'M' : 'L') + x.toFixed(1) + ' ' + y.toFixed(1) + ' ';
-    }
-    areaD += 'L' + W + ' ' + CH + ' L0 ' + CH + ' Z';
+    // Explicit two-sided depth: separate BID/ASK areas with a current-price separator.
+    const center = Math.max(0, Math.min(W, X(curTick)));
+    const areaD = 'M0 0 L' + center.toFixed(1) + ' ' + (CH * .84).toFixed(1) + ' L' + center.toFixed(1) + ' 0 Z'
+      + ' M' + center.toFixed(1) + ' 0 L' + center.toFixed(1) + ' ' + (CH * .84).toFixed(1) + ' L' + W + ' 0 Z';
+    const pathD = 'M0 0 L' + center.toFixed(1) + ' ' + (CH * .84).toFixed(1) + ' L' + W + ' 0';
     const area = document.createElementNS(NS, 'path');
     area.setAttribute('d', areaD); area.setAttribute('fill', 'url(#binArea)');
     svg.appendChild(area);
@@ -3486,7 +3804,7 @@ function openAddModal() {
   $('adPosWrap').style.display = ''; $('adRangeWrap').style.display = '';
   $('adSub').textContent = 'Uniswap V3 · deposit both tokens';
   $('adConfirm').textContent = 'Mint Position';
-  $('binCount').value = 10; $('binSupport').value = '10'; $('binResist').value = '10';
+  $('binCount').value = 2; $('binSupport').value = '10'; $('binResist').value = '10'; $('binSupportPrice').value = ''; $('binResistPrice').value = '';
   $('modalAdd').classList.add('open');
   drawRangeChart(addPoolObj, $('adRange').value);
 }
@@ -3550,6 +3868,7 @@ async function drawRangeChart(p, rangeKey) {
 async function confirmAddModal() {
   if (!addPoolObj || !S.address) return;
   busy(true);
+  let mintedCount = 0;
   try {
     const a = parseFloat($('amtA').value) || 0, b = parseFloat($('amtB').value) || 0;
     const p = addPoolObj;
@@ -3622,7 +3941,7 @@ async function confirmAddModal() {
 
     let hash;
     if (binMode) {
-      // SPOT GRID — mint N narrow V3 positions (BID / ACTIVE / ASK allocation)
+      // SPOT GRID — mint the continuous BID / ASK V3 ranges
       if (!binPlan || binPlan.length < 1) throw new Error('Generate ranges first — set deposit amount then pick Spot Grid');
       if (!tokAAddr || !tokBAddr) throw new Error('Pool address not resolved');
       const executionPlan = binPlan.map(x => ({ ...x }));
@@ -3639,8 +3958,6 @@ async function confirmAddModal() {
         executionPlan.splice(0, executionPlan.length, ...binPlan.map(x => ({ ...x })));
       }
       validateSpotPlan(executionPlan, BigInt(Math.floor(a * 10 ** decA)), BigInt(Math.floor(b * 10 ** decB)), spacing);
-      const slip = (parseFloat($('slippageSel').value) || 1.0);
-      const slipRate = 1 - (slip / 100);
       const deadline = Math.floor(Date.now()/1000) + 1800;
       let done = 0;
       const minted = [];
@@ -3651,24 +3968,25 @@ async function confirmAddModal() {
       for (const bin of executionPlan) {
         let a0wei = bin.amt0, a1wei = bin.amt1;
         if (ord.token0.toLowerCase() === bL && ord.token1.toLowerCase() === aL) { a0wei = bin.amt1; a1wei = bin.amt0; }
-        const sMin0 = BigInt(Math.max(0, Math.floor(Number(a0wei) * slipRate)));
-        const sMin1 = BigInt(Math.max(0, Math.floor(Number(a1wei) * slipRate)));
-        const data = encodeMint(ord.token0, ord.token1, ord.fee || feeTier, bin.tl, bin.tu, a0wei, a1wei, S.address, deadline, sMin0, sMin1);
-        toast('Minting bin ' + (done+1) + '/' + executionPlan.length + '…');
+        // One-sided BID/ASK position: no minimum consumed amount. The NFPM
+        // uses the live composition; any unused desired asset stays in wallet.
+        const data = encodeMint(ord.token0, ord.token1, ord.fee || feeTier, bin.tl, bin.tu, a0wei, a1wei, S.address, deadline, 0n, 0n);
+        toast('Minting ' + (bin.side === 'bid' ? 'BID' : 'ASK') + ' range…');
         hash = await sendTx(CFG.nfpm, data);
         const receipt = await txReceipt(hash);
         if (!receipt) throw new Error('bin ' + (done+1) + ' failed ' + shortAddr(hash));
+        mintedCount++;
         const ids = extractNfpmTokenIds(receipt, S.address);
         if (ids.length !== 1) throw new Error('cannot resolve minted position id for bin ' + (done+1));
         const binUsd = saneUsd(Number(bin.amt0) / 10 ** decA * priceOf(tokASym)
           + Number(bin.amt1) / 10 ** decB * priceOf(tokBSym));
-        minted.push({ tokenId: ids[0], usd: binUsd, txHash: hash });
+        minted.push({ tokenId: ids[0], usd: binUsd, txHash: hash, side: bin.side });
         done++;
       }
-      minted.forEach(x => recordPnlDeposit(x.tokenId, x.usd || (usedTotalUsd / Math.max(1, minted.length)), x.txHash, 'spot-grid'));
+      minted.forEach(x => recordPnlDeposit(x.tokenId, x.usd || (usedTotalUsd / Math.max(1, minted.length)), x.txHash, 'spot-grid', x.side));
       toast('Minted ' + done + ' positions ✓', 'ok');
       closeAddModal();
-      await loadPositionsUI();
+      try { await loadPositionsUI(); } catch (refreshErr) { toast('BID/ASK minted; refresh positions manually.', ''); }
       busy(false);
       return;
     } else if (existingId) {
@@ -3718,15 +4036,25 @@ async function confirmAddModal() {
       hash = await sendTx(CFG.nfpm, data);
       const receipt = await txReceipt(hash);
       if (!receipt) throw new Error('tx failed ' + shortAddr(hash));
+      mintedCount++;
       const ids = extractNfpmTokenIds(receipt, S.address);
       if (ids.length !== 1) throw new Error('cannot resolve minted position id');
       recordPnlDeposit(ids[0], depositUsd, hash, isSingle ? 'one-asset' : 'mint');
     }
     closeAddModal();
-    await loadPositionsUI();
     toast('Liquidity added ✓', 'ok');
-  } catch (e) { toast('Add failed: ' + e.message, 'err'); if (binMode && $('modalAdd').classList.contains('open')) startSpotLivePricing(); }
-  busy(false);
+    try { await loadPositionsUI(); } catch (refreshErr) { toast('Position minted; refresh positions manually.', ''); }
+    } catch (e) {
+      if (mintedCount > 0) {
+        closeAddModal();
+        toast(mintedCount + ' position' + (mintedCount === 1 ? '' : 's') + ' minted successfully; refresh the Positions tab.', 'ok');
+        try { await loadPositionsUI(); } catch (refreshErr) {}
+      } else {
+        toast('Add failed: ' + e.message, 'err');
+        if (binMode && $('modalAdd').classList.contains('open')) startSpotLivePricing();
+      }
+    }
+    busy(false);
 }
 function computeLiquidityFromAmount(usdAmt, aAddr, bAddr, fee, tLower, tUpper) {
   // crude estimate: assume full-range-ish position. For robustness return a 
@@ -3962,6 +4290,34 @@ $('binTabBins').addEventListener('click', () => setAddBinMode('bins'));
 $('binCount').addEventListener('input', schedulePlanBins);
 $('binSupport').addEventListener('input', schedulePlanBins);
 $('binResist').addEventListener('input', schedulePlanBins);
+function syncRangeInput(side, source) {
+  const p = addPoolObj && Number(addPoolObj.priceB);
+  if (!(p > 0)) return;
+  const priceEl = $(side === 'support' ? 'binSupportPrice' : 'binResistPrice');
+  const pctEl = $(side === 'support' ? 'binSupport' : 'binResist');
+  if (source === 'price') {
+    const price = parseFloat(priceEl.value);
+    if (!(price > 0)) return;
+    pctEl.value = (side === 'support' ? (1 - price / p) * 100 : (price / p - 1) * 100).toFixed(2).replace(/\.00$/, '');
+  } else {
+    const pct = parseFloat(pctEl.value);
+    if (!(pct > 0)) return;
+    const price = side === 'support' ? p * (1 - pct / 100) : p * (1 + pct / 100);
+    priceEl.value = priceFull(price);
+  }
+  schedulePlanBins();
+}
+['support','resist'].forEach(side => {
+  $(side === 'support' ? 'binSupportPrice' : 'binResistPrice').addEventListener('input', () => syncRangeInput(side, 'price'));
+  $(side === 'support' ? 'binSupport' : 'binResist').addEventListener('input', () => syncRangeInput(side, 'pct'));
+});
+document.querySelectorAll('[data-range-step]').forEach(btn => btn.addEventListener('click', () => {
+  const side = btn.dataset.rangeStep;
+  const pct = $(side === 'support' ? 'binSupport' : 'binResist');
+  const step = Number(pct.step || .1) * (btn.dataset.step === 'up' ? 1 : -1);
+  pct.value = Math.max(Number(pct.min || .1), Number(pct.value || 10) + step).toFixed(2).replace(/\.00$/, '');
+  syncRangeInput(side, 'pct');
+}));
 document.querySelectorAll('.max-btn').forEach(b=>b.addEventListener('click', async ()=>{
   const side = b.dataset.max;
   const p = currentPool(); if (!p) return;
@@ -4066,7 +4422,8 @@ window.addEventListener('load', async ()=>{
       S.pools = buildPoolsFromRadar(l);
       syncTokenMetaFromPools();
       renderPoolChips(); renderAddSide(); renderMonitor(); renderSwap(false);
-      if (S.address) await loadPositionsUI();
+      // Keep wallet positions stable during background market refresh.
+      // Positions refresh only after an explicit wallet action or manual refresh.
     }
   }, 60000);
 });
@@ -4290,13 +4647,15 @@ function fillVeloStrip(flows) {
   if (outEl) outEl.textContent = '-$' + fmt(outflow);
   const net = inflow - outflow;
   if (netEl) { netEl.textContent = (net >= 0 ? 'NET +$' : 'NET -$') + fmt(Math.abs(net)); netEl.className = 'velo-net ' + (net >= 0 ? 'pos' : 'neg'); }
-  // strip: proportional green(up/inflow) vs red(down/outflow) bars
+  // strip: proportional green(up/inflow) vs red(down/outflow) bars, staggered-in
   if (strip) {
     const seg = 26, total = inflow + outflow;
+    const upCount = total > 0 ? Math.round(seg * inflow / total) : Math.round(seg / 2);
     let html = '';
     for (let i = 0; i < seg; i++) {
-      const isUp = total > 0 ? (i < Math.round(seg * inflow / total)) : Math.random() > 0.5;
-      html += `<i class="${isUp ? 'up' : 'down'}"></i>`;
+      const isUp = i < upCount;
+      const delay = (i * 18) + 'ms';
+      html += `<i class="${isUp ? 'up' : 'down'}" style="animation:veloPop .45s ease ${delay} both"></i>`;
     }
     strip.innerHTML = html;
   }
@@ -4386,8 +4745,15 @@ function renderToolsFeed(swaps) {
     const flash = flashSet.has(tx) ? (' flash-' + (side === 'buy' ? 'buy' : 'sell')) : '';
     const wh = val >= whThresh ? ' whale' : '';
     const ago = timeAgo(r.time);
+    const sym = r.symbol || '?';
+    // resolve token logo: RadarDex token meta by address, else letter fallback
+    const tokMeta = radarTokenByAddress(r.token);
+    const icon = tokMeta && tokMeta.icon && tokMeta.icon !== '/' ? tokMeta.icon : '';
+    const tokLogo = icon
+      ? `<span class="fp-tok"><img src="${icon}" alt="" loading="lazy" onerror="this.outerHTML='<span class=&quot;fp-tok&quot;>${(sym[0]||'?').toUpperCase()}</span>'"/></span>`
+      : `<span class="fp-tok">${(sym[0] || '?').toUpperCase()}</span>`;
     html += `<div class="feed-row${wh}${flash}">
-      <span class="fp"><span class="fp-pair">USDC / ${r.symbol || '?'}</span><small>${ago ? ago + ' ago' : ''}</small></span>
+      <span class="fp">${tokLogo}<span class="fp-txt"><span class="fp-pair">USDC / ${sym}</span><small>${ago ? ago + ' ago' : ''}</small></span></span>
       <span class="fv">${fmtUsd(val)}</span>
       <span class="ft ${side === 'buy' ? 'buy' : 'sell'}">${side === 'buy' ? 'BUY' : 'SELL'}</span>
       <a class="fx" href="https://arc-scan.org/tx/${tx}" target="_blank" rel="noopener noreferrer" title="${tx}">${shortAddr(tx)}</a>
