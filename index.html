@@ -1992,7 +1992,7 @@ const CFG = {
     'https://rpc.arc-scan.org',                                   // public node (rate-limited)
     '/api/rpc',                                                   // local retry proxy (dev only — no-op in prod)
   ],
-  blockExplorerUrls: ['https://arc-scan.org'],
+  blockExplorerUrls: ['https://explorer.arc.io'],
   factory: '0xf0db7b58379503491d857db50ac9ece64c653918',  // Uniswap V3 Factory
   router:  '0x53bf6b0684ec7ef91e1387da3d1a1769bc5a6f77',   // SwapRouter02
   nfpm:    '0x39654A85A4C05127f5Fd6ED22CAeC077A0fB1377',   // NonfungiblePositionManager (verified, totalSupply 4221)
@@ -5145,7 +5145,7 @@ function renderToolsFeed(swaps) {
       <span class="fp">${tokLogo}<span class="fp-txt"><span class="fp-pair">USDC / ${sym}</span><small>${ago ? ago + ' ago' : ''}</small></span></span>
       <span class="fv ${side}">${fmtUsd(val)}</span>
       <span class="ft ${side === 'buy' ? 'buy' : 'sell'}">${side === 'buy' ? 'BUY' : 'SELL'}</span>
-      <a class="fx" href="https://arc-scan.org/tx/${tx}" target="_blank" rel="noopener noreferrer" title="${tx}">${shortAddr(tx)}</a>
+      <a class="fx" href="${CFG.blockExplorerUrls[0]}/tx/${tx}" target="_blank" rel="noopener noreferrer" title="${tx}">${shortAddr(tx)}</a>
     </div>`;
   });
   if (empty) empty.style.display = 'none';
