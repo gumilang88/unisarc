@@ -1787,7 +1787,7 @@ a.px-btn{display:inline-block;text-align:center;text-decoration:none;width:auto}
 
       <!-- FEATURE · PAIRS SCREENER (full width) -->
       <div class="px-card tools-card scr-card">
-        <div class="card-title"><h2>Pairs Screener</h2><span class="hint" id="scrLive">TOP 50 · LIVE</span></div>
+        <div class="card-title"><h2>Pairs Screener</h2><span class="hint" id="scrLive">TOP 500 · LIVE</span></div>
         <p class="tools-sub">Sortable table of USDC pairs. Click a header to sort; click a row to jump to Add LP for that pool.</p>
         <div class="scr-wrap">
           <table class="scr-table" id="scrTable">
@@ -5354,13 +5354,15 @@ async function loadMomTokens() {
   try {
     const ctrl = new AbortController();
     const t = setTimeout(() => ctrl.abort(), 9000);
-    const r = await fetch(RADAR_API + '/tokens?sort=volume24&dir=desc&limit=100&window=24h', { signal: ctrl.signal });
+    // Full 500-token market window (not top-50) so the screener + pool-quality scanner
+    // see every token RadarDex returns — consistent with the rest of the dashboard.
+    const r = await fetch(RADAR_API + '/tokens?sort=volume24&dir=desc&limit=500&window=24h', { signal: ctrl.signal });
     clearTimeout(t);
     if (!r.ok) throw new Error('http ' + r.status);
     const j = await r.json();
     const toks = (j && j.tokens) || j;
     if (!Array.isArray(toks)) throw new Error('bad payload');
-    _momToks = toks.slice(0, 50);
+    _momToks = toks;
     _momLoaded = true;
   } catch (e) {
     if (_momToks) return _momToks;
@@ -5498,7 +5500,7 @@ function renderSmBody() {
   });
   const rows = all;
   if (!rows.length) { body.innerHTML = '<tr><td class="scr-none" colspan="9"><span class="skel-line w60"></span></td></tr>'; return; }
-  body.innerHTML = rows.slice(0, 100).map(t => {
+  body.innerHTML = rows.slice(0, 500).map(t => {
     const c24 = t.change24h;
     const up = (c24 || 0) >= 0;
     const icon = t.icon ? `<img src="${t.icon}" alt="" loading="lazy" onerror="this.style.display='none'"/>` : '';
