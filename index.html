@@ -5,10 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>UNISARC - LP Dashboard</title>
 <!-- Hidden until the active view is set from the URL hash — avoids any flash/jump to Positions on refresh -->
-<style>html{visibility:hidden}</style>
+<style>html{visibility:hidden}body{opacity:0;transition:opacity .15s ease}html.js-ready body{opacity:1}</style>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+<noscript><link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" /></noscript>
 <link rel="icon" type="image/png" href="assets/unisarc-favicon.png" />
 <link rel="apple-touch-icon" href="assets/unisarc-icon-180.png" />
 <link rel="icon" type="image/png" sizes="180x180" href="assets/unisarc-icon-180.png" />
@@ -353,6 +355,42 @@ main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 3rem}
 .scr-table td.sym-main{display:flex;align-items:center;gap:.35rem}
 .scr-table td img{width:16px;height:16px;border:1px solid #000;background:#fff;object-fit:cover}
 .scr-table td small{color:rgba(255,255,255,.4);font-family:var(--vt);font-size:10px}
+/* ---- token explorer ---- */
+.expl-card{margin-bottom:1.4rem}
+.expl-search{display:flex;gap:.7rem;margin-bottom:1rem}
+.expl-search input{flex:1;font-family:var(--vt);font-size:15px;padding:.7rem .85rem;border:4px solid #000;background:var(--pop);color:#fff;box-shadow:5px 5px 0 #000}
+.expl-search input:focus{outline:none;border-color:var(--cyan)}
+.expl-search input::placeholder{color:rgba(255,255,255,.4)}
+.expl-results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.8rem;max-height:480px;overflow-y:auto}
+.expl-empty{grid-column:1/-1;font-family:var(--vt);font-size:14px;color:rgba(255,255,255,.45);padding:1.5rem 0;text-align:center}
+.expl-row{position:relative;background:linear-gradient(160deg,#4a1768 0%,#3c1154 100%);border:3px solid #000;box-shadow:3px 3px 0 #000,6px 6px 0 rgba(0,0,0,.2);padding:.8rem .85rem;cursor:pointer;transition:transform .1s}
+.expl-row:hover{transform:translate(-2px,-2px)}
+.expl-row-top{display:flex;align-items:center;justify-content:space-between;gap:.6rem}
+.expl-row-pair{display:flex;align-items:center;gap:.5rem;min-width:0;font-family:var(--vt);font-size:15px;font-weight:800;color:#fff;text-transform:none}
+.expl-row-pair img{width:22px;height:22px;border:2px solid #000;border-radius:50%;object-fit:cover;background:var(--card2)}
+.expl-row-price{font-family:var(--vt);font-size:14px;font-weight:700;color:var(--cyan);white-space:nowrap}
+.expl-row-addr{font-family:var(--vt);font-size:10px;color:rgba(255,255,255,.4);margin-top:.2rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.expl-row-metrics{display:flex;gap:1rem;margin-top:.6rem;font-family:var(--vt);font-size:11px;color:rgba(255,255,255,.6)}
+.expl-row-metrics b{color:#fff;font-weight:700}
+.expl-row-actions{display:flex;gap:.5rem;margin-top:.7rem}
+.expl-row-actions .px-btn{font-size:11px;padding:.4rem .7rem;box-shadow:3px 3px 0 #000}
+/* ---- impermanent loss calculator ---- */
+.il-card{margin-bottom:1.4rem}
+.il-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.9rem;margin-bottom:1.1rem}
+.il-field label{display:block;font-family:var(--px);font-size:10px;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:.35rem}
+.il-field input{width:100%;font-family:var(--vt);font-size:15px;padding:.65rem .8rem;border:4px solid #000;background:var(--pop);color:#fff;box-shadow:4px 4px 0 #000}
+.il-field input:focus{outline:none;border-color:var(--cyan)}
+.il-field input::placeholder{color:rgba(255,255,255,.4)}
+.il-result{border:3px solid #000;background:var(--pop);padding:.9rem 1rem}
+.il-line{display:flex;justify-content:space-between;align-items:center;padding:.45rem 0;border-bottom:2px solid rgba(0,0,0,.35);font-family:var(--vt);font-size:14px}
+.il-line:last-child{border-bottom:0}
+.il-line span{color:rgba(255,255,255,.6)}
+.il-line b{font-family:var(--vt);font-size:15px;font-weight:800;color:#fff}
+.il-line b.loss{color:var(--orange)}
+.il-line b.gain{color:var(--green)}
+.il-note{margin-top:.4rem;padding-top:.7rem;border-top:3px solid var(--cyan);border-bottom:0}
+.il-note span{color:var(--cyan)}
+.il-note b{color:var(--yellow);font-size:16px}
 /* ---- D: terminal header + stats pills ---- */
 .term-head{align-items:center}
 .term-pills{display:flex;gap:.6rem;flex-wrap:wrap}
@@ -1758,6 +1796,44 @@ a.px-btn{display:inline-block;text-align:center;text-decoration:none;width:auto}
           </table>
         </div>
       </div>
+
+      <!-- FEATURE · TOKEN EXPLORER (full width) -->
+      <div class="px-card tools-card expl-card">
+        <div class="card-title"><h2>Token Explorer</h2><span class="hint" id="explLive">LIVE · ALL PAIRS</span></div>
+        <p class="tools-sub">Search any ARC token by symbol or contract address. Click a result to open Add LP or Swap for that pool.</p>
+        <div class="expl-search">
+          <input id="explSearch" placeholder="Search symbol or 0x… address" autocomplete="off" spellcheck="false" />
+          <button class="px-btn" id="explClear" type="button">Clear</button>
+        </div>
+        <div class="expl-results" id="explResults"><div class="expl-empty">Type to search tokens…</div></div>
+      </div>
+
+      <!-- FEATURE · IMPERMANENT LOSS CALCULATOR (full width) -->
+      <div class="px-card tools-card il-card">
+        <div class="card-title"><h2>Impermanent Loss Calculator</h2><span class="hint">ESTIMATE</span></div>
+        <p class="tools-sub">Estimate the loss (or gain) from holding a LP position vs. just holding the tokens, when the price moves.</p>
+        <div class="il-grid">
+          <div class="il-field">
+            <label>Entry Price</label>
+            <input id="ilEntry" type="number" step="any" inputmode="decimal" placeholder="e.g. 0.10" />
+          </div>
+          <div class="il-field">
+            <label>Current Price</label>
+            <input id="ilCurrent" type="number" step="any" inputmode="decimal" placeholder="e.g. 0.15" />
+          </div>
+          <div class="il-field">
+            <label>Initial Investment ($)</label>
+            <input id="ilAmount" type="number" step="any" inputmode="decimal" placeholder="e.g. 1000" />
+          </div>
+        </div>
+        <div class="il-result" id="ilResult">
+          <div class="il-line"><span>Price Change</span><b id="ilPriceChange">—</b></div>
+          <div class="il-line"><span>Impermanent Loss</span><b id="ilLoss">—</b></div>
+          <div class="il-line"><span>Holding Value</span><b id="ilHold">—</b></div>
+          <div class="il-line"><span>LP Position Value</span><b id="ilLp">—</b></div>
+          <div class="il-line il-note"><span>Difference vs. Holding</span><b id="ilDiff">—</b></div>
+        </div>
+      </div>
   </section>
 
   <div class="footer-wrap">
@@ -1932,11 +2008,12 @@ const CFG = {
 };
 
 const RADAR_API = '/api/radar';          // proxy (same-origin) — no CORS issue
+const POLL_MS = 15000;                   // realtime market refresh interval (ms). Tune here: 5000=faster, 30000=calmer.
 const TICK_SPACING = { 100: 1, 500: 10, 3000: 60, 10000: 200 };
 const MIN_TICK = -887272, MAX_TICK = 887272;
 const USDC_ADDR = '0x3600000000000000000000000000000000000000'.toLowerCase();
 const USDC_ICON = 'https://assets.coingecko.com/coins/images/6319/large/usdc.png';
-const RADAR_SNAPSHOT = [{"symbol":"Architects","address":"0x8bcb94279fc2c984ec34e0c1f2192df8c69ea4f0","price":0.002431927139929907,"liquidityUsdc":84253.309687,"volume24":20065.600965,"change24h":-3.0030672482083114,"spark":[0.00217323,0.00214223,0.00216742,0.00220464,0.00221871,0.00226617,0.00225141,0.00221307,0.00220454,0.00249969,0.00251203,0.00251076,0.00251184,0.00245949,0.00250628,0.00243193],"icon":"https://arc-api-production-ef9c.up.railway.app/api/image/a02941c5-9a8a-4195-b0f8-e7f1eadbcbfc"},{"symbol":"ARCANINE","address":"0xf3715bf5c2de299f08b81180ffb739a8372a175f","price":0.000280418079587923,"liquidityUsdc":33334.217473,"volume24":7083.21389,"change24h":-5.021945806305996,"spark":[0.000281302,0.000295771,0.000293974,0.000293068,0.000298484,0.000305831,0.000305831,0.000299568,0.00030686,0.000301115,0.000306256,0.000306256,0.000286395,0.000285833,0.000286124,0.000280418],"icon":"https://i.ibb.co/hFJDb0Gb/arcaninetoken.png"},{"symbol":"STEVE","address":"0xa23632d6a32174ff4ee8e76aacf9f244e10cfd73","price":0.00027682882532923,"liquidityUsdc":32600.811582,"volume24":2193.923443,"change24h":5.444364132031077,"spark":[0.000262228,0.000261789,0.00025895,0.00025895,0.000254949,0.00026709,0.00026709,0.000269523,0.000273611,0.0002715,0.0002715,0.0002715,0.000275483,0.000275736,0.000275817,0.000276829],"icon":"https://i.ibb.co/5Wxj7dzy/Capture-d-cran-2026-07-15-190425.png"},{"symbol":"WARP","address":"0x384c60f98ecd4c26345499345c03d677e40f115e","price":0.00045408815396818,"liquidityUsdc":31346.911802,"volume24":36335.325201,"change24h":-30.229325048325666,"spark":[0.000474457,0.000461916,0.000399694,0.000407477,0.000409602,0.000473887,0.000458667,0.000430406,0.000429964,0.000438722,0.000438722,0.000541577,0.000500982,0.000450662,0.000454088,0.000454088],"icon":"https://gold-negative-silkworm-810.mypinata.cloud/ipfs/QmSdDCPWv4ah7wrjGizhcT5RKWMZfSmLYVwXGHhUpMybJL"},{"symbol":"ARCAT","address":"0x07704b06981ea962b87296362a1281484d160000","price":0.000247414953320093,"liquidityUsdc":29649.965791,"volume24":12322.072981,"change24h":-13.458658788449052,"spark":[0.000263832,0.000223524,0.000218939,0.000217662,0.000217198,0.000215212,0.000215212,0.000218332,0.00021876,0.00021787,0.00021787,0.000235132,0.000237161,0.000252311,0.000247415,0.000247415],"icon":"https://cyan-bright-dormouse-440.mypinata.cloud/ipfs/QmQybedZvBS4MV8sVkxY7gfo7kyEuUXQcQMm3L39evAReF"},{"symbol":"BUILDOG","address":"0x4cb8382b9daf7992d3b27d32f7db650c57881daa","price":0.000136094491642367,"liquidityUsdc":21295.674522,"volume24":1078.323731,"change24h":3.0104258285435876,"spark":[0.000134423,0.000134139,0.000134802,0.000134788,0.000134788,0.000132022,0.000132022,0.00013182,0.000131892,0.000131892,0.000131782,0.000134817,0.000133198,0.000133198,0.000133164,0.000136094],"icon":"https://i.ibb.co/PvhzL9vK/mascot.png"},{"symbol":"TOLLY","address":"0xbc43ce8dec648ea298c4275559b81d6261c90b67","price":0.000103256807884444,"liquidityUsdc":17617.717062,"volume24":5477.290393,"change24h":21.922376492820327,"spark":[9.02368e-05,9.04257e-05,9.36857e-05,9.36857e-05,9.32772e-05,9.32772e-05,9.33021e-05,9.48405e-05,9.5128e-05,9.30882e-05,9.99588e-05,9.87157e-05,0.000103439,0.000105475,0.000103585,0.000103257],"icon":"https://api.tollylabs.com/token-image/0xbc43ce8dec648ea298c4275559b81d6261c90b67.png"},{"symbol":"SLJ","address":"0x127f80844ff3d672410ce4b6f4f9ea1a8d6a7ae6","price":0.000126655417565479,"liquidityUsdc":16779.673156,"volume24":2252.935812,"change24h":-11.205278515095033,"spark":[0.000142638,0.000141127,0.000141127,0.000141127,0.000141127,0.000139558,0.000139558,0.000139558,0.000137281,0.000134513,0.000134513,0.000123828,0.000125749,0.000125749,0.000126655],"icon":"https://gateway.pinata.cloud/ipfs/bafkreieyakdzrvwfwkacie7xx4yukzemso57tbrw2wj3jfv3ny4pbfpd3i"},{"symbol":"COOL","address":"0xeb64987643db71c76b2a2be7e723decc995e5b37","price":9.1231466291204e-05,"liquidityUsdc":16667.74495,"volume24":4201.954634,"change24h":11.417586527498244,"spark":[9.01689e-05,9.49956e-05,9.24743e-05,9.09417e-05,9.09417e-05,9.09417e-05,9.62734e-05,9.30665e-05,9.49756e-05,9.50729e-05,9.51913e-05,9.17686e-05,9.01464e-05,9.32732e-05,9.12315e-05,9.12315e-05],"icon":"https://i.postimg.cc/rsPPW2R3/coologo1.png"},{"symbol":"Aros","address":"0x3af1d499cb46cd5504a5a3cb864dcc105b74470d","price":6.6255605662725e-05,"liquidityUsdc":15980.975718,"volume24":6.357947,"change24h":0,"spark":[6.62556e-05,6.62556e-05,6.62556e-05,6.62556e-05,6.62556e-05,6.62556e-05,6.62556e-05,6.62556e-05,6.62556e-05,6.62556e-05,6.62556e-05,6.62556e-05,6.62556e-05],"icon":"https://i.ibb.co/3mdvGWhj/74a13d39-6b63-45dc-9b00-acb6a9668c4b.jpg"},{"symbol":"SHARC","address":"0xf2627e7566d01f6c8ff2892f4a802fee6d2898af","price":8.0384579124579e-05,"liquidityUsdc":15344.362603,"volume24":6827.245719,"change24h":-16.209339030202354,"spark":[0.000101128,0.000103197,0.000100696,0.000102487,9.57861e-05,9.44658e-05,9.11989e-05,9.03093e-05,8.95949e-05,8.95949e-05,8.92668e-05,8.5722e-05,7.91799e-05,8.25815e-05,8.19604e-05,8.03846e-05],"icon":"https://i.ibb.co/msNXKKS/sgvb.png"},{"symbol":"AROS","address":"0x313c87e367791fe16ae97754554f4871bfe7fcb6","price":0.000101942886494717,"liquidityUsdc":14646.469252,"volume24":3143.738133,"change24h":35.754195535640676,"spark":[7.50937e-05,7.50937e-05,7.50937e-05,7.50937e-05,7.50937e-05,7.50937e-05,9.88584e-05,9.42758e-05,9.42758e-05,9.42758e-05,9.36387e-05,9.34859e-05,9.34859e-05,0.000101943,0.000101943,0.000101943],"icon":"https://arc-api-production-ef9c.up.railway.app/api/image/9761634a-2a21-4475-80e9-72ba6c9a774f"},{"symbol":"Arc House","address":"0x1fa496cca20d1249972bee850bb3fc612f808cab","price":9.6629937331469e-05,"liquidityUsdc":14376.984155,"volume24":6613.599552,"change24h":13.249984615777105,"spark":[9.08481e-05,0.000110332,0.000110237,0.000114834,0.000109944,0.000110208,0.000103826,9.52411e-05,9.7686e-05,9.7686e-05,9.7686e-05,9.47039e-05,9.47039e-05,8.9836e-05,9.66299e-05,9.66299e-05],"icon":"https://arc-api-production-ef9c.up.railway.app/api/image/9081077b-a219-4e4e-815d-da5bb22639d1"},{"symbol":"peg","address":"0x2bfe315f219cc9fdc9ce0266e6c115927f0e4c10","price":8.8153481596843e-05,"liquidityUsdc":13359.732812,"volume24":2651.778916,"change24h":-9.85812368700252,"spark":[9.77941e-05,0.000100873,0.000100873,0.000100873,0.000100873,0.000100873,0.000100873,0.00010083,0.000100798,0.00010289,0.000104884,0.000104884,8.67782e-05,8.67782e-05,8.78856e-05,8.81535e-05],"icon":"https://arc-api-production-ef9c.up.railway.app/api/image/06ecdffc-d1cf-4938-a5e0-c3d55b62a8e6"}];
+const RADAR_SNAPSHOT = [{"symbol":"UNISARC","address":"0x1061d7f4934542b654e2a4ef7f04f101b4e8018d","price":0.0015,"liquidityUsdc":100000,"volume24":50000,"change24h":0,"spark":[0.0014,0.00142,0.00145,0.00144,0.00147,0.00146,0.00148,0.0015,0.00149,0.00152,0.0015,0.00151,0.00153,0.00152,0.00151,0.0015],"icon":"assets/unisarc-logo.png"},{"symbol":"Architects","address":"0x8bcb94279fc2c984ec34e0c1f2192df8c69ea4f0","price":0.002431927139929907,"liquidityUsdc":84253.309687,"volume24":20065.600965,"change24h":-3.0030672482083114,"spark":[0.00217323,0.00214223,0.00216742,0.00220464,0.00221871,0.00226617,0.00225141,0.00221307,0.00220454,0.00249969,0.00251203,0.00251076,0.00251184,0.00245949,0.00250628,0.00243193],"icon":"https://arc-api-production-ef9c.up.railway.app/api/image/a02941c5-9a8a-4195-b0f8-e7f1eadbcbfc"},{"symbol":"ARCANINE","address":"0xf3715bf5c2de299f08b81180ffb739a8372a175f","price":0.000280418079587923,"liquidityUsdc":33334.217473,"volume24":7083.21389,"change24h":-5.021945806305996,"spark":[0.000281302,0.000295771,0.000293974,0.000293068,0.000298484,0.000305831,0.000305831,0.000299568,0.00030686,0.000301115,0.000306256,0.000306256,0.000286395,0.000285833,0.000286124,0.000280418],"icon":"https://i.ibb.co/hFJDb0Gb/arcaninetoken.png"},{"symbol":"STEVE","address":"0xa23632d6a32174ff4ee8e76aacf9f244e10cfd73","price":0.00027682882532923,"liquidityUsdc":32600.811582,"volume24":2193.923443,"change24h":5.444364132031077,"spark":[0.000262228,0.000261789,0.00025895,0.00025895,0.000254949,0.00026709,0.00026709,0.000269523,0.000273611,0.0002715,0.0002715,0.0002715,0.000275483,0.000275736,0.000275817,0.000276829],"icon":"https://i.ibb.co/5Wxj7dzy/Capture-d-cran-2026-07-15-190425.png"},{"symbol":"WARP","address":"0x384c60f98ecd4c26345499345c03d677e40f115e","price":0.00045408815396818,"liquidityUsdc":31346.911802,"volume24":36335.325201,"change24h":-30.229325048325666,"spark":[0.000474457,0.000461916,0.000399694,0.000407477,0.000409602,0.000473887,0.000458667,0.000430406,0.000429964,0.000438722,0.000438722,0.000541577,0.000500982,0.000450662,0.000454088,0.000454088],"icon":"https://gold-negative-silkworm-810.mypinata.cloud/ipfs/QmSdDCPWv4ah7wrjGizhcT5RKWMZfSmLYVwXGHhUpMybJL"},{"symbol":"ARCAT","address":"0x07704b06981ea962b87296362a1281484d160000","price":0.000247414953320093,"liquidityUsdc":29649.965791,"volume24":12322.072981,"change24h":-13.458658788449052,"spark":[0.000263832,0.000223524,0.000218939,0.000217662,0.000217198,0.000215212,0.000215212,0.000218332,0.00021876,0.00021787,0.00021787,0.000235132,0.000237161,0.000252311,0.000247415,0.000247415],"icon":"https://cyan-bright-dormouse-440.mypinata.cloud/ipfs/QmQybedZvBS4MV8sVkxY7gfo7kyEuUXQcQMm3L39evAReF"},{"symbol":"BUILDOG","address":"0x4cb8382b9daf7992d3b27d32f7db650c57881daa","price":0.000136094491642367,"liquidityUsdc":21295.674522,"volume24":1078.323731,"change24h":3.0104258285435876,"spark":[0.000134423,0.000134139,0.000134802,0.000134788,0.000134788,0.000132022,0.000132022,0.00013182,0.000131892,0.000131892,0.000131782,0.000134817,0.000133198,0.000133198,0.000133164,0.000136094],"icon":"https://i.ibb.co/PvhzL9vK/mascot.png"},{"symbol":"TOLLY","address":"0xbc43ce8dec648ea298c4275559b81d6261c90b67","price":0.000103256807884444,"liquidityUsdc":17617.717062,"volume24":5477.290393,"change24h":21.922376492820327,"spark":[9.02368e-05,9.04257e-05,9.36857e-05,9.36857e-05,9.32772e-05,9.32772e-05,9.33021e-05,9.48405e-05,9.5128e-05,9.30882e-05,9.99588e-05,9.87157e-05,0.000103439,0.000105475,0.000103585,0.000103257],"icon":"https://api.tollylabs.com/token-image/0xbc43ce8dec648ea298c4275559b81d6261c90b67.png"},{"symbol":"SLJ","address":"0x127f80844ff3d672410ce4b6f4f9ea1a8d6a7ae6","price":0.000126655417565479,"liquidityUsdc":16779.673156,"volume24":2252.935812,"change24h":-11.205278515095033,"spark":[0.000142638,0.000141127,0.000141127,0.000141127,0.000141127,0.000139558,0.000139558,0.000139558,0.000137281,0.000134513,0.000134513,0.000123828,0.000125749,0.000125749,0.000126655],"icon":"https://gateway.pinata.cloud/ipfs/bafkreieyakdzrvwfwkacie7xx4yukzemso57tbrw2wj3jfv3ny4pbfpd3i"},{"symbol":"COOL","address":"0xeb64987643db71c76b2a2be7e723decc995e5b37","price":9.1231466291204e-05,"liquidityUsdc":16667.74495,"volume24":4201.954634,"change24h":11.417586527498244,"spark":[9.01689e-05,9.49956e-05,9.24743e-05,9.09417e-05,9.09417e-05,9.09417e-05,9.62734e-05,9.30665e-05,9.49756e-05,9.50729e-05,9.51913e-05,9.17686e-05,9.01464e-05,9.32732e-05,9.12315e-05,9.12315e-05],"icon":"https://i.postimg.cc/rsPPW2R3/coologo1.png"},{"symbol":"Aros","address":"0x3af1d499cb46cd5504a5a3cb864dcc105b74470d","price":6.6255605662725e-05,"liquidityUsdc":15980.975718,"volume24":6.357947,"change24h":0,"spark":[6.62556e-05,6.62556e-05,6.62556e-05,6.62556e-05,6.62556e-05,6.62556e-05,6.62556e-05,6.62556e-05,6.62556e-05,6.62556e-05,6.62556e-05,6.62556e-05,6.62556e-05],"icon":"https://i.ibb.co/3mdvGWhj/74a13d39-6b63-45dc-9b00-acb6a9668c4b.jpg"},{"symbol":"SHARC","address":"0xf2627e7566d01f6c8ff2892f4a802fee6d2898af","price":8.0384579124579e-05,"liquidityUsdc":15344.362603,"volume24":6827.245719,"change24h":-16.209339030202354,"spark":[0.000101128,0.000103197,0.000100696,0.000102487,9.57861e-05,9.44658e-05,9.11989e-05,9.03093e-05,8.95949e-05,8.95949e-05,8.92668e-05,8.5722e-05,7.91799e-05,8.25815e-05,8.19604e-05,8.03846e-05],"icon":"https://i.ibb.co/msNXKKS/sgvb.png"},{"symbol":"AROS","address":"0x313c87e367791fe16ae97754554f4871bfe7fcb6","price":0.000101942886494717,"liquidityUsdc":14646.469252,"volume24":3143.738133,"change24h":35.754195535640676,"spark":[7.50937e-05,7.50937e-05,7.50937e-05,7.50937e-05,7.50937e-05,7.50937e-05,9.88584e-05,9.42758e-05,9.42758e-05,9.42758e-05,9.36387e-05,9.34859e-05,9.34859e-05,0.000101943,0.000101943,0.000101943],"icon":"https://arc-api-production-ef9c.up.railway.app/api/image/9761634a-2a21-4475-80e9-72ba6c9a774f"},{"symbol":"Arc House","address":"0x1fa496cca20d1249972bee850bb3fc612f808cab","price":9.6629937331469e-05,"liquidityUsdc":14376.984155,"volume24":6613.599552,"change24h":13.249984615777105,"spark":[9.08481e-05,0.000110332,0.000110237,0.000114834,0.000109944,0.000110208,0.000103826,9.52411e-05,9.7686e-05,9.7686e-05,9.7686e-05,9.47039e-05,9.47039e-05,8.9836e-05,9.66299e-05,9.66299e-05],"icon":"https://arc-api-production-ef9c.up.railway.app/api/image/9081077b-a219-4e4e-815d-da5bb22639d1"},{"symbol":"peg","address":"0x2bfe315f219cc9fdc9ce0266e6c115927f0e4c10","price":8.8153481596843e-05,"liquidityUsdc":13359.732812,"volume24":2651.778916,"change24h":-9.85812368700252,"spark":[9.77941e-05,0.000100873,0.000100873,0.000100873,0.000100873,0.000100873,0.000100873,0.00010083,0.000100798,0.00010289,0.000104884,0.000104884,8.67782e-05,8.67782e-05,8.78856e-05,8.81535e-05],"icon":"https://arc-api-production-ef9c.up.railway.app/api/image/06ecdffc-d1cf-4938-a5e0-c3d55b62a8e6"}];
 
 
 /* ============ state ============ */
@@ -1950,6 +2027,7 @@ const S = {
   tokenMeta: {},          // addr -> {symbol, decimals, icon} cache
   radarTokens: {},        // all Radar tokens by address (not limited by pool-card TVL filter)
   pendingPoolScan: false,
+  _lastFp: '',
   swap: { tokenIn: null, tokenOut: null, fee: 10000, slippage: 1, quote: null, quoteSeq: 0, pickerSide: 'in', _balSeq: 0, _allBalSeq: 0 },
 };
 
@@ -2369,6 +2447,59 @@ function buildPoolsFromRadar(list) {
     return out;
     }
 function poolsFromSnapshot() { return buildPoolsFromRadar(RADAR_SNAPSHOT); }
+
+// UNISARC is the platform's own token but is often NOT in RadarDex's top-500
+// /tokens response (low 24h volume). Fetch it directly from /token/:addr and inject
+// it into S.pools so it's always present + pinned #1, regardless of top-500 ranking.
+const UNISARC_ADDR = '0x1061d7f4934542b654e2a4ef7f04f101b4e8018d';
+let _unisarcPoolCache = null;
+async function fetchUnisarcToken() {
+  if (_unisarcPoolCache) return _unisarcPoolCache;
+  try {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 9000);
+    const r = await fetch(RADAR_API + '/token/' + UNISARC_ADDR, { signal: ctrl.signal });
+    clearTimeout(t);
+    if (!r.ok) return null;
+    const j = await r.json();
+    if (!j || !j.symbol) return null;
+    // keep the RAW token payload too so pool-quality scanner + screener (which read
+    // _uniTok expecting raw /tokens shape: symbol/volume24/liquidityUsdc/change24h…)
+    // can still merge UNISARC into their lists.
+    _uniTok = j;
+    const liq = Number(j.liquidityUsdc) || 0, vol = Number(j.volume24) || 0, price = Number(j.price) || 0;
+    const spark = Array.isArray(j.spark) && j.spark.length ? j.spark : [1];
+    const apr = liq > 0 ? (vol * 0.01 * 0.85 / liq) * 365 * 100 : 0;
+    _unisarcPoolCache = {
+      id: 'USDC-UNISARC', a: 'USDC', b: 'UNISARC', addr: UNISARC_ADDR,
+      icon: j.icon || j.imageUrl || 'assets/unisarc-logo.png',
+      fee: 10000, reserveA: liq, reserveB: liq / (price || 1),
+      tvl: liq, priceB: price, apr: Math.min(240, Math.max(0.1, apr)),
+      vol, chg24: Number(j.change24h) || 0, spark,
+      verified: !!j.verified, launchpad: '', website: j.website || '', twitter: j.twitter || '',
+    };
+    return _unisarcPoolCache;
+  } catch (e) { return null; }
+}
+function injectUnisarcPool(pool) {
+  if (!pool) return;
+  const i = S.pools.findIndex(p => (p.b || '').toUpperCase() === 'UNISARC');
+  if (i === 0) { S.pools[0] = pool; return; }          // already pinned — refresh data
+  if (i > 0) S.pools.splice(i, 1);                       // exists elsewhere — move to top
+  S.pools.unshift(pool);                                 // ensure it's #1
+}
+
+// Lightweight fingerprint of the pool set for change detection: an array of
+// [id, priceB, tvl, vol, spark-last] rounded. If unchanged between polls, skip the
+// expensive full re-render (renderPoolChips + renderMonitor rebuild large DOM trees).
+function poolsFingerprint(pools) {
+  return (pools || []).map(p => {
+    const sp = p.spark && p.spark.length ? p.spark[p.spark.length - 1] : 0;
+    return p.id + '|' + (Math.round((p.priceB || 0) * 1e6) / 1e6) + '|' +
+      (Math.round((p.tvl || 0) * 100) / 100) + '|' + (Math.round((p.vol || 0) * 100) / 100) +
+      '|' + (Math.round(sp * 1e8) / 1e8);
+  }).join(';');
+}
 
 function radarTokenByAddress(addr) {
   addr = String(addr || '').toLowerCase();
@@ -3121,9 +3252,15 @@ function openMaxYield() {
   }));
 }
 function renderMonitor() {
-  const tvl = S.pools.reduce((s,p)=>s+p.tvl,0);
-  const vol = S.pools.reduce((s,p)=>s+p.vol,0);
-  const fees = S.pools.reduce((s,p)=>s+p.vol*((p.fee != null ? p.fee : 10000)/1000000)*0.85,0);
+  // Use the full-token aggregate (all 500 Radar tokens) for the header stats so
+  // Monitor's TVL/Volume match the Tools terminal pills — the pool grid below still
+  // shows the TVL-filtered S.pools (≥ $1400) cards. Previously this summed only
+  // S.pools, so Monitor under-reported vs Tools by a large margin.
+  const tot = (typeof sumRadarTotals === 'function' ? sumRadarTotals() : { totalVolume24: 0, totalTvl: 0 });
+  const tvl = tot.totalTvl || S.pools.reduce((s,p)=>s+p.tvl,0);
+  const vol = tot.totalVolume24 || S.pools.reduce((s,p)=>s+p.vol,0);
+  const feeRate = 0.85;
+  const fees = vol * (10000 / 1000000) * feeRate;   // 1% fee tier · 85% to LPs
   const myVal = S.positions.reduce((s,x)=>s+x.value,0);
   $('monStats').innerHTML = `
     <div class="stat"><div class="label">Pool TVL</div><div class="value">${fmtUsd(tvl)}</div><div class="sub">${S.pools.length} live pools</div></div>
@@ -4481,6 +4618,11 @@ $('poolqGrid').addEventListener('click', e=>{
 
 /* ============ init ============ */
 window.addEventListener('load', async ()=>{
+  // Reveal FAST — don't wait for fonts or the 500-token Radar fetch. Set a hard
+  // fallback so the page can never stay hidden if anything below throws.
+  const reveal = () => { document.documentElement.classList.add('js-ready'); document.documentElement.style.visibility = 'visible'; };
+  reveal();
+  const _safety = setTimeout(reveal, 1200);
   S.pools = poolsFromSnapshot();
   S.selected = (S.pools.find(p => (p.b || '').toUpperCase() === 'UNISARC') || S.pools[0])?.id || '';
   initSwapState(); renderSwap(true);
@@ -4488,7 +4630,7 @@ window.addEventListener('load', async ()=>{
   // so the page appears directly on the right tab with NO flash/jump to Positions.
   showView((location.hash || '').slice(1) || 'home');
   renderAll();
-  document.documentElement.style.visibility = 'visible';
+  clearTimeout(_safety);
   // restore wallet session (eth_accounts is silent — no popup; keeps wallet connected across refresh)
   if (window.ethereum) {
     try {
@@ -4503,29 +4645,39 @@ window.addEventListener('load', async ()=>{
   }
   syncWalletUI();
   if (S.address && currentPool) { renderAddSide(); renderSwap(false); refreshSwapBalances(); loadAllSwapBalances(); }
-  const live = await fetchRadarTop();
-  if (live && live.length) {
-    S.pools = buildPoolsFromRadar(live);
-    // default-select the UNISARC/USDC pool on first live load (pinned to #1)
-    const uni = S.pools.find(p => (p.b || '').toUpperCase() === 'UNISARC');
-    if (uni && (!S.pools.find(p=>p.id===S.selected) || !S._userPickedPool)) S.selected = uni.id;
-    renderPoolChips(); renderAddSide(); renderMonitor(); renderSwap(false);
-  }
+  // Live market data loads ASYNC after first paint — the page is already interactive,
+  // then the pool list swaps from the embedded snapshot to live Radar data when ready.
+  refreshPools(true);
   // Position valuation starts only after the full 500-token address registry is
   // available, avoiding a first-render race against the stale embedded snapshot.
   if (S.address) await loadPositionsUI();
-  // auto-refresh pool market data every 60s so TVL/price/volume stay live & synced
-  setInterval(async () => {
-    const l = await fetchRadarTop();
-    if (l && l.length) {
-      S.pools = buildPoolsFromRadar(l);
-      syncTokenMetaFromPools();
-      renderPoolChips(); renderAddSide(); renderMonitor(); renderSwap(false);
-      // Keep wallet positions stable during background market refresh.
-      // Positions refresh only after an explicit wallet action or manual refresh.
-    }
-  }, 60000);
+  // REALTIME market refresh every 15s (no caching) — TVL/price/volume stay live.
+  // Delta detection skips the expensive DOM rebuild when nothing meaningful changed,
+  // so the tighter poll interval never causes jank.
+  setInterval(() => refreshPools(false), POLL_MS);
 });
+
+// Poll RadarDex for fresh pool data and re-render ONLY if the pool set changed.
+// force=true always re-renders (initial load / explicit refresh).
+async function refreshPools(force) {
+  const l = await fetchRadarTop();
+  if (!l || !l.length) return;
+  S.pools = buildPoolsFromRadar(l);
+  // Always ensure UNISARC (platform token) is present + pinned #1, even when it's
+  // outside RadarDex's top-500 volume ranking.
+  const uni = await fetchUnisarcToken();
+  injectUnisarcPool(uni);
+  const fp = poolsFingerprint(S.pools);
+  if (!force && fp === S._lastFp) return;   // no meaningful change → skip re-render
+  S._lastFp = fp;
+  syncTokenMetaFromPools();
+  // default-select the UNISARC/USDC pool on first live load (pinned to #1)
+  const uniPool = S.pools.find(p => (p.b || '').toUpperCase() === 'UNISARC');
+  if (uniPool && (!S.pools.find(p=>p.id===S.selected) || !S._userPickedPool)) S.selected = uniPool.id;
+  renderPoolChips(); renderAddSide(); renderMonitor(); renderSwap(false);
+  // keep header pills (Volume 24h / TVL / Pools) in sync with the fresh pool data
+  if (typeof fillTermPills === 'function') fillTermPills(S.pools);
+}
 
 /* ============ PUBLIC TERMINAL / TOOLS ============ */
 let _toolsFetched = false;
@@ -4867,12 +5019,34 @@ function refreshLiveAgo() {
   const s = _lastLiveTs ? Math.floor((Date.now() - _lastLiveTs) / 1000) : 0;
   el.textContent = s <= 1 ? 'live' : 'updated ' + s + 's ago';
 }
+// Sum volume24 / TVL / pool-count directly from S.radarTokens (ALL tokens Radar
+// returned, not the TVL-filtered S.pools), so the header pills are correct even
+// before/without the separate flows fetch (_currentFlows).
+function sumRadarTotals() {
+  let vol = 0, tvl = 0, pools = 0;
+  for (const a in (S.radarTokens || {})) {
+    const t = S.radarTokens[a];
+    vol += t.vol || 0;
+    tvl += t.tvl || 0;
+    pools++;
+  }
+  return { totalVolume24: vol, totalTvl: tvl, totalPools: pools };
+}
+
 function fillTermPills(pools) {
   const v = $t('tVolume'), tv = $t('tTvl'), pc = $t('tPools');
   if (!v && !tv && !pc) return;
-  // semua baca dari ALL-token flow fetch (konsisten dgn inflow/outflow)
-  const fl = _currentFlows;
-  if (!fl) return; // tunggu fetch pertama -> placeholder "—" tetap tampil
+  // Prefer the flow aggregate (has inflow/outflow split); fall back to a direct
+  // sum over S.radarTokens so the pills NEVER stay stuck on "—" when the flow
+  // fetch hasn't landed yet or failed.
+  let fl = _currentFlows;
+  if (!fl) {
+    const n = Object.keys(S.radarTokens || {}).length;
+    // Only trust the direct sum once the full 500-token registry is in — avoid a
+    // misleading flash of the tiny embedded snapshot (14 tokens) on first paint.
+    fl = (n >= 100) ? sumRadarTotals() : null;
+  }
+  if (!fl) return;
   if (v) v.textContent = '$' + fmt(fl.totalVolume24 || 0);
   if (tv) tv.textContent = '$' + fmt(fl.totalTvl || 0);
   const poolCount = fl.totalPools || ((pools || []).length);
@@ -5168,21 +5342,6 @@ function renderLiquidityDistribution() {
 
 /* ============ MARKET TOKEN DATA (shared by screener + pool scanner) ============ */
 let _momToks = null, _momLoaded = false, _uniTok = null;
-async function fetchUnisarcToken() {
-  // UNISARC volume kecil — keluar dari top 50; ambil khusus sekali buat pin di screener
-  if (_uniTok) return _uniTok;
-  try {
-    const ctrl = new AbortController();
-    const t = setTimeout(() => ctrl.abort(), 9000);
-    const r = await fetch(RADAR_API + '/tokens?sort=volume24&dir=desc&limit=500&window=24h', { signal: ctrl.signal });
-    clearTimeout(t);
-    if (!r.ok) throw new Error('http ' + r.status);
-    const j = await r.json();
-    const toks = (j && j.tokens) || j;
-    if (Array.isArray(toks)) _uniTok = toks.find(t => (t.symbol || '').toUpperCase() === 'UNISARC') || null;
-  } catch (e) { _uniTok = null; }
-  return _uniTok;
-}
 async function loadMomTokens() {
   if (_momLoaded && _momToks) return _momToks;
   try {
@@ -5476,6 +5635,196 @@ function initReveal() {
   }
 });
 window.addEventListener('load', () => setTimeout(initReveal, 50));
+
+/* ============ TOKEN EXPLORER ============ */
+let _tokenListCache = null;   // full RadarDex tokenlist.json (3754 tokens: symbol/name/addr/logo/links)
+let _tokenListLoaded = false;
+// Fetch the full token list (metadata only: symbol/name/address/logo/website/twitter).
+// No volume/tvl/price here — those only exist on /tokens (capped at 500). Used to make
+// the explorer search cover EVERY listed token, not just the top-500 market movers.
+async function loadTokenList() {
+  if (_tokenListLoaded) return _tokenListCache;
+  _tokenListLoaded = true;
+  try {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 15000);
+    const r = await fetch(RADAR_API + '/tokenlist.json', { signal: ctrl.signal });
+    clearTimeout(t);
+    if (!r.ok) throw new Error('http ' + r.status);
+    const j = await r.json();
+    _tokenListCache = (j && Array.isArray(j.tokens)) ? j.tokens : [];
+  } catch (e) {
+    _tokenListCache = [];   // don't retry-spam; re-fetch on next full reload
+  }
+  return _tokenListCache;
+}
+function explorerTokens() {
+  const uni = swapTokenUniverse();
+  const byAddr = new Map();
+  uni.forEach(t => byAddr.set(t.address, t));
+  // enrich with Radar market data (tvl / vol / icon / price) where available
+  const out = uni.map(t => {
+    const r = S.radarTokens && S.radarTokens[t.address];
+    return {
+      ...t,
+      priceUsd: (r && r.priceB > 0) ? r.priceB : t.priceUsd,
+      tvl: (r && r.tvl) || 0,
+      vol: (r && r.vol) || 0,
+      icon: t.icon || (r && r.icon) || '',
+    };
+  });
+  // merge the full token list (3754 tokens) so search reaches every listed token —
+  // these carry metadata only (no market data); they enrich/supplement `out`.
+  (_tokenListCache || []).forEach(t => {
+    const a = String(t.address || '').toLowerCase();
+    if (!a || !/^0x[0-9a-f]{40}$/.test(a) || byAddr.has(a)) return;
+    byAddr.set(a, {
+      address: a,
+      symbol: t.symbol || '?',
+      name: t.name || t.symbol || 'Token',
+      decimals: Number.isFinite(Number(t.decimals)) ? Number(t.decimals) : 18,
+      icon: t.logoURI || '',
+      priceUsd: 0, tvl: 0, vol: 0,
+    });
+    out.push({
+      address: a, symbol: t.symbol || '?', name: t.name || t.symbol || 'Token',
+      decimals: Number.isFinite(Number(t.decimals)) ? Number(t.decimals) : 18,
+      icon: t.logoURI || '', priceUsd: 0, tvl: 0, vol: 0,
+    });
+  });
+  // sort: USDC first, then by TVL desc (market-data tokens float to top; metadata-only sink)
+  out.sort((a, b) => {
+    if (a.symbol === 'USDC') return -1;
+    if (b.symbol === 'USDC') return 1;
+    return (b.tvl || 0) - (a.tvl || 0);
+  });
+  return out;
+}
+function renderExplorer() {
+  const q = ($('explSearch').value || '').trim().toLowerCase();
+  const listEl = $('explResults');
+  if (!listEl) return;
+  if (!q) { listEl.innerHTML = '<div class="expl-empty">Type to search tokens…</div>'; return; }
+  const isAddr = isAddressLike(q);
+  const all = explorerTokens();
+  const matches = all.filter(t =>
+    isAddr ? t.address === q
+           : (t.symbol || '').toLowerCase().includes(q) || (t.name || '').toLowerCase().includes(q));
+  // show as USDC/<token> pair (LP dashboard context)
+  const rows = matches.slice(0, 24);
+  if (!rows.length) {
+    if (isAddr) {
+      resolveSwapTokenByAddress(q).then(res => {
+        if (res && res.symbol && res.symbol !== '?') {
+          listEl.innerHTML = renderExplorerRow({ ...res, tvl: 0, vol: 0 }, true);
+        } else {
+          listEl.innerHTML = '<div class="expl-empty">No token found at this address.</div>';
+        }
+      });
+    } else {
+      listEl.innerHTML = '<div class="expl-empty">No tokens match "' + q + '".</div>';
+    }
+    return;
+  }
+  listEl.innerHTML = rows.map(t => renderExplorerRow(t)).join('');
+}
+function renderExplorerRow(t, isResolved) {
+  const poolId = 'USDC-' + (t.symbol || '?');
+  const hasPool = S.pools.some(p => p.id === poolId);
+  const icon = t.icon ? `<img src="${t.icon}" alt="" onerror="this.style.display='none'" />` : '';
+  const tvlTxt = t.tvl > 0 ? 'TVL $' + fmt(t.tvl) : '';
+  const volTxt = t.vol > 0 ? '24h vol $' + fmt(t.vol) : '';
+  const priceTxt = t.priceUsd > 0 ? swapPriceFive(t) : '—';
+  return `<div class="expl-row" data-addr="${t.address}" data-symbol="${(t.symbol || '?').replace(/"/g, '')}">
+    <div class="expl-row-top">
+      <span class="expl-row-pair">${icon}<span>USDC / ${t.symbol || '?'}</span></span>
+      <span class="expl-row-price">${priceTxt}</span>
+    </div>
+    <div class="expl-row-addr">${t.address}</div>
+    <div class="expl-row-metrics">${tvlTxt ? '<span>TVL <b>' + '$' + fmt(t.tvl) + '</b></span>' : ''}${volTxt ? '<span>24h Vol <b>' + '$' + fmt(t.vol) + '</b></span>' : ''}<span>24h <b>${t.priceUsd > 0 ? 'LIVE' : '—'}</b></span></div>
+    <div class="expl-row-actions">
+      <button class="px-btn" type="button" data-expl="add">Add LP</button>
+      <button class="px-btn orange" type="button" data-expl="swap">Swap</button>
+      <a class="px-btn ghost" style="text-decoration:none" href="${CFG.blockExplorerUrls[0]}/address/${t.address}" target="_blank" rel="noopener noreferrer">Explorer ↗</a>
+    </div>
+  </div>`;
+}
+function jumpExplorerPool(addr, symbol, toView) {
+  const poolId = 'USDC-' + (symbol || '?');
+  if (toView === 'add') {
+    // ensure a matching pool exists (or select first) then open Add LP
+    const p = S.pools.find(pp => pp.id === poolId);
+    if (p) S.selected = p.id;
+    showView('add');
+    renderPoolChips();
+    renderAddSide();
+  } else {
+    // swap: set tokenOut to this token (vs USDC) and jump to Swap
+    const t = (S.swap.resolvedTokens || {})[addr] || swapTokenUniverse().find(x => x.address === addr);
+    if (t) {
+      S.swap.tokenIn = swapTokenUniverse().find(x => x.symbol === 'USDC') || S.swap.tokenIn;
+      S.swap.tokenOut = t;
+      if (S.swap.tokenIn.address === S.swap.tokenOut.address) S.swap.tokenIn = swapTokenUniverse().find(x => x.address !== t.address) || S.swap.tokenIn;
+    }
+    showView('swap');
+    renderSwap(true);
+    refreshSwapBalances();
+  }
+}
+function bindExplorer() {
+  const search = $('explSearch'); if (!search) return;
+  search.addEventListener('input', () => {
+    // kick off the full token-list fetch on first keystroke, then re-render when it
+    // lands so the search reaches all 3754 tokens (not just the top-500 movers).
+    if (!_tokenListLoaded) loadTokenList().then(() => renderExplorer());
+    renderExplorer();
+  });
+  $('explClear').addEventListener('click', () => { search.value = ''; renderExplorer(); search.focus(); });
+  const results = $('explResults');
+  results.addEventListener('click', e => {
+    const btn = e.target.closest('[data-expl]');
+    const row = e.target.closest('.expl-row');
+    if (!row) return;
+    const addr = row.dataset.addr, symbol = row.dataset.symbol;
+    if (btn) jumpExplorerPool(addr, symbol, btn.dataset.expl);
+  });
+}
+
+/* ============ IMPERMANENT LOSS CALCULATOR ============ */
+function calcIL() {
+  const entry = parseFloat($('ilEntry').value);
+  const cur = parseFloat($('ilCurrent').value);
+  const amt = parseFloat($('ilAmount').value);
+  const set = (id, txt, cls) => { const el = $(id); if (el) { el.textContent = txt; el.className = cls || ''; } };
+  if (!(entry > 0) || !(cur > 0)) {
+    ['ilPriceChange','ilLoss','ilHold','ilLp','ilDiff'].forEach(id => set(id, '—'));
+    return;
+  }
+  const ratio = cur / entry;             // price ratio
+  const priceChange = (ratio - 1) * 100; // % price change
+  // IL formula (constant product, 50/50): 2*sqrt(ratio)/(1+ratio) - 1
+  const il = (2 * Math.sqrt(ratio)) / (1 + ratio) - 1;
+  const invest = amt > 0 ? amt : 1000;
+  const holdValue = invest * (1 + ratio) / 2;   // if you just held both halves
+  const lpValue = holdValue * (1 + il);         // actual LP position value
+  const diff = lpValue - holdValue;
+  const pct = (v) => (v * 100).toFixed(2) + '%';
+  set('ilPriceChange', (priceChange >= 0 ? '+' : '') + priceChange.toFixed(2) + '%', priceChange >= 0 ? 'gain' : 'loss');
+  set('ilLoss', pct(il), il >= 0 ? 'gain' : 'loss');
+  set('ilHold', '$' + fmt(holdValue), '');
+  set('ilLp', '$' + fmt(lpValue), '');
+  set('ilDiff', (diff >= 0 ? '+' : '−') + '$' + fmt(Math.abs(diff)), diff >= 0 ? 'gain' : 'loss');
+}
+function bindIL() {
+  ['ilEntry','ilCurrent','ilAmount'].forEach(id => {
+    const el = $(id); if (el) el.addEventListener('input', calcIL);
+  });
+}
+
+/* wire up explorer + IL on load (elements exist in DOM at parse time) */
+bindExplorer();
+bindIL();
+
 </script>
 </body>
 </html>

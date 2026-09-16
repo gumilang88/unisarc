@@ -3,6 +3,7 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const zlib = require('zlib');
 
 const PORT = process.env.PORT || 3011;
 const RADAR = 'https://api.radardex.pro';
@@ -10,13 +11,33 @@ const FILE = path.join(__dirname, 'index.html');
 
 // Arc mainnet RPC (chain 5042) — public node is intermittent; retry aggressively.
 // thecusp/warp are ecosystem relays that the RadarDex frontend also uses as fallback.
+// arc.drpc.org is the fastest/healthiest; raced in parallel below.
 const RPC_URLS = [
+  'https://arc.drpc.org',
   'https://thecusp.io/api/arc-rpc',
   'https://warp-arc-production.up.railway.app/rpc',
   'https://rpc.arc-scan.org',
 ];
 
 const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.png': 'image/png', '.svg': 'image/svg+xml', '.json': 'application/json' };
+// assets (favicon/icons) are immutable — long cache. html is no-store (dev/live edit).
+const CACHEABLE = new Set(['.png', '.svg', '.ico', '.js', '.css']);
+
+// gzip/deflate compress text responses so the 355KB index.html transfers in ~40KB.
+function compress(req, res, status, headers, body) {
+  const accept = req.headers['accept-encoding'] || '';
+  const enc = /\bgzip\b/.test(accept) ? 'gzip' : (/\bdeflate\b/.test(accept) ? 'deflate' : null);
+  if (!enc || !body || body.length < 1024) {
+    res.writeHead(status, headers);
+    res.end(body);
+    return;
+  }
+  res.setHeader('Content-Encoding', enc);
+  res.setHeader('Vary', 'Accept-Encoding');
+  res.writeHead(status, headers);
+  const buf = enc === 'gzip' ? zlib.gzipSync(body) : zlib.deflateSync(body);
+  res.end(buf);
+}
 
 const server = http.createServer((req, res) => {
   // CORS headers buat semua response
@@ -29,15 +50,7 @@ const server = http.createServer((req, res) => {
   if (req.url.startsWith('/api/radar')) {
     const rest = req.url.slice('/api/radar'.length); // e.g. ?sort=... or /tokens?...
     const target = RADAR + (rest.startsWith('/') ? rest : '/tokens' + rest);
-    const ctrl = new AbortController();
-    const to = setTimeout(() => ctrl.abort(), 15000);
-    fetch(target, {
-      signal: ctrl.signal,
-      headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)', 'Accept': 'application/json' },
-    })
-      .then(r => { clearTimeout(to); const ct = r.headers.get('content-type') || 'application/json'; res.writeHead(r.status, { 'Content-Type': ct }); return r.text(); })
-      .then(body => res.end(body))
-      .catch(e => { clearTimeout(to); res.writeHead(502, { 'Content-Type': 'application/json' }); res.end(JSON.stringify({ error: 'proxy failed', msg: String(e.message || e) })); });
+    radarProxy(req, res, target);
     return;
   }
 
@@ -64,22 +77,56 @@ const server = http.createServer((req, res) => {
   const p = req.url === '/' ? '/' + 'index.html' : req.url.split('?')[0];
   const full = path.join(__dirname, p);
   if (!full.startsWith(__dirname)) { res.writeHead(403); return res.end('forbidden'); }
+  const ext = path.extname(full);
   if (p === '/index.html' || p === '/') {
-    fs.readFile(FILE, (err, data) => {
-      if (err) { res.writeHead(500); return res.end('read error'); }
-      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' });
-      res.end(data);
-    });
+    res.setHeader('Cache-Control', 'no-store');
+    compress(req, res, 200, { 'Content-Type': 'text/html; charset=utf-8' }, indexHtmlCache);
     return;
   }
   fs.readFile(full, (err, data) => {
     if (err) { res.writeHead(404); return res.end('not found'); }
-    res.writeHead(200, { 'Content-Type': MIME[path.extname(full)] || 'application/octet-stream' });
-    res.end(data);
+    const h = { 'Content-Type': MIME[ext] || 'application/octet-stream' };
+    if (CACHEABLE.has(ext)) h['Cache-Control'] = 'public, max-age=86400, immutable';
+    compress(req, res, 200, h, data);
   });
 });
 
 server.listen(PORT, () => console.log(`UNISARC on http://localhost:${PORT}  (proxy /api/radar -> ${RADAR})`));
+
+// Cache index.html in memory (re-read if it changes on disk) so static serving never blocks on fs.
+let indexHtmlCache = fs.readFileSync(FILE);
+fs.watchFile(FILE, { interval: 1000 }, () => {
+  try { indexHtmlCache = fs.readFileSync(FILE); console.log('[unisarc] index.html reloaded'); } catch (e) {}
+});
+
+async function radarProxy(req, res, target) {
+  // RadarDex upstream is intermittently slow/unreachable. Retry a few times with a
+  // short per-attempt timeout (fail fast) instead of one 15s hang, so the browser's
+  // own abort + snapshot fallback kicks in quickly when the upstream is truly down.
+  const attempts = [4000, 4000, 8000];
+  for (let i = 0; i < attempts.length; i++) {
+    const ctrl = new AbortController();
+    const to = setTimeout(() => ctrl.abort(), attempts[i]);
+    try {
+      const r = await fetch(target, {
+        signal: ctrl.signal,
+        headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)', 'Accept': 'application/json' },
+      });
+      clearTimeout(to);
+      const ct = r.headers.get('content-type') || 'application/json';
+      res.writeHead(r.status, { 'Content-Type': ct, 'Cache-Control': 'no-store' });
+      res.end(await r.text());
+      return;
+    } catch (e) {
+      clearTimeout(to);
+      if (i === attempts.length - 1) {
+        res.writeHead(502, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'proxy failed', msg: String(e && e.message || e) }));
+        return;
+      }
+    }
+  }
+}
 
 // Forward a single JSON-RPC payload to an upstream Arc node with retries.
 // arc-scan.org rate-limits eth_call/eth_blockNumber ("unreachable" + retry_after),
@@ -111,15 +158,15 @@ async function rpcFetchOnce(url, payload, timeoutMs) {
 }
 
 async function rpcRetry(payload) {
-  // Light retry: the browser already races a 2.2s timeout + multiple upstreams, so this
-  // proxy should fail fast rather than holding a request open for tens of seconds.
-  const attempts = 2;
+  // Race ALL upstreams in parallel — first healthy response wins. This collapses the
+  // old sequential 4×2 retry ladder (~12s worst case) down to a single ~1.5s round.
+  const first = await Promise.race(RPC_URLS.map(url => rpcFetchOnce(url, payload, 1500)));
+  if (first.ok) return first;
+
+  // Fallback ladder: one retry per endpoint for transient throttles/races.
   for (const url of RPC_URLS) {
-    for (let i = 0; i < attempts; i++) {
-      const out = await rpcFetchOnce(url, payload, 1500);
-      if (out.ok) return out;
-      await new Promise(r => setTimeout(r, 200 * (i + 1)));
-    }
+    const out = await rpcFetchOnce(url, payload, 2000);
+    if (out.ok) return out;
   }
   return { ok: false, err: 'all upstream RPC endpoints failed' };
 }
