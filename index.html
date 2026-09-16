@@ -1986,10 +1986,11 @@ const CFG = {
   chainName: 'ARC Mainnet',
   nativeCurrency: { name: 'USDC', symbol: 'USDC', decimals: 6 },
   rpcUrls: [
+    'https://arc.drpc.org',                                      // healthiest public node (fast, stable)
     'https://thecusp.io/api/arc-rpc',                             // ecosystem relay (live)
     'https://warp-arc-production.up.railway.app/rpc',             // ecosystem relay (live)
     'https://rpc.arc-scan.org',                                   // public node (rate-limited)
-    '/api/rpc',                                                   // local retry proxy (fallback)
+    '/api/rpc',                                                   // local retry proxy (dev only — no-op in prod)
   ],
   blockExplorerUrls: ['https://arc-scan.org'],
   factory: '0xf0db7b58379503491d857db50ac9ece64c653918',  // Uniswap V3 Factory
@@ -3430,15 +3431,20 @@ async function _receiptOnce(hash) {
   return results.find(rc => rc && (rc.status === '0x1' || rc.status === '0x0')) || null;
 }
 async function txReceipt(hash) {
-  // Poll up to ~90s (60 polls × 1.5s). Longer adaptive spacing avoids hammering the
-  // throttled public node; the wallet RPC is the primary source once mined.
-  for (let i = 0; i < 60; i++) {
-    if (i) await new Promise(r => setTimeout(r, TX_POLL_MS));
+  // Poll up to ~3min (120 polls). Arc is USDC-native with a distinct mempool and the
+  // public nodes throttle heavily under load, so receipts routinely arrive well after
+  // 90s. Longer window + adaptive backoff (1.5s→3s) means a slow-but-mined tx is no
+  // longer misreported as "no receipt". The wallet RPC stays the primary source.
+  let delay = TX_POLL_MS;
+  for (let i = 0; i < 120; i++) {
+    if (i) await new Promise(r => setTimeout(r, delay));
     const rc = await _receiptOnce(hash);
     if (rc) {
       if (rc.status === '0x1') return rc;
       if (rc.status === '0x0') return null;   // mined but reverted
     }
+    // back off gradually so we don't hammer throttled nodes
+    if (i % 20 === 19) delay = Math.min(3000, delay + 500);
   }
   return null;
 }
@@ -4209,7 +4215,8 @@ async function confirmAddModal() {
         const receipt = await txReceipt(hash);
         if (!receipt) {
           const reason = await getRevertReason(hash);
-          throw new Error('bin ' + (done+1) + ' failed ' + shortAddr(hash) + (reason ? ' — reverted: ' + reason : ' — no receipt (tx may be stuck/reverted)'));
+          throw new Error('bin ' + (done+1) + ' ' + shortAddr(hash) +
+            (reason ? ' reverted: ' + reason : ' still pending — check explorer; tx may confirm shortly'));
         }
         mintedCount++;
         const ids = extractNfpmTokenIds(receipt, S.address);
