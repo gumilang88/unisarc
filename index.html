@@ -341,6 +341,9 @@ main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 3rem}
 @media(max-width:640px){.poolq-method{margin-left:0;width:100%}.poolq-summary{grid-template-columns:58px minmax(0,1fr);gap:.65rem}.poolq-top{align-items:flex-start;flex-direction:column}.poolq-metrics{grid-template-columns:1fr}.poolq-metric,.poolq-metric:first-child{border-left:0;padding-left:.52rem}.poolq-bars,.poolq-reasons{grid-template-columns:1fr}.poolq-action{align-items:flex-start;flex-direction:column}.poolq-open{width:100%}}
 /* ---- pairs screener ---- */
 .scr-wrap{overflow-x:auto;max-height:560px;overflow-y:auto}
+.scr-toolbar{display:flex;gap:.6rem;margin-bottom:.8rem}
+.scr-filter{border:3px solid #000;box-shadow:3px 3px 0 #000;background:var(--pop);color:#fff;font-family:var(--px);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;padding:.5rem .8rem;cursor:pointer}
+.scr-filter.active{background:var(--cyan);color:var(--ink)}
 .scr-table{width:100%;border-collapse:collapse;font-size:13px}
 .scr-table th{font-family:var(--px);font-size:11px;text-transform:uppercase;color:rgba(255,255,255,.6);text-align:right;padding:.5rem .5rem;border-bottom:3px solid #000;cursor:pointer;white-space:nowrap;user-select:none}
 .scr-table th:first-child{text-align:left}
@@ -1789,6 +1792,10 @@ a.px-btn{display:inline-block;text-align:center;text-decoration:none;width:auto}
       <!-- FEATURE · PAIRS SCREENER (full width) -->
       <div class="px-card tools-card scr-card">
         <div class="card-title"><h2>Pairs Screener</h2><span class="hint" id="scrLive">TOP 500 · LIVE</span></div>
+        <div class="scr-toolbar">
+          <button class="scr-filter active" type="button" data-scr="all">All</button>
+          <button class="scr-filter" type="button" data-scr="v4">V4 · Top 200</button>
+        </div>
         <p class="tools-sub">Sortable table of USDC pairs. Click a header to sort; click a row to jump to Add LP for that pool.</p>
         <div class="scr-wrap">
           <table class="scr-table" id="scrTable">
@@ -4747,6 +4754,12 @@ $('scrBody').addEventListener('click', e=>{
   if (pool) { S.selected = pool.id; showView('add'); renderPoolChips(); }
   else toast('No pool loaded for ' + sym + ' yet', 'err');
 });
+// screener All / V4 filter toggle
+document.querySelectorAll('.scr-filter').forEach(btn => btn.addEventListener('click', () => {
+  _scrMode = btn.dataset.scr === 'v4' ? 'v4' : 'all';
+  document.querySelectorAll('.scr-filter').forEach(b => b.classList.toggle('active', b === btn));
+  renderScrTable();
+}));
 $('poolqToolbar').addEventListener('click', e=>{
   const btn = e.target.closest('button[data-pq]'); if (!btn) return;
   _poolqMode = btn.dataset.pq || 'all';
@@ -5593,6 +5606,7 @@ async function refreshPoolQuality() {
 
 /* ============ PAIRS SCREENER (sortable) ============ */
 let _scrSort = { key: 'vol', dir: -1 };
+let _scrMode = 'all';   // 'all' = every token, 'v4' = Uniswap V4 pools only (top 200 by vol)
 const SCR_COLS = [
   { key: 'sym', label: 'Pair' },
   { key: 'price', label: 'Price' },
@@ -5626,19 +5640,27 @@ function renderScrHead() {
 }
 function renderSmBody() {
   const body = $t('scrBody'); if (!body) return;
-  const all = (_momToks || []).slice();
+  let all = (_momToks || []).slice();
   // Merge the low-volume UNISARC token (it falls outside the top-50 fetch) so it still
   // appears, but let it flow through the normal sort — never pin it to row #1.
   if (_uniTok && !all.some(t => (t.symbol || '').toUpperCase() === 'UNISARC')) all.push(_uniTok);
+  // V4 filter: only tokens with a Uniswap V4 pool, top 200 by 24h volume (realtime).
+  if (_scrMode === 'v4') {
+    all = all.filter(t => Array.isArray(t.versions) && t.versions.includes('v4'));
+  }
   const k = _scrSort.key;
   all.sort((a, b) => {
     const va = scrVal(a, k), vb = scrVal(b, k);
     if (typeof va === 'string') return va.localeCompare(vb) * _scrSort.dir;
     return (va - vb) * _scrSort.dir;
   });
+  // default sort = volume desc; cap the display to the requested top-N.
+  const cap = _scrMode === 'v4' ? 200 : 500;
   const rows = all;
   if (!rows.length) { body.innerHTML = '<tr><td class="scr-none" colspan="9"><span class="skel-line w60"></span></td></tr>'; return; }
-  body.innerHTML = rows.slice(0, 500).map(t => {
+  const badge = $t('scrLive');
+  if (badge) badge.textContent = (_scrMode === 'v4' ? 'V4 · TOP 200' : 'TOP 500') + ' · LIVE';
+  body.innerHTML = rows.slice(0, cap).map(t => {
     const c24 = t.change24h;
     const up = (c24 || 0) >= 0;
     const icon = t.icon ? `<img src="${t.icon}" alt="" loading="lazy" onerror="this.style.display='none'"/>` : '';
