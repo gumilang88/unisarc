@@ -11,10 +11,9 @@ const FILE = path.join(__dirname, 'index.html');
 // Arc mainnet RPC (chain 5042) — public node is intermittent; retry aggressively.
 // thecusp/warp are ecosystem relays that the RadarDex frontend also uses as fallback.
 const RPC_URLS = [
-  'https://rpc.arc-scan.org',
-  'https://arc-mainnet.infura.io/v3/b6bf7d3508c941499b10025c0776eaf8',
   'https://thecusp.io/api/arc-rpc',
   'https://warp-arc-production.up.railway.app/rpc',
+  'https://rpc.arc-scan.org',
 ];
 
 const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.png': 'image/png', '.svg': 'image/svg+xml', '.json': 'application/json' };

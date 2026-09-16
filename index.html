@@ -1884,11 +1884,10 @@ const CFG = {
   chainName: 'ARC Mainnet',
   nativeCurrency: { name: 'USDC', symbol: 'USDC', decimals: 6 },
   rpcUrls: [
-    '/api/rpc',                                                       // local retry proxy (handles arc-scan rate-limit)
-    'https://rpc.arc-scan.org',
-    'https://arc-mainnet.infura.io/v3/b6bf7d3508c941499b10025c0776eaf8',
-    'https://thecusp.io/api/arc-rpc',
-    'https://warp-arc-production.up.railway.app/rpc',
+    'https://thecusp.io/api/arc-rpc',                             // ecosystem relay (live)
+    'https://warp-arc-production.up.railway.app/rpc',             // ecosystem relay (live)
+    'https://rpc.arc-scan.org',                                   // public node (rate-limited)
+    '/api/rpc',                                                   // local retry proxy (fallback)
   ],
   blockExplorerUrls: ['https://arc-scan.org'],
   factory: '0xf0db7b58379503491d857db50ac9ece64c653918',  // Uniswap V3 Factory
@@ -2036,24 +2035,11 @@ async function estimateSwapGas(tx) {
   } catch (e) { return null; }
 }
 async function buildGasFields(tx) {
-  const priority = await ethMaxPriorityFeePerGas();
-  const gasPrice = await ethGasPrice();
-  const baseFee = await ethBaseFeePerGas();
-  const estGas = await estimateSwapGas(tx);
-  if (estGas) tx.gas = '0x' + estGas.toString(16);
-  if (priority != null && gasPrice != null) {
-    // Arc's RPC currently suggests a 20 gwei priority fee, which makes wallet previews
-    // look ~10x too high. Cap the tip at 1 gwei and leave 20% base-fee headroom.
-    const oneGwei = 1000000000n;
-    const tip = priority < oneGwei ? priority : oneGwei;
-    const base = baseFee != null ? baseFee : gasPrice;
-    const tightCap = base * 120n / 100n + tip;
-    const maxFee = tightCap < gasPrice ? tightCap : gasPrice;
-    tx.maxPriorityFeePerGas = '0x' + tip.toString(16);
-    tx.maxFeePerGas = '0x' + maxFee.toString(16);
-  } else if (gasPrice != null) {
-    tx.gasPrice = '0x' + gasPrice.toString(16);
-  }
+  // Arc is a USDC-native chain — its gas market (USDC-denominated base fee, distinct
+  // mempool) differs from standard EIP-1559 EVM. ANY override of gas / maxFeePerGas /
+  // gasPrice with Ethereum-style math here produced values the Arc mempool rejected,
+  // leaving txs stuck with "no receipt". Fix: attach nothing — send the bare tx and let
+  // the wallet (MetaMask/Rabby, which understand Arc's USDC gas model) fill every field.
   return tx;
 }
 
@@ -3267,21 +3253,53 @@ async function sendTx(to, data, value='0x0') {
   const hash = await window.ethereum.request({ method: 'eth_sendTransaction', params: [tx] });
   return hash;
   }
-const TX_POLL_MS = 500;
-async function txReceipt(hash) {
-  for (let i=0;i<360;i++) {
-    if (i) await new Promise(r=>setTimeout(r,TX_POLL_MS));
+const TX_POLL_MS = 1500;
+// Fetch a single receipt, trying wallet RPC then every public endpoint until one
+// returns a definite answer (mined). Returns {status} on success, null on not-yet.
+async function _receiptOnce(hash) {
+  // 1) wallet RPC first — it usually sees the submitted tx first
+  if (window.ethereum && window.ethereum.request) {
     try {
-      // Wallet RPC usually sees the submitted tx first; public RPC remains fallback.
-      const walletReceipt = window.ethereum && window.ethereum.request
-        ? window.ethereum.request({ method: 'eth_getTransactionReceipt', params: [hash] })
-        : Promise.reject(new Error('wallet RPC unavailable'));
-      const rc = await Promise.any([walletReceipt, ethRpcNode('eth_getTransactionReceipt', [hash])]);
-      if (rc && rc.status === '0x1') return rc;
-      if (rc && rc.status === '0x0') return null;
-    } catch(e) {}
+      const rc = await window.ethereum.request({ method: 'eth_getTransactionReceipt', params: [hash] });
+      if (rc && (rc.status === '0x1' || rc.status === '0x0')) return rc;
+    } catch (e) {}
+  }
+  // 2) race all public endpoints (thecusp/warp/arc-scan + proxy) for a definite receipt
+  const probes = CFG.rpcUrls.map(url =>
+    rpcFrom(url, 'eth_getTransactionReceipt', [hash]).then(rc => {
+      if (rc && (rc.status === '0x1' || rc.status === '0x0')) return rc;
+      return null;
+    }).catch(() => null)
+  );
+  const results = await Promise.all(probes);
+  return results.find(rc => rc && (rc.status === '0x1' || rc.status === '0x0')) || null;
+}
+async function txReceipt(hash) {
+  // Poll up to ~90s (60 polls × 1.5s). Longer adaptive spacing avoids hammering the
+  // throttled public node; the wallet RPC is the primary source once mined.
+  for (let i = 0; i < 60; i++) {
+    if (i) await new Promise(r => setTimeout(r, TX_POLL_MS));
+    const rc = await _receiptOnce(hash);
+    if (rc) {
+      if (rc.status === '0x1') return rc;
+      if (rc.status === '0x0') return null;   // mined but reverted
+    }
   }
   return null;
+}
+// Best-effort revert reason for a failed tx: replay the call via eth_call and surface
+// the raw revert string. Returns '' if it can't be determined (node throttled, etc).
+async function getRevertReason(hash) {
+  try {
+    const tx = await rpc('eth_getTransactionByHash', [hash]);
+    if (!tx || !tx.from || !tx.to || tx.input == null) return '';
+    const r = await rpc('eth_call', [{ from: tx.from, to: tx.to, data: tx.input, value: tx.value || '0x0' }, 'latest']);
+    return '';  // no revert on replay = not a deterministic revert
+  } catch (e) {
+    let msg = (e && e.message) || '';
+    const m = msg.match(/execution reverted[^:]*:?\s*([A-Z_]{2,})/) || msg.match(/reason="([^"]+)"/) || msg.match(/'(.+?)'/);
+    return m && m[1] ? m[1] : '';
+  }
 }
 async function waitTx(hash) { return !!(await txReceipt(hash)); }
 const ERC721_TRANSFER_TOPIC = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
@@ -4034,7 +4052,10 @@ async function confirmAddModal() {
         toast('Minting ' + (bin.side === 'bid' ? 'BID' : 'ASK') + ' range…');
         hash = await sendTx(CFG.nfpm, data);
         const receipt = await txReceipt(hash);
-        if (!receipt) throw new Error('bin ' + (done+1) + ' failed ' + shortAddr(hash));
+        if (!receipt) {
+          const reason = await getRevertReason(hash);
+          throw new Error('bin ' + (done+1) + ' failed ' + shortAddr(hash) + (reason ? ' — reverted: ' + reason : ' — no receipt (tx may be stuck/reverted)'));
+        }
         mintedCount++;
         const ids = extractNfpmTokenIds(receipt, S.address);
         if (ids.length !== 1) throw new Error('cannot resolve minted position id for bin ' + (done+1));
