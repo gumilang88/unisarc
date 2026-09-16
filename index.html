@@ -1272,9 +1272,35 @@ a.px-btn{display:inline-block;text-align:center;text-decoration:none;width:auto}
 .scr-table tbody tr{transition:background .15s}
 .scr-table tbody tr:hover{background:rgba(61,218,216,.05)}
 .scr-table tbody tr:nth-child(even){background:rgba(255,255,255,.02)}
+
+/* ===================== RPC STATUS BANNER + SKELETON ===================== */
+/* #2 — RPC degraded banner: shown when eth_call fails across all endpoints */
+.rpc-banner{
+  display:none;align-items:center;gap:.6rem;justify-content:center;
+  padding:.45rem 1rem;border-bottom:3px solid #000;
+  background:linear-gradient(90deg,#4a1a30,#3c1154 50%,#4a1a30);
+  font-family:var(--px);font-size:11px;text-transform:uppercase;letter-spacing:.05em;
+  color:#ffc0a8;text-align:center;
+}
+.rpc-banner.show{display:flex}
+.rpc-banner .dot{width:9px;height:9px;border-radius:50%;background:var(--orange);box-shadow:0 0 8px var(--orange);animation:pulse 1.6s ease-in-out infinite}
+
+/* #3 — skeleton shimmer for loading/empty states (replaces flat grey text) */
+@keyframes shimmer{0%{background-position:-200px 0}100%{background-position:200px 0}}
+.skel{
+  display:inline-block;border-radius:3px;min-height:1em;
+  background:linear-gradient(90deg,#4a1768 0%,#5b1d7d 40%,#4a1768 80%);
+  background-size:400px 100%;
+  animation:shimmer 1.4s linear infinite;
+}
+.skel-line{display:block;width:100%;height:12px;margin:.4rem 0}
+.skel-line.w60{width:60%} .skel-line.w80{width:80%} .skel-line.w40{width:40%}
+.loading-state{padding:1rem;color:rgba(255,255,255,.5)}
 </style>
 </head>
 <body>
+
+<div class="rpc-banner" id="rpcBanner"><span class="dot"></span><span id="rpcBannerText">Network degraded — on-chain data may be delayed</span></div>
 
 <header>
   <div class="brand"><img class="brand-logo" src="assets/unisarc-logo.png" alt="UNISARC"/><span>Uni<b>Sarc</b></span></div>
@@ -1656,7 +1682,7 @@ a.px-btn{display:inline-block;text-align:center;text-decoration:none;width:auto}
         <div class="heat-spot">
           <div class="heat-spot-head"><h3>Token Spotlight</h3><span class="hint" id="spotLive">LIVE</span></div>
           <div class="spot-body" id="spotBody">
-            <div class="spot-empty">Loading…</div>
+            <div class="spot-empty"><span class="skel-line w80"></span><span class="skel-line w60"></span><span class="skel-line w40"></span></div>
           </div>
         </div>
       </div>
@@ -1678,7 +1704,7 @@ a.px-btn{display:inline-block;text-align:center;text-decoration:none;width:auto}
       <div class="px-card tools-card liqd-card">
         <div class="card-title"><h2>Liquidity Distribution</h2><span class="hint" id="liqdLive">LIVE</span></div>
         <div class="liqd-body" id="liqdBody">
-          <div class="liqd-empty">Loading…</div>
+          <div class="liqd-empty"><span class="skel-line w80"></span><span class="skel-line w60"></span><span class="skel-line w50"></span></div>
         </div>
       </div>
       </div>
@@ -1690,18 +1716,18 @@ a.px-btn{display:inline-block;text-align:center;text-decoration:none;width:auto}
           <span>Pair</span><span>Value</span><span>Type</span><span>Tx</span>
         </div>
         <div class="feed-list" id="feedList">
-          <div class="feed-empty" id="feedEmpty">Loading live swaps…</div>
+          <div class="feed-empty" id="feedEmpty"><span class="skel-line w80"></span><span class="skel-line w60"></span><span class="skel-line w70"></span><span class="skel-line w50"></span></div>
         </div>
         <div class="feed-mig">
           <div class="feed-mig-head"><h3>Multi-Tier Pool Migration · LP-Attention</h3><span class="hint" id="migLive">LIVE</span></div>
           <div class="mig-flex">
             <div class="mig-col">
               <div class="mig-col-head"><span>Momentum IN</span><span class="mig-agg up" id="migIn">+$—</span></div>
-              <div class="mig-list" id="migInList"><div class="feed-empty">Sampling…</div></div>
+              <div class="mig-list" id="migInList"><div class="feed-empty"><span class="skel-line w70"></span><span class="skel-line w50"></span></div></div>
             </div>
             <div class="mig-col">
               <div class="mig-col-head"><span>Pressure OUT</span><span class="mig-agg down" id="migOut">-$—</span></div>
-              <div class="mig-list" id="migOutList"><div class="feed-empty">Sampling…</div></div>
+              <div class="mig-list" id="migOutList"><div class="feed-empty"><span class="skel-line w70"></span><span class="skel-line w50"></span></div></div>
             </div>
           </div>
         </div>
@@ -1718,7 +1744,7 @@ a.px-btn{display:inline-block;text-align:center;text-decoration:none;width:auto}
           <button class="poolq-filter" type="button" data-pq="stable">Lower Volatility</button>
           <span class="poolq-method">Score ≠ guaranteed return · click a pool to open Add LP</span>
         </div>
-        <div class="poolq-grid" id="poolqGrid"><div class="poolq-empty">Scanning pools…</div></div>
+        <div class="poolq-grid" id="poolqGrid"><div class="poolq-empty"><span class="skel-line w80"></span><span class="skel-line w60"></span><span class="skel-line w70"></span></div></div>
       </div>
 
       <!-- FEATURE · PAIRS SCREENER (full width) -->
@@ -2004,42 +2030,34 @@ async function rpcWithRetry(method, params, attempts = 2) {
 }
 async function rpc(method, params) {
   try { return await rpcWithRetry(method, params, 2); }
-  catch (e) { throw new Error('all RPC endpoints failed'); }
+  catch (e) { setRpcDegraded(true); throw new Error('all RPC endpoints failed'); }
 }
-async function ethCall(to, data) { return rpc('eth_call', [{ to, data }, 'latest']); }
+// #2 — RPC degraded banner: track consecutive failures, show/hide the banner.
+let _rpcFailStreak = 0, _rpcOkStreak = 0;
+function setRpcDegraded(degraded) {
+  const b = document.getElementById('rpcBanner');
+  if (!b) return;
+  if (degraded) {
+    _rpcFailStreak++; _rpcOkStreak = 0;
+    if (_rpcFailStreak >= 3) b.classList.add('show');
+  } else {
+    _rpcOkStreak++; _rpcFailStreak = 0;
+    if (_rpcOkStreak >= 2) b.classList.remove('show');
+  }
+}
+async function ethCall(to, data) {
+  try { const r = await rpc('eth_call', [{ to, data }, 'latest']); setRpcDegraded(false); return r; }
+  catch (e) { setRpcDegraded(true); throw e; }
+}
 async function ethGetCode(addr) { return rpc('eth_getCode', [addr, 'latest']); }
 async function ethRpcNode(method, params) { return rpc(method, params); }
 
-/* ---------- gas fee (EIP-1559) helpers ----------
-   Wallet defaults often over-estimate tip → popup shows a bloated gas number.
-   We pull the chain's real base fee + priority fee and a tight estimateGas so the
-   wallet popup shows a low, accurate figure. Amounts/destination/calldata untouched. */
-async function ethMaxPriorityFeePerGas() {
-  try { return BigInt(await rpc('eth_maxPriorityFeePerGas', [])); } catch (e) { return null; }
-}
-async function ethGasPrice() {
-  try { return BigInt(await rpc('eth_gasPrice', [])); } catch (e) { return null; }
-}
-async function ethBaseFeePerGas() {
-  try {
-    const b = await rpc('eth_getBlockByNumber', ['latest', false]);
-    return BigInt(b.baseFeePerGas || 0);
-  } catch (e) { return null; }
-}
-async function estimateSwapGas(tx) {
-  try {
-    const g = await rpc('eth_estimateGas', [tx]);
-    const est = BigInt(g);
-    // pad modestly so it never stalls, but keep the number shown low.
-    return est * 115n / 100n;
-  } catch (e) { return null; }
-}
+/* ---------- tx gas fields ----------
+   Arc is a USDC-native chain — its gas market (USDC-denominated base fee, distinct
+   mempool) differs from standard EIP-1559 EVM. We deliberately attach NO gas fields
+   and let the wallet (MetaMask/Rabby) fill them, since it understands Arc's gas model.
+   (Overriding gas here with Ethereum-style math previously left txs stuck — "no receipt".) */
 async function buildGasFields(tx) {
-  // Arc is a USDC-native chain — its gas market (USDC-denominated base fee, distinct
-  // mempool) differs from standard EIP-1559 EVM. ANY override of gas / maxFeePerGas /
-  // gasPrice with Ethereum-style math here produced values the Arc mempool rejected,
-  // leaving txs stuck with "no receipt". Fix: attach nothing — send the bare tx and let
-  // the wallet (MetaMask/Rabby, which understand Arc's USDC gas model) fill every field.
   return tx;
 }
 
@@ -5057,7 +5075,7 @@ function setSpotTf(tf) {
 function renderSpotlight() {
   const body = $t('spotBody'); if (!body) return;
   const toks = _heatTokens || [];
-  if (!toks.length) { body.innerHTML = '<div class="spot-empty">Loading…</div>'; return; }
+  if (!toks.length) { body.innerHTML = '<div class="spot-empty"><span class="skel-line w80"></span><span class="skel-line w60"></span><span class="skel-line w40"></span></div>'; return; }
   let best = null, fallback = null;
   for (const t of toks) {
     const isSparky = t.volume24 > 0 && Array.isArray(t.spark) && t.spark.length >= 10;
@@ -5065,7 +5083,7 @@ function renderSpotlight() {
     if (t.volume24 > 0 && (!fallback || t.volume24 > fallback.volume24)) fallback = t;
   }
   if (!best) best = fallback;
-  if (!best) { body.innerHTML = '<div class="spot-empty">Loading…</div>'; return; }
+  if (!best) { body.innerHTML = '<div class="spot-empty"><span class="skel-line w80"></span><span class="skel-line w60"></span></div>'; return; }
   const icon = best.icon ? '<img src="' + best.icon + '" alt="" loading="lazy" onerror="this.style.display=\'none\'" />' : '';
   const ch = best.change24h || 0, cls = ch >= 0 ? 'up' : 'down';
   _spotChart = { spark: best.spark, candles: buildCandles(best.spark, TF['15m'].n), cw: TF['15m'].cw, offset: 0 };
@@ -5094,7 +5112,7 @@ function renderSpotlight() {
           <button class="tf" data-tf="1D">1D</button>
         </div>
       </div>
-      <div class="candle-view" id="candleView"><div class="spot-empty">Loading…</div></div>
+      <div class="candle-view" id="candleView"><div class="spot-empty"><span class="skel-line w80"></span><span class="skel-line w60"></span><span class="skel-line w40"></span></div></div>
       <div class="spot-ohlc" id="spotOhlc"></div>
     </div>`;
   initSpotCandles();
@@ -5105,7 +5123,7 @@ function renderSpotlight() {
 function renderLiquidityDistribution() {
   const body = $t('liqdBody'); if (!body) return;
   const toks = (_heatTokens || []).filter(t => (t.liquidityUsdc || 0) > 0);
-  if (!toks.length) { body.innerHTML = '<div class="liqd-empty">Loading…</div>'; return; }
+  if (!toks.length) { body.innerHTML = '<div class="liqd-empty"><span class="skel-line w80"></span><span class="skel-line w60"></span></div>'; return; }
   // sort by liquidity, but pin UNISARC (the token with the official website) to #1
   const sorted = toks.slice().sort((a, b) => (b.liquidityUsdc || 0) - (a.liquidityUsdc || 0));
   const uniIdx = sorted.findIndex(t => (t.symbol || '').toUpperCase() === 'UNISARC');
@@ -5313,7 +5331,7 @@ function renderSmBody() {
     return (va - vb) * _scrSort.dir;
   });
   const rows = all;
-  if (!rows.length) { body.innerHTML = '<tr><td class="scr-none" colspan="9">Loading…</td></tr>'; return; }
+  if (!rows.length) { body.innerHTML = '<tr><td class="scr-none" colspan="9"><span class="skel-line w60"></span></td></tr>'; return; }
   body.innerHTML = rows.slice(0, 100).map(t => {
     const c24 = t.change24h;
     const up = (c24 || 0) >= 0;

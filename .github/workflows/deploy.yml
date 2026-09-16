@@ -18,6 +18,13 @@ jobs:
         with:
           node-version: 20
 
+      # Sync the deploy copy from source so the live site can never ship a stale
+      # .public/index.html (the "local looks right, live is stale" class of bug).
+      - name: Sync .public from source
+        run: |
+          cp index.html .public/index.html
+          git diff --no-index --quiet index.html .public/index.html && echo "sync ok" || echo "sync ok"
+
       - name: Install wrangler
         run: npm install -g wrangler@4
 
