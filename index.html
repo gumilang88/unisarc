@@ -2824,10 +2824,67 @@ function openPoolModal() { $('poolModal').classList.add('open'); renderPoolChips
 function closePoolModal() { $('poolModal').classList.remove('open'); }
 function filterPoolOptions(q) {
   q = (q||'').trim().toLowerCase();
+  // contract address pasted → resolve the token and surface a matching pool (or a
+  // "resolve this token" entry) instead of just filtering the already-loaded list.
+  if (/^0x[0-9a-f]{40}$/.test(q)) {
+    resolvePoolFromContract(q);
+    return;
+  }
   document.querySelectorAll('.pool-opt').forEach(el => {
     const ok = !q || el.textContent.toLowerCase().includes(q);
     el.style.display = ok ? '' : 'none';
   });
+  // clear any prior contract-resolution placeholder
+  const ph = document.getElementById('pmContractRow');
+  if (ph) ph.remove();
+}
+// Paste a contract address in the pool picker: resolve the token (tokenlist → radar →
+// on-chain), then (a) if its pool is already loaded, filter to it; (b) otherwise show a
+// one-click row that resolves & opens Manual Add for that token.
+async function resolvePoolFromContract(addr) {
+  const list = $('pmList');
+  if (!list) return;
+  const ph = document.getElementById('pmContractRow');
+  if (ph) ph.remove();
+  const row = document.createElement('div');
+  row.id = 'pmContractRow';
+  row.style.padding = '.6rem .4rem';
+  row.innerHTML = '<span style="color:var(--cyan);font-family:var(--vt);font-size:13px">Resolving contract…</span>';
+  list.prepend(row);
+  // already-loaded pool for this token (by address)?
+  const pool = S.pools.find(pp => String(pp.addr || '').toLowerCase() === addr);
+  if (pool) {
+    // filter to just that pool + highlight it
+    document.querySelectorAll('.pool-opt').forEach(el => {
+      const match = el.dataset.pool === pool.id;
+      el.style.display = match ? '' : 'none';
+    });
+    row.remove();
+    return;
+  }
+  const t = await resolveSwapTokenByAddress(addr);
+  row.remove();
+  if (t && t.symbol && t.symbol !== '?') {
+    const btn = document.createElement('button');
+    btn.className = 'pool-opt';
+    btn.type = 'button';
+    btn.style.width = '100%';
+    btn.innerHTML = `<span class="po-main"><span class="po-sym">USDC / ${t.symbol}</span><span class="po-a">${t.address}</span></span><span class="po-right"><span class="po-tvl">ADD →</span></span>`;
+    btn.addEventListener('click', () => {
+      closePoolModal();
+      $('manualPanel').style.display = 'block';
+      $('btnManualPool').textContent = '× Close manual';
+      $('manAddrA').value = addr;
+      $('manAddrB').value = '';
+      resolveManualPool();
+    });
+    list.prepend(btn);
+  } else {
+    const none = document.createElement('div');
+    none.style.padding = '.6rem .4rem';
+    none.innerHTML = '<span style="color:var(--orange);font-family:var(--vt);font-size:13px">Token not found at this address — try Manual Add.</span>';
+    list.prepend(none);
+  }
 }
 let CUSTOM_POOL = null; // last resolved manual pool
 async function resolveManualPool() {
