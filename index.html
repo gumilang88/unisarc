@@ -2874,8 +2874,9 @@ async function resolvePoolFromContract(addr) {
       closePoolModal();
       $('manualPanel').style.display = 'block';
       $('btnManualPool').textContent = '× Close manual';
-      $('manAddrA').value = addr;
-      $('manAddrB').value = '';
+      // Pasted contract goes to Token B (the pair token); Token A stays USDC.
+      $('manAddrA').value = USDC_ADDR;
+      $('manAddrB').value = addr;
       resolveManualPool();
     });
     list.prepend(btn);
