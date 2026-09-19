@@ -5341,35 +5341,40 @@ async function fetchArgusSwaps() {
 }
 
 // ---- BasedBot swap feed (real per-trade data, all ARC launchpads) ----
-// One batched request to /api/basedbot-feed: server-side a single python process
-// (warm curl_cffi session) pulls the top-12 token list + each token's recent
-// trades in parallel (~1.3s upstream, 30s server cache). Much faster than the
-// old 13 per-token browser requests.
+// Data path (prod): WSL poller (curl_cffi CF-bypass) → unisarc-feed Worker
+// (Durable Object) → this frontend via FEED_WORKER_URL. Local dev: server.js
+// /api/basedbot-feed batch endpoint (direct python helper). Try local first,
+// then the worker, so both environments work with the same code.
+const FEED_WORKER_URL = 'https://unisarc-feed.akunftx99.workers.dev';
 async function fetchBasedBotSwaps() {
-  try {
-    const r = await fetch('/api/basedbot-feed');
-    if (!r.ok) return [];
-    const j = await r.json();
-    const swaps = (j && j.swaps) || [];
-    const rows = [];
-    for (const s of swaps) {
-      const usdc = Number(s.volume_usd || 0);
-      if (!Number.isFinite(usdc) || usdc <= 0) continue;
-      rows.push({
-        token: String(s.token || '').toLowerCase(),
-        symbol: s.symbol || '?',
-        side: s.is_buy ? 'buy' : 'sell',
-        usdc,
-        price: Number(s.price_usd || 0),
-        trader: s.trader || '',
-        txHash: s.tx_hash || '',
-        time: s.timestamp ? Math.floor(new Date(s.timestamp + 'Z').getTime() / 1000) : Math.floor(Date.now() / 1000),
-        quoteToken: USDC_ADDR,
-        version: 'basedbot',
-      });
-    }
-    return rows;
-  } catch (e) { return []; }
+  const sources = ['/api/basedbot-feed', FEED_WORKER_URL + '/feed'];
+  for (const src of sources) {
+    try {
+      const r = await fetch(src);
+      if (!r.ok) continue;
+      const j = await r.json();
+      const swaps = (j && j.swaps) || [];
+      const rows = [];
+      for (const s of swaps) {
+        const usdc = Number(s.volume_usd || 0);
+        if (!Number.isFinite(usdc) || usdc <= 0) continue;
+        rows.push({
+          token: String(s.token || '').toLowerCase(),
+          symbol: s.symbol || '?',
+          side: s.is_buy ? 'buy' : 'sell',
+          usdc,
+          price: Number(s.price_usd || 0),
+          trader: s.trader || '',
+          txHash: s.tx_hash || '',
+          time: s.timestamp ? Math.floor(new Date(s.timestamp + 'Z').getTime() / 1000) : Math.floor(Date.now() / 1000),
+          quoteToken: USDC_ADDR,
+          version: 'basedbot',
+        });
+      }
+      if (rows.length) return rows;
+    } catch (e) { /* try next source */ }
+  }
+  return [];
 }
 
 
