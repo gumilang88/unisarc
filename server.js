@@ -54,6 +54,34 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // Argus token data — /api/argus -> serve the scraped top-100-by-volume snapshot.
+  // argus.world's API is Cloudflare-protected (TLS fingerprint + JS challenge), so the
+  // snapshot lives in argus-data.json (refreshed out-of-band via a browser session).
+  if (req.url === '/api/argus' || req.url.startsWith('/api/argus?')) {
+    fs.readFile(path.join(__dirname, 'argus-data.json'), (err, data) => {
+      if (err) { res.writeHead(404, { 'Content-Type': 'application/json' }); return res.end(JSON.stringify({ error: 'no argus snapshot' })); }
+      res.writeHead(200, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' });
+      res.end(data);
+    });
+    return;
+  }
+
+  // BasedBot proxy — /api/basedbot<path> -> https://basedbot.app<path>.
+  // basedbot.app is Cloudflare-protected against plain node fetch (TLS fingerprint
+  // challenge), but curl_cffi's chrome impersonation passes cleanly.
+  // /api/basedbot-feed runs the batch helper: ONE python process fetches the token
+  // list + all top-token trades in parallel with a warm session (~1.3s total vs
+  // 13 cold processes ≈ 8-15s). 30s in-memory cache keeps polls off the upstream.
+  if (req.url.startsWith('/api/basedbot/')) {
+    const rest = req.url.slice('/api/basedbot'.length); // "/api/tokens?chain=..." etc.
+    basedbotProxy(req, res, rest);
+    return;
+  }
+  if (req.url.startsWith('/api/basedbot-feed')) {
+    basedbotProxy(req, res, '--feed 12 30');
+    return;
+  }
+
   // Arc RPC proxy — /api/rpc -> forward JSON-RPC to an upstream Arc node.
   // The public node (rpc.arc-scan.org) rate-limits / intermittently drops requests,
   // which breaks wallet flows (add LP BID/ASK, swap, claim) in the browser. Routing
@@ -98,6 +126,45 @@ let indexHtmlCache = fs.readFileSync(FILE);
 fs.watchFile(FILE, { interval: 1000 }, () => {
   try { indexHtmlCache = fs.readFileSync(FILE); console.log('[unisarc] index.html reloaded'); } catch (e) {}
 });
+
+// BasedBot upstream proxy with a 30s in-memory cache.
+// The python helper (basedbot_fetch.py) does the actual CF-bypassing fetch via
+// curl_cffi; this wrapper handles concurrency (same-path requests coalesce into
+// one upstream call), caching, and timeouts.
+const BB_CACHE = new Map(); // key -> { at, body, inflight }
+function basedbotProxy(req, res, restPath) {
+  const key = restPath;
+  const now = Date.now();
+  const hit = BB_CACHE.get(key);
+  // fresh cached body (< 30s) — serve immediately
+  if (hit && hit.body && now - hit.at < 30000) {
+    res.writeHead(200, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store', 'X-BB-Cache': 'hit' });
+    return res.end(hit.body);
+  }
+  // an upstream fetch for this path is already in flight — piggyback on it
+  if (hit && hit.inflight && hit.inflight.length) {
+    hit.inflight.push({ res });
+    return;
+  }
+  const waiters = [{ res }];
+  const entry = { at: now, body: null, inflight: waiters };
+  BB_CACHE.set(key, entry);
+  // --feed args arrive as one pre-joined string; split into argv for the helper
+  const helperArgs = restPath.startsWith('--feed') ? restPath.split(/\s+/) : [restPath];
+  const { execFile } = require('child_process');
+  execFile('python3', [path.join(__dirname, 'basedbot_fetch.py'), ...helperArgs], { timeout: 25000, maxBuffer: 8e6 }, (err, stdout, stderr) => {
+    const ok = !err && stdout && stdout.trim().startsWith('{');
+    if (ok) {
+      entry.body = stdout;
+      entry.at = Date.now();
+      entry.inflight = [];
+      for (const w of waiters) { try { w.res.writeHead(200, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }); w.res.end(stdout); } catch (e) {} }
+    } else {
+      entry.inflight = [];
+      for (const w of waiters) { try { w.res.writeHead(502, { 'Content-Type': 'application/json' }); w.res.end(JSON.stringify({ error: 'basedbot proxy failed' })); } catch (e) {} }
+    }
+  });
+}
 
 async function radarProxy(req, res, target) {
   // RadarDex upstream is intermittently slow/unreachable. Retry a few times with a

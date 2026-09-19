@@ -2485,6 +2485,127 @@ function buildPoolsFromRadar(list) {
     }
 function poolsFromSnapshot() { return buildPoolsFromRadar(RADAR_SNAPSHOT); }
 
+// Argus.world is a separate ARC-chain launchpad (V4 pools). Its API is Cloudflare-
+// protected, so the dashboard reads a locally-served snapshot via /api/argus. Field
+// names differ from RadarDex, so map them to RadarDex's raw /tokens shape and reuse
+// buildPoolsFromRadar for the pool construction.
+async function fetchArgusTop() {
+  try {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 6000);
+    const r = await fetch('/api/argus', { signal: ctrl.signal });
+    clearTimeout(t);
+    if (!r.ok) return null;
+    const j = await r.json();
+    return Array.isArray(j) ? j : (j.tokens || null);
+  } catch (e) { return null; }
+}
+// Map argus token -> pool objects directly (no liq filter, no radarTokens reset).
+// Argus graduated tokens are real Uniswap V3 pools (already off the bonding curve).
+// Argus.world logo URLs point at a *dedicated* Pinata gateway
+// (magenta-worthwhile-weasel-473.mypinata.cloud) whose content is frequently
+// unpinned → HTTP 403, so every Argus logo renders as a letter avatar. The public
+// Pinata gateway (gateway.pinata.cloud/ipfs/<cid>) still serves the same CID, so
+// rewrite the host + path to the public gateway. Also route gmgn.ai (hotlink-
+// protected) through the public IPFS gateway when a CID is available.
+function argusLogoUrl(u) {
+  if (!u) return '';
+  try {
+    // any *.mypinata.cloud/ipfs/<cid> → gateway.pinata.cloud/ipfs/<cid>
+    if (/mypinata\.cloud\/ipfs\/(.+)/.test(u)) {
+      return 'https://gateway.pinata.cloud/ipfs/' + u.match(/ipfs\/(.+)/)[1];
+    }
+    // gmgn.ai hotlink-protected — leave as-is (client fallback handles failure)
+    return u;
+  } catch (e) { return u; }
+}
+
+function buildPoolsFromArgus(argusList) {
+  const out = [];
+  for (const a of argusList || []) {
+    const sym = a.symbol || '?';
+    const name = a.name || sym;
+    const liq = Number(a.liquidityUsdc) || 0;
+    const vol = Number(a.volume24) || 0;
+    const price = Number(a.price) || 0;
+    const spark = Array.isArray(a.spark) && a.spark.length ? a.spark : [1];
+    const apr = liq > 0 ? (vol * 0.01 * 0.85 / liq) * 365 * 100 : 0;
+    const addr = String(a.address || '').toLowerCase();
+    const icon = argusLogoUrl(a.imageUrl);
+    // Some memecoins deliberately use a well-known symbol (USDC/EURC/PI/AI/…), which
+    // collides with the USDC quote side and would render "USDC / USDC". Use the token's
+    // NAME as the display label when its symbol clashes with the quote token, so every
+    // pool reads unambiguously (e.g. "USDC / UpSideDownCat").
+    const label = (sym.toUpperCase() === 'USDC') ? name : sym;
+    if (addr) S.radarTokens[addr] = {
+      addr, symbol: sym, priceB: price, tvl: liq, vol,
+      icon, fee: 10000, spark, change24h: Number(a.change24h) || 0,
+      v4: false, versions: [], launchpad: 'argus',
+    };
+    out.push({
+      id: 'ARGUS-' + addr, a: 'USDC', b: label, addr,
+      icon, fee: 10000,
+      reserveA: liq, reserveB: liq / (price || 1),
+      tvl: liq, priceB: price, apr: Math.min(240, Math.max(0.1, apr)),
+      vol, chg24: Number(a.change24h) || 0, spark,
+      verified: false, launchpad: 'argus', website: '', twitter: '',
+      v4: false, versions: [],
+    });
+  }
+  return out;
+}
+
+// Map argus tokens to RadarDex raw /tokens shape so Tools-page consumers
+// (screener `_momToks`, heatmap `_heatTokens`, pool-quality scanner) can merge
+// Argus V4 tokens seamlessly. Fields Radar uses that Argus lacks (txns24/buys24/
+// sells24/ageSec) default to 0.
+async function argusTokensAsRadar() {
+  const argus = await fetchArgusTop();
+  if (!argus || !argus.length) return [];
+  return argus.map(a => ({
+    symbol: a.symbol || '?',
+    name: a.name || a.symbol || 'Token',
+    address: String(a.address || '').toLowerCase(),
+    price: Number(a.price) || 0,
+    change24h: Number(a.change24h) || 0,
+    volume24: Number(a.volume24) || 0,
+    liquidityUsdc: Number(a.liquidityUsdc) || 0,
+    mcap: Number(a.marketCap) || 0,
+    holders: Number(a.holders) || 0,
+    txns24: 0, buys24: 0, sells24: 0, ageSec: 0,
+    icon: argusLogoUrl(a.imageUrl), spark: Array.isArray(a.spark) ? a.spark : [],
+    // Graduated argus tokens live on regular Uniswap V3 pools — do NOT tag V4.
+    versions: [],
+  }));
+}
+
+
+// Called after every radar refresh so the Argus set survives the 15s poll overwrite.
+async function mergeArgusPools() {
+  const argus = await fetchArgusTop();
+  if (!argus || !argus.length) return 0;
+  const argusPools = buildPoolsFromArgus(argus);
+  const existing = new Set(S.pools.map(p => (p.addr || '').toLowerCase()));
+  let added = 0;
+  for (const ap of argusPools) {
+    const key = (ap.addr || '').toLowerCase();
+    if (!key || existing.has(key)) continue;
+    existing.add(key);
+    S.pools.push(ap);
+    added++;
+  }
+  return added;
+}
+
+// Rebuild S.pools from a live Radar token list AND re-attach the Argus set in one
+// step, so no consumer (Monitor, Tools heatmap, pool-quality scanner, screener) ever
+// loses the Argus pools when radar overwrites S.pools. Returns the merged array.
+async function rebuildPoolsWithArgus(live) {
+  S.pools = (live && live.length) ? buildPoolsFromRadar(live) : (S.pools || []);
+  await mergeArgusPools();
+  return S.pools;
+}
+
 // UNISARC is the platform's own token but is often NOT in RadarDex's top-500
 // /tokens response (low 24h volume). Fetch it directly from /token/:addr and inject
 // it into S.pools so it's always present + pinned #1, regardless of top-500 ranking.
@@ -3130,7 +3251,7 @@ async function resolveSwapTokenByAddress(addr){
   // 3) RadarDex /token/:addr (market data: price/volume/icon) → fast, richer than on-chain
   try {
     const ctrl = new AbortController();
-    const tm = setTimeout(() => ctrl.abort(), 6000);
+    const tm = setTimeout(() => ctrl.abort(), 3000);
     const r = await fetch(RADAR_API + '/token/' + addr, { signal: ctrl.signal });
     clearTimeout(tm);
     if (r.ok) {
@@ -3394,10 +3515,17 @@ function renderMonitor() {
     <div class="stat"><div class="label">Volume 24H</div><div class="value">${fmtUsd(vol)}</div><div class="sub">across all pools</div></div>
     <div class="stat"><div class="label">Fees to LPs 24H</div><div class="value up">${fmtUsd(fees)}</div><div class="sub">swap fees · 85% to LPs</div></div>
     <div class="stat"><div class="label">My Positions</div><div class="value">${fmtUsd(myVal)}</div><div class="sub">${S.positions.length} on-chain</div></div>`;
-  $('monGrid').innerHTML = S.pools.map(p => {
+  // Sort pools by 24h volume desc (highest first) — argus + radar mixed.
+  const sortedPools = S.pools.slice().sort((a, b) => (b.vol || 0) - (a.vol || 0));
+  $('monGrid').innerHTML = sortedPools.map(p => {
     const hasPos = S.positions.find(x => x.meta1 && x.meta1.symbol === p.b);
     const cls = p.spark && p.spark.length ? (p.spark[p.spark.length-1] >= p.spark[0] ? 'good' : 'bad') : 'good';
-    const logoB = p.icon ? `<img class="monico" src="${p.icon}" alt="" onerror="this.style.display='none'"/>` : `<span class="monico-l" style="background:${token(p.b).color||'#3ddad8'}">${p.b.slice(0,1)}</span>`;
+    // Logo with letter fallback: if the <img> fails to load, swap to a colored letter avatar.
+    const letter = (p.b || '?').slice(0,1).toUpperCase();
+    const color = token(p.b).color || '#3ddad8';
+    const logoB = p.icon
+      ? `<img class="monico" src="${p.icon}" alt="" onerror="this.outerHTML='&lt;span class=&quot;monico-l&quot; style=&quot;background:${color}&quot;&gt;${letter}&lt;/span&gt;'"/>`
+      : `<span class="monico-l" style="background:${color}">${letter}</span>`;
     return `<div class="mon-card">
       <div class="mon-top"><span class="nm">${logoB}<span class="mon-name">${p.a} / ${p.b}${p.v4 ? ' <span class="v4-badge">V4</span>' : ''}</span></span><span class="pr">${fmt(p.priceB)} ${p.b}</span></div>
       <div class="mon-val">${fmtUsd(p.tvl)}</div>
@@ -3411,8 +3539,11 @@ function renderMonitor() {
   }).join('');
 }
 function sparkInner(arr, w, h, cls) {
-  const mn = Math.min(...arr), mx = Math.max(...arr), sp = (mx-mn)||1;
-  const pts = arr.map((v,i)=>`${(i/(arr.length-1))*w},${h-8-((v-mn)/sp)*(h-16)}`).join(' ');
+  // Guard against <2 points (division by zero → NaN coords) and non-finite values.
+  let a = (arr || []).filter(v => Number.isFinite(Number(v)));
+  if (a.length < 2) a = a.length === 1 ? [a[0], a[0]] : [1, 1];
+  const mn = Math.min(...a), mx = Math.max(...a), sp = (mx - mn) || 1;
+  const pts = a.map((v, i) => `${(i / (a.length - 1)) * w},${h - 8 - ((v - mn) / sp) * (h - 16)}`).join(' ');
   return `<polyline points="${pts}" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>`;
 }
 function renderRewards() {
@@ -4477,15 +4608,19 @@ async function ensureMonitorPools() {
   }
   renderMonitor();
   if (!_monitorLoadPromise) {
-    _monitorLoadPromise = fetchRadarTop().then(live => {
+    _monitorLoadPromise = (async () => {
+      const [live] = await Promise.all([fetchRadarTop()]);
+      // Radar may be down (snapshot fallback already in S.pools). Build pools from radar
+      // when available; otherwise keep the snapshot. Argus merge runs independently.
       if (live && live.length) {
         S.pools = buildPoolsFromRadar(live);
-        const uni = S.pools.find(p => (p.b || '').toUpperCase() === 'UNISARC');
-        if (uni && (!S.pools.find(p=>p.id===S.selected) || !S._userPickedPool)) S.selected = uni.id;
-        renderPoolChips();
-        renderMonitor();
       }
-    }).catch(()=>{}).finally(() => { _monitorLoadPromise = null; });
+      await mergeArgusPools();
+      const uni = S.pools.find(p => (p.b || '').toUpperCase() === 'UNISARC');
+      if (uni && (!S.pools.find(p=>p.id===S.selected) || !S._userPickedPool)) S.selected = uni.id;
+      renderPoolChips();
+      renderMonitor();
+    })().catch(()=>{}).finally(() => { _monitorLoadPromise = null; });
   }
   return _monitorLoadPromise;
 }
@@ -4825,6 +4960,7 @@ async function refreshPools(force) {
   // outside RadarDex's top-500 volume ranking.
   const uni = await fetchUnisarcToken();
   injectUnisarcPool(uni);
+  await mergeArgusPools();
   const fp = poolsFingerprint(S.pools);
   if (!force && fp === S._lastFp) return;   // no meaningful change → skip re-render
   S._lastFp = fp;
@@ -4856,6 +4992,21 @@ async function fetchHeatTokens() {
     const j = await r.json();
     const toks = (j && j.tokens) || [];
     _heatTokens = toks.filter(t => t && t.price);
+    // Merge Argus V4 tokens so the heatmap picker + gainers/losers + liquidity
+    // distribution include them (dedup by address).
+    try {
+      const argus = await argusTokensAsRadar();
+      if (argus.length) {
+        const seen = new Set(_heatTokens.map(t => String(t.address || '').toLowerCase()));
+        for (const a of argus) {
+          if (!a.address || seen.has(a.address)) continue;
+          seen.add(a.address);
+          _heatTokens.push(a);
+        }
+      }
+    } catch (e) { /* best-effort */ }
+    // Sort by 24h volume desc (highest first) — argus + radar mixed, consistent with Monitor.
+    _heatTokens.sort((a, b) => (b.volume24 || 0) - (a.volume24 || 0));
     return _heatTokens;
   } catch (e) { return []; }
 }
@@ -5083,6 +5234,178 @@ async function fetchRadarSwaps(limit = 50) {
   } catch (e) { return null; }
 }
 
+// ---- ARGUS SWAP FEED (on-chain V3 Swap events) ----
+// Argus.world is a separate ARC launchpad whose graduated tokens live on Uniswap V3
+// pools that RadarDex does NOT index — so their swaps never appear in /swaps. We read
+// the raw V3 Swap event straight off-chain via eth_getLogs for each active Argus pool.
+const V3_SWAP_TOPIC = '0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67';
+const ARGUS_FEE_TIERS = [10000, 3000, 500, 100];
+let _argusPoolCache = null;      // Map<tokenAddr, poolAddr> resolved once, refreshed on token-set change
+let _argusSwapSeq = 0;
+
+// Resolve the live V3 pool for an Argus token (first fee tier with non-zero liquidity).
+async function resolveArgusPool(tokenAddr) {
+  const fees = ARGUS_FEE_TIERS;
+  for (const fee of fees) {
+    try {
+      const pool = await getPool(USDC_ADDR, tokenAddr, fee);
+      if (!pool || pool === '0x0000000000000000000000000000000000000000') continue;
+      const liq = await poolLiquidity(pool);
+      if (liq > 0n) return { pool, fee };
+    } catch (e) { /* try next fee tier */ }
+  }
+  return null;
+}
+
+async function argusPoolMap(force = false) {
+  if (_argusPoolCache && !force) return _argusPoolCache;
+  const argus = await fetchArgusTop();
+  if (!argus || !argus.length) return _argusPoolCache || new Map();
+  // Limit to the top tokens by volume to keep the RPC getLogs fan-out bounded.
+  const top = argus.slice().sort((a, b) => (b.volume24 || 0) - (a.volume24 || 0)).slice(0, 40);
+  const map = new Map();
+  // Resolve pools sequentially with a tiny stagger so blockdaemon doesn't rate-limit.
+  for (const t of top) {
+    const addr = String(t.address || '').toLowerCase();
+    if (!/^0x[0-9a-f]{40}$/.test(addr)) continue;
+    try {
+      const r = await resolveArgusPool(addr);
+      if (r) map.set(addr, { pool: r.pool, tokenAddr: addr, symbol: t.symbol, name: t.name });
+    } catch (e) { /* skip */ }
+  }
+  _argusPoolCache = map;
+  return map;
+}
+
+// Decode one V3 Swap log into the feed row shape renderToolsFeed expects.
+function decodeArgusSwap(log, meta, blockTs) {
+  try {
+    const data = String(log.data || '').replace(/^0x/, '');
+    if (data.length < 128) return null;
+    const amount0 = BigInt.asIntN(256, BigInt('0x' + data.slice(0, 64)));
+    const amount1 = BigInt.asIntN(256, BigInt('0x' + data.slice(64, 128)));
+    // Determine token order: USDC (0x3600…0000) sorts numerically. If the token's
+    // address is BELOW USDC it is token0 (USDC = token1); otherwise USDC = token0.
+    const tokenIsToken0 = String(meta.tokenAddr || '').toLowerCase() < USDC_ADDR;
+    // USDC amount is amount0 when USDC is token0, else amount1.
+    const usdcAmt = tokenIsToken0 ? amount1 : amount0;
+    // Positive USDC amount → USDC flowed INTO the pool → BUY token; negative → SELL.
+    const side = usdcAmt > 0n ? 'buy' : 'sell';
+    const usdc = Number(usdcAmt < 0n ? -usdcAmt : usdcAmt) / 1e6;
+    if (!Number.isFinite(usdc) || usdc <= 0) return null;
+    // Memecoins that deliberately use "USDC" as their ticker would render "USDC / USDC"
+    // in the feed — show their NAME instead so the pair reads unambiguously.
+    const sym = (meta.symbol || '?').toUpperCase() === 'USDC' ? (meta.name || meta.symbol || '?') : (meta.symbol || '?');
+    return {
+      token: meta.tokenAddr || '',      // token address → icon resolves via S.radarTokens
+      symbol: sym,
+      side, usdc,
+      price: 0,
+      trader: log.topics && log.topics[2] ? '0x' + log.topics[2].slice(-40) : '',
+      txHash: log.transactionHash || '',
+      time: blockTs || Math.floor(Date.now() / 1000),
+      quoteToken: USDC_ADDR,
+      version: 'argus',
+    };
+  } catch (e) { return null; }
+}
+
+async function fetchArgusSwaps() {
+  try {
+    const map = await argusPoolMap();
+    if (!map.size) return [];
+    const bnHex = await rpcWithRetry('eth_blockNumber', [], 2);
+    const bn = parseInt(bnHex, 16);
+    if (!Number.isFinite(bn)) return [];
+    const fromBlock = '0x' + Math.max(0, bn - 300).toString(16);
+    const rows = [];
+    const pools = [...map.values()];
+    // getLogs in parallel but capped via Promise.all — blockdaemon handles a few dozen.
+    const logBatches = await Promise.all(pools.map(async meta => {
+      try {
+        const logs = await rpcWithRetry('eth_getLogs', [{ address: meta.pool, topics: [V3_SWAP_TOPIC], fromBlock, toBlock: 'latest' }], 2);
+        return { meta, logs: Array.isArray(logs) ? logs : [] };
+      } catch (e) { return { meta, logs: [] }; }
+    }));
+    // block timestamps: use Date.now() as an approximation for "ago" (good enough for a feed).
+    const now = Math.floor(Date.now() / 1000);
+    for (const { meta, logs } of logBatches) {
+      for (const log of logs) {
+        const row = decodeArgusSwap(log, meta, now);
+        if (row) rows.push(row);
+      }
+    }
+    rows.sort((a, b) => b.usdc - a.usdc);
+    return rows;
+  } catch (e) { return []; }
+}
+
+// ---- BasedBot swap feed (real per-trade data, all ARC launchpads) ----
+// One batched request to /api/basedbot-feed: server-side a single python process
+// (warm curl_cffi session) pulls the top-12 token list + each token's recent
+// trades in parallel (~1.3s upstream, 30s server cache). Much faster than the
+// old 13 per-token browser requests.
+async function fetchBasedBotSwaps() {
+  try {
+    const r = await fetch('/api/basedbot-feed');
+    if (!r.ok) return [];
+    const j = await r.json();
+    const swaps = (j && j.swaps) || [];
+    const rows = [];
+    for (const s of swaps) {
+      const usdc = Number(s.volume_usd || 0);
+      if (!Number.isFinite(usdc) || usdc <= 0) continue;
+      rows.push({
+        token: String(s.token || '').toLowerCase(),
+        symbol: s.symbol || '?',
+        side: s.is_buy ? 'buy' : 'sell',
+        usdc,
+        price: Number(s.price_usd || 0),
+        trader: s.trader || '',
+        txHash: s.tx_hash || '',
+        time: s.timestamp ? Math.floor(new Date(s.timestamp + 'Z').getTime() / 1000) : Math.floor(Date.now() / 1000),
+        quoteToken: USDC_ADDR,
+        version: 'basedbot',
+      });
+    }
+    return rows;
+  } catch (e) { return []; }
+}
+
+
+// Argus swaps carry version='argus', BasedBot swaps version='basedbot' —
+// the feed can badge sources distinctly later.
+async function fetchAllSwaps(radarLimit = 200) {
+  const [radar, argus, basedbot] = await Promise.all([
+    fetchRadarSwaps(radarLimit),
+    fetchArgusSwaps().catch(() => []),
+    (typeof fetchBasedBotSwaps === 'function' ? fetchBasedBotSwaps(30) : Promise.resolve([])),
+  ]);
+  const merged = [];
+  const seen = new Set();
+  for (const s of (radar || [])) {
+    if (!s || !s.txHash) { merged.push(s); continue; }
+    if (seen.has(s.txHash)) continue;
+    seen.add(s.txHash);
+    merged.push(s);
+  }
+  for (const s of (argus || [])) {
+    if (!s || !s.txHash) continue;
+    if (seen.has(s.txHash)) continue;
+    seen.add(s.txHash);
+    merged.push(s);
+  }
+  for (const s of (basedbot || [])) {
+    if (!s || !s.txHash) continue;
+    if (seen.has(s.txHash)) continue;
+    seen.add(s.txHash);
+    merged.push(s);
+  }
+  // sort by time desc (newest first) for a live feel; fall back to usdc desc.
+  merged.sort((a, b) => (b.time || 0) - (a.time || 0));
+  return merged;
+}
+
 // Inflow/Outflow across ALL tokens (24h) — 'all koin' scope.
 // Per-koin: share buang anggap proporsional ke rasio tx buy/sell, kali volume24.
 // Ini estimasi (radardex ngga nyimpen volume $ buy vs sell terpisah per koin),
@@ -5130,13 +5453,13 @@ function renderToolsFeed(swaps) {
   const list = $t('feedList'); const empty = $t('feedEmpty'); if (!list) return;
   if (Array.isArray(swaps)) _lastSwaps = swaps;   // cache for filter re-render
   swaps = _lastSwaps || swaps;
-  // keep only swaps above $100 + apply side filter
+  // keep only swaps of $200 and up (whale watch) + apply side filter
   const rows = (swaps && swaps.length ? swaps : [])
-    .filter(r => (r.usdc || 0) > 100)
+    .filter(r => (r.usdc || 0) >= 200)
     .filter(r => _feedFilter === 'all' || (r.side || 'buy').toLowerCase() === _feedFilter)
     .slice(0, 50);
   if (!rows.length) {
-    if (empty) { empty.style.display = ''; empty.textContent = 'No swaps above $100 yet…'; }
+    if (empty) { empty.style.display = ''; empty.textContent = 'No swaps above $200 yet…'; }
     _lastFeedIds = [];
     return;
   }
@@ -5160,7 +5483,7 @@ function renderToolsFeed(swaps) {
       ? `<span class="fp-tok"><img src="${icon}" alt="" loading="lazy" onerror="this.outerHTML='<span class=&quot;fp-tok&quot;>${(sym[0]||'?').toUpperCase()}</span>'"/></span>`
       : `<span class="fp-tok">${(sym[0] || '?').toUpperCase()}</span>`;
     html += `<div class="feed-row${wh}${flash}">
-      <span class="fp">${tokLogo}<span class="fp-txt"><span class="fp-pair">USDC / ${sym}</span><small>${ago ? ago + ' ago' : ''}</small></span></span>
+      <span class="fp">${tokLogo}<span class="fp-txt"><span class="fp-pair">USDC / ${sym}</span><small>${ago === 'now' ? 'now' : (ago ? ago + ' ago' : '')}</small></span></span>
       <span class="fv ${side}">${fmtUsd(val)}</span>
       <span class="ft ${side === 'buy' ? 'buy' : 'sell'}">${side === 'buy' ? 'BUY' : 'SELL'}</span>
       <a class="fx" href="${CFG.blockExplorerUrls[0]}/tx/${tx}" target="_blank" rel="noopener noreferrer" title="${tx}">${shortAddr(tx)}</a>
@@ -5515,6 +5838,20 @@ async function loadMomTokens() {
     if (!Array.isArray(toks)) throw new Error('bad payload');
     _momToks = toks;
     _momLoaded = true;
+    // Merge Argus V4 tokens (dedup by address) so the screener + pool scanner see them too.
+    try {
+      const argus = await argusTokensAsRadar();
+      if (argus.length) {
+        const seen = new Set(_momToks.map(t => String(t.address || '').toLowerCase()));
+        for (const a of argus) {
+          if (!a.address || seen.has(a.address)) continue;
+          seen.add(a.address);
+          _momToks.push(a);
+        }
+      }
+    } catch (e) { /* argus merge is best-effort */ }
+    // Sort by 24h volume desc so the screener + pool scanner default to highest-first.
+    _momToks.sort((a, b) => (b.volume24 || 0) - (a.volume24 || 0));
   } catch (e) {
     if (_momToks) return _momToks;
     throw e;
@@ -5727,7 +6064,7 @@ async function renderTools() {
       if (typeof fetchRadarTop === 'function') {
         const live = await fetchRadarTop();
         if (live && live.length) {
-          S.pools = buildPoolsFromRadar(live);
+          await rebuildPoolsWithArgus(live);
           drawHeat(S.pools, _currentFlows);
           fillTermPills(S.pools);
           renderMigration();
@@ -5741,8 +6078,8 @@ async function renderTools() {
           renderMigration();
         }
       }
-      if (typeof fetchRadarSwaps === 'function') {
-        const sw = await fetchRadarSwaps(200);
+      if (typeof fetchAllSwaps === 'function') {
+        const sw = await fetchAllSwaps(200);
         if (sw && sw.length) { _lastLiveTs = Date.now(); renderToolsFeed(sw); refreshLiveAgo(); }
       }
     }, 8000);
@@ -5752,7 +6089,7 @@ async function renderTools() {
     _toolsFetched = true;
     const live = await fetchRadarTop();
     if (live && live.length) {
-      S.pools = buildPoolsFromRadar(live);
+      await rebuildPoolsWithArgus(live);
       drawHeat(S.pools, _currentFlows);
       fillTermPills(S.pools);
       renderMigration();  // establishes migration baseline
@@ -5767,8 +6104,8 @@ async function renderTools() {
     }
   }
   // initial real swap feed
-  if (typeof fetchRadarSwaps === 'function') {
-    const sw = await fetchRadarSwaps(200);
+  if (typeof fetchAllSwaps === 'function') {
+    const sw = await fetchAllSwaps(200);
     if (sw && sw.length) { _lastLiveTs = Date.now(); renderToolsFeed(sw); refreshLiveAgo(); }
   }
 }
@@ -5816,7 +6153,7 @@ async function loadTokenList() {
   _tokenListLoaded = true;
   try {
     const ctrl = new AbortController();
-    const t = setTimeout(() => ctrl.abort(), 15000);
+    const t = setTimeout(() => ctrl.abort(), 5000);
     const r = await fetch(RADAR_API + '/tokenlist.json', { signal: ctrl.signal });
     clearTimeout(t);
     if (!r.ok) throw new Error('http ' + r.status);
