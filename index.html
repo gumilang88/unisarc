@@ -2606,6 +2606,69 @@ async function rebuildPoolsWithArgus(live) {
   return S.pools;
 }
 
+// ---- BasedBot V4 pool merge ----
+// RadarDex only indexes Uniswap V3 pools — every UNISWAP_V4 pool on ARC is invisible
+// to it. BasedBot (via the feed worker /api/basedbot-feed) lists all pool types, so we
+// merge those tokens into S.pools + S.radarTokens here. V4 pools are tagged v4:true so
+// the Add-LP / Swap flows (which are V3-only) can guard them cleanly.
+let _bbPoolIds = null;
+function bbPoolId(t) { return 'BBV4-' + (t.address || ''); }
+function buildPoolsFromBasedBot(list) {
+  const out = [];
+  if (!Array.isArray(list)) return out;
+  for (const t of list) {
+    const ptype = String(t.pool_type || '').toUpperCase();
+    if (ptype !== 'UNISWAP_V4') continue;                 // V3 already covered by Radar
+    const addr = String(t.address || '').toLowerCase();
+    if (!/^0x[0-9a-f]{40}$/.test(addr)) continue;
+    const quote = String(t.quote_address || '').toLowerCase() || USDC_ADDR;
+    const sym = t.displaySymbol || t.symbol || '?';
+    const name = t.name || sym;
+    const liq = Number(t.liquidity_usd) || 0;
+    const vol = Number(t.volume_24h) || 0;
+    const price = Number(t.price_usd) || 0;
+    const spark = Array.isArray(t.sparkline) && t.sparkline.length ? t.sparkline.map(Number).filter(Number.isFinite) : [1];
+    const apr = liq > 0 ? (vol * 0.01 * 0.85 / liq) * 365 * 100 : 0;
+    const fee = Number(t.pool_real_fee) || 10000;
+    const icon = t.icon || '';
+    // token metadata (swap picker, valuations, logo fallbacks)
+    if (!S.radarTokens[addr] || (S.radarTokens[addr] && !S.radarTokens[addr].v4)) {
+      S.radarTokens[addr] = {
+        addr, symbol: sym, name, decimals: Number.isFinite(Number(t.decimals)) ? Number(t.decimals) : 18,
+        priceB: price, tvl: liq, vol, icon, fee,
+        spark, change24h: Number(t.change_24h) || 0,
+        v4: true, versions: ['v4'], pool_type: 'UNISWAP_V4',
+      };
+    }
+    out.push({
+      id: bbPoolId(t), a: 'USDC', b: sym, name, addr, icon,
+      fee, reserveA: liq, reserveB: liq / (price || 1),
+      tvl: liq, priceB: price, apr: Math.min(240, Math.max(0.1, apr)),
+      vol, chg24: Number(t.change_24h) || 0, spark,
+      verified: false, launchpad: 'basedbot', website: '', twitter: '',
+      v4: true, versions: ['v4'], pool_type: 'UNISWAP_V4',
+      poolId: t.pool_address || '', poolHooks: t.pool_hooks || '',
+    });
+  }
+  return out;
+}
+// Append/reconcile BasedBot V4 pools into S.pools. Refreshes vol/liq/price for pools
+// already present (keyed by token address) and appends new ones. Never removes.
+async function mergeBasedBotPools() {
+  if (!_bbTokenList) { try { await fetchBasedBotSwaps(); } catch (e) { /* offline */ } }
+  if (!Array.isArray(_bbTokenList)) return 0;
+  const fresh = buildPoolsFromBasedBot(_bbTokenList);
+  if (!fresh.length) return 0;
+  _bbPoolIds = new Set(fresh.map(p => p.id));
+  const byId = new Map(S.pools.map(p => [p.id, p]));
+  for (const np of fresh) {
+    const old = byId.get(np.id);
+    if (old) { Object.assign(old, { tvl: np.tvl, vol: np.vol, priceB: np.priceB, apr: np.apr, chg24: np.chg24, spark: np.spark, reserveA: np.reserveA, reserveB: np.reserveB }); }
+    else S.pools.push(np);
+  }
+  return fresh.length;
+}
+
 // UNISARC is the platform's own token but is often NOT in RadarDex's top-500
 // /tokens response (low 24h volume). Fetch it directly from /token/:addr and inject
 // it into S.pools so it's always present + pinned #1, regardless of top-500 ranking.
@@ -2944,7 +3007,7 @@ function renderPoolChips() {
     <button class="pool-opt ${pp.id===S.selected?'active':''}" data-pool="${pp.id}" type="button">
       ${poolIconHtml(pp, 'po-ico')}
       <span class="po-main">
-        <span class="po-sym">${(pp.a||'?')} / ${(pp.b||'?')}</span>
+        <span class="po-sym">${(pp.a||'?')} / ${(pp.b||'?')}${pp.v4 ? ' <span class="v4-badge">V4</span>' : ''}</span>
         <span class="po-a">${(pp.addr||'').slice(0,6)}…${(pp.addr||'').slice(-4)}</span>
       </span>
       <span class="po-right">
@@ -3176,7 +3239,17 @@ async function refreshSwapBalances(){
 function scheduleSwapQuote(){ clearTimeout(_swapQuoteTimer); const seq=++S.swap.quoteSeq; S.swap.quote=null; renderSwap(true); _swapQuoteTimer=setTimeout(()=>runSwapQuote(seq),120); }
 async function runSwapQuote(seq){
   const a=S.swap.tokenIn,b=S.swap.tokenOut; const amountIn=decimalToRaw($('swapAmountIn').value,a.decimals);
-  if(amountIn<=0n)return renderSwap(true); $('swapQuoteStatus').textContent='Reading Uniswap pool…';
+  if(amountIn<=0n)return renderSwap(true);
+  // V4-only tokens have no V3 pool — the quoter call would revert. Fail fast with a
+  // clear message instead of a generic "no output from pool".
+  if(isV4OnlyToken(a.address)||isV4OnlyToken(b.address)){
+    if(seq!==S.swap.quoteSeq)return;
+    S.swap.quote=null;$('swapAmountOut').value='';
+    $('swapQuoteStatus').textContent='Uniswap V4 pool — V4 swap support coming soon';
+    $('swapRate').textContent='Enter an amount';$('swapImpact').textContent='—';$('swapMinOut').textContent='—';
+    renderSwap(false);return;
+  }
+  $('swapQuoteStatus').textContent='Reading Uniswap pool…';
   try{
     const baseIn=amountIn/1000n>0n?amountIn/1000n:1n;
     const [out,baseOut]=await Promise.all([quoteUniswap(a,b,amountIn),quoteUniswap(a,b,baseIn)]); if(seq!==S.swap.quoteSeq)return;
@@ -3283,7 +3356,8 @@ function renderSwapPicker(){
   const renderRow=(t,balOverride)=>{
     const bal=S.address?(cache[t.address]??balOverride??0):0;
     const balTxt=S.address?fmtCoin(bal,t.decimals):'—';
-    return `<button class="pool-opt swap-pick-row" data-addr="${t.address}" type="button">${swapTokenIcon(t)}<span class="po-main"><span class="po-sym">${t.symbol}</span><span class="po-a">${t.name}</span></span><span class="po-right"><span class="swap-pick-price">${swapPriceFive(t)}</span><span class="swap-pick-balance" data-balance-addr="${t.address}">${S.address?'Balance '+balTxt+' '+t.symbol:'—'}</span></span></button>`;
+    const v4=isV4OnlyToken(t.address);
+    return `<button class="pool-opt swap-pick-row" data-addr="${t.address}" type="button"${v4?' title="Uniswap V4 pool — V4 swap support coming soon"':''}>${swapTokenIcon(t)}<span class="po-main"><span class="po-sym">${t.symbol}${v4?' <span class="v4-badge">V4</span>':''}</span><span class="po-a">${t.name}</span></span><span class="po-right"><span class="swap-pick-price">${v4?'V4 · soon':swapPriceFive(t)}</span><span class="swap-pick-balance" data-balance-addr="${t.address}">${S.address?'Balance '+balTxt+' '+t.symbol:'—'}</span></span></button>`;
   };
   if(isAddressLike(q)){
     // Already resolved? render instantly (no blinking).
@@ -3304,6 +3378,15 @@ function renderSwapPicker(){
   const sorted=uni.filter(t=>!q||t.symbol.toLowerCase().includes(q)||t.name.toLowerCase().includes(q))
     .sort((a,b)=>(SWAP_PIN_BOTTOM.get(a.address)||0)-(SWAP_PIN_BOTTOM.get(b.address)||0)||(cache[b.address]||0)-(cache[a.address]||0));
   listEl.innerHTML=sorted.map(t=>renderRow(t)).join('')||'<div class="swap-picker-loading">No tokens found</div>';
+}
+// V4-only tokens (no V3 pool) cannot be routed through the V3 quoter/router yet.
+// Show them in the picker greyed-out with a V4 tag so users know why a quote fails.
+function isV4OnlyToken(addr){
+  const a=String(addr||'').toLowerCase();
+  const rt=S.radarTokens[a];
+  if(rt&&rt.v4) return true;
+  const p=S.pools.find(x=>String(x.addr||'').toLowerCase()===a&&x.v4);
+  return !!p;
 }
 function chooseSwapToken(addr){let t=(S.swap.resolvedTokens||{})[addr]||swapTokenUniverse().find(x=>x.address===addr);if(!t)return;const side=S.swap.pickerSide;if(side==='in'){if(t.address===S.swap.tokenOut.address)S.swap.tokenOut=S.swap.tokenIn;S.swap.tokenIn=t;}else{if(t.address===S.swap.tokenIn.address)S.swap.tokenIn=S.swap.tokenOut;S.swap.tokenOut=t;}closeSwapPicker();scheduleSwapQuote();refreshSwapBalances();}
 function applySwapPct(pct){
@@ -4264,6 +4347,9 @@ function openAddModal() {
   const isSingle = (S._addMode || 'auto') === 'single';
   if (isSingle ? !a : (!a || !b)) return toast(isSingle ? 'Enter deposit amount (Token A)' : 'Enter both deposit amounts (Token A and B)', 'err');
   const p = currentPool(); if (!p) return toast('No pool selected', 'err');
+  // V4 pools live in the singleton PoolManager — the V3 NFPM mint path below would
+  // send a tx to a non-existent V3 pool and revert. Guard until V4 LP is shipped.
+  if (p.v4) return toast(p.b + ' is a Uniswap V4 pool — V4 LP support is coming soon', 'err');
   // set the pool object: for existing radar pools it's p; for custom, use CUSTOM_POOL's resolved tokens
   let tok0 = p.a, tok1 = p.b, poolAddr = p.addr;
   if (p.id === '__manual__' && CUSTOM_POOL) { tok0 = CUSTOM_POOL.a; tok1 = CUSTOM_POOL.b; poolAddr = CUSTOM_POOL.addr; }
@@ -4616,6 +4702,7 @@ async function ensureMonitorPools() {
         S.pools = buildPoolsFromRadar(live);
       }
       await mergeArgusPools();
+      await mergeBasedBotPools();
       const uni = S.pools.find(p => (p.b || '').toUpperCase() === 'UNISARC');
       if (uni && (!S.pools.find(p=>p.id===S.selected) || !S._userPickedPool)) S.selected = uni.id;
       renderPoolChips();
@@ -4728,7 +4815,12 @@ $('btnCompound').addEventListener('click', async ()=>{
 $('btnRefresh').addEventListener('click', async ()=>{
   toast('Refreshing pools...');
   const live = await fetchRadarTop();
-  if (live) { S.pools = buildPoolsFromRadar(live); renderPoolChips(); renderAddSide(); renderMonitor(); toast('Pools updated', 'ok'); }
+  if (live) {
+    S.pools = buildPoolsFromRadar(live);
+    await mergeArgusPools();
+    await mergeBasedBotPools();
+    renderPoolChips(); renderAddSide(); renderMonitor(); toast('Pools updated', 'ok');
+  }
   if (S.address) await loadPositionsUI();
   else toast('Pools refreshed', 'ok');
 });
@@ -4961,6 +5053,7 @@ async function refreshPools(force) {
   const uni = await fetchUnisarcToken();
   injectUnisarcPool(uni);
   await mergeArgusPools();
+  await mergeBasedBotPools();
   const fp = poolsFingerprint(S.pools);
   if (!force && fp === S._lastFp) return;   // no meaningful change → skip re-render
   S._lastFp = fp;
@@ -5346,6 +5439,10 @@ async function fetchArgusSwaps() {
 // /api/basedbot-feed batch endpoint (direct python helper). Try local first,
 // then the worker, so both environments work with the same code.
 const FEED_WORKER_URL = 'https://unisarc-feed.akunftx99.workers.dev';
+// Latest BasedBot token list (from the feed payload) — every ARC pool type
+// incl. UNISWAP_V4, which RadarDex does not index at all.
+let _bbTokenList = null;
+let _bbTokenListAt = 0;
 async function fetchBasedBotSwaps() {
   const sources = ['/api/basedbot-feed', FEED_WORKER_URL + '/feed'];
   for (const src of sources) {
@@ -5354,6 +5451,10 @@ async function fetchBasedBotSwaps() {
       if (!r.ok) continue;
       const j = await r.json();
       const swaps = (j && j.swaps) || [];
+      if (Array.isArray(j && j.tokens_list) && j.tokens_list.length) {
+        _bbTokenList = j.tokens_list;
+        _bbTokenListAt = Date.now();
+      }
       const rows = [];
       for (const s of swaps) {
         const usdc = Number(s.volume_usd || 0);
@@ -5855,6 +5956,37 @@ async function loadMomTokens() {
         }
       }
     } catch (e) { /* argus merge is best-effort */ }
+    // Merge BasedBot V4 tokens (RadarDex does not index Uniswap V4 pools at all).
+    try {
+      await mergeBasedBotPools();
+      if (Array.isArray(_bbTokenList)) {
+        const seen = new Set(_momToks.map(t => String(t.address || '').toLowerCase()));
+        for (const t of _bbTokenList) {
+          const addr = String(t.address || '').toLowerCase();
+          if (!addr || seen.has(addr)) continue;
+          if (String(t.pool_type || '').toUpperCase() !== 'UNISWAP_V4') continue;
+          seen.add(addr);
+          _momToks.push({
+            symbol: t.displaySymbol || t.symbol || '?',
+            name: t.name || t.symbol || 'Token',
+            address: addr,
+            price: Number(t.price_usd) || 0,
+            change24h: Number(t.change_24h) || 0,
+            volume24: Number(t.volume_24h) || 0,
+            liquidityUsdc: Number(t.liquidity_usd) || 0,
+            mcap: Number(t.market_cap_usd) || 0,
+            holders: 0,
+            txns24: Number(t.txns_24h) || 0,
+            buys24: Number(t.buys_24h) || 0,
+            sells24: Number(t.sells_24h) || 0,
+            ageSec: 0,
+            icon: t.icon || '',
+            spark: Array.isArray(t.sparkline) ? t.sparkline : [],
+            versions: ['v4'],   // real V4 — the screener's V4 filter keys off this
+          });
+        }
+      }
+    } catch (e) { /* basedbot merge is best-effort */ }
     // Sort by 24h volume desc so the screener + pool scanner default to highest-first.
     _momToks.sort((a, b) => (b.volume24 || 0) - (a.volume24 || 0));
   } catch (e) {

@@ -78,7 +78,9 @@ const server = http.createServer((req, res) => {
     return;
   }
   if (req.url.startsWith('/api/basedbot-feed')) {
-    basedbotProxy(req, res, '--feed 12 30');
+    // 40 tokens: the tokens_list payload also feeds the dashboard's V4 pool list
+    // (Monitor + Add LP picker + swap picker), so wider coverage = more pools.
+    basedbotProxy(req, res, '--feed 40 30');
     return;
   }
 
