@@ -1,0 +1,25 @@
+UNISARC Dashboard — Update
+
+Here's what's new.
+
+⚡ Added Spot Grid
+Set up a multi-range grid strategy with live price feed from the pool's slot0. Chart, BID/ACTIVE/ASK zones, and token allocation follow the live price in real time.
+
+🎯 Safer mint
+The Spot Grid plan is rebuilt from the latest on-chain price right before minting. If price moves during wallet confirmation, it rebuilds again — no more reverts from stale price.
+
+📊 LP Pool Quality Scanner
+Ranks every USDC pool by fee efficiency, liquidity depth, activity quality, age, and price stability. Click any pool to jump straight into Add LP.
+
+🧾 PnL for existing positions
+Existing positions now get an automatic cost-basis backfill, so profit/loss shows instead of a dash.
+
+Summary
+
+- Spot Grid with live pricing and revert-proof mints
+- LP Pool Quality Scanner for ranking the best pools
+- PnL coverage for every position
+
+https://unisarc.xyz
+
+#UNISARC #ARC #DeFi
