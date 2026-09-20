@@ -5428,6 +5428,17 @@ window.addEventListener('load', async ()=>{
   // Live market data loads ASYNC after first paint — the page is already interactive,
   // then the pool list swaps from the embedded snapshot to live Radar data when ready.
   refreshPools(true);
+  // Global flows aggregate at boot (header pills + velo strip on every view) —
+  // previously only the Tools view fetched it, so home page numbers came from a
+  // different aggregation path and could disagree with the Tools ticker.
+  if (typeof fetchRadarFlows === 'function') {
+    fetchRadarFlows(500).then(fl => {
+      if (!fl) return;
+      _currentFlows = fl;
+      if (typeof fillVeloStrip === 'function') fillVeloStrip(fl);
+      if (typeof fillTermPills === 'function') fillTermPills(S.pools || []);
+    }).catch(() => {});
+  }
   // Position valuation starts only after the full 500-token address registry is
   // available, avoiding a first-render race against the stale embedded snapshot.
   if (S.address) await loadPositionsUI();
@@ -5724,7 +5735,7 @@ function fillVeloStrip(flows) {
   const inEl = $t('veloIn'), outEl = $t('veloOut'), netEl = $t('veloNet');
   const inflow = (flows && flows.inflow) || 0;
   const outflow = (flows && flows.outflow) || 0;
-  // update ticker values (inflow/outflow = estimasi dari 500 token)
+  // update ticker values (inflow/outflow = estimasi 500 token Radar + semua pool V4 BasedBot)
   if (inEl) inEl.textContent = '+$' + fmt(inflow);
   if (outEl) outEl.textContent = '-$' + fmt(outflow);
   const net = inflow - outflow;
@@ -5941,6 +5952,60 @@ async function fetchAllSwaps(radarLimit = 200) {
   return merged;
 }
 
+// UNISWAP_V4 aggregate from the BasedBot feed. RadarDex does not index V4 pools
+// at all, so the global Volume 24h / Total TVL / inflow / outflow numbers miss
+// every V4 pool unless merged here. Same methodology as the Radar side: the
+// buy/sell tx share of the 24h volume splits inflow vs outflow.
+function basedBotFlowTotals() {
+  const list = Array.isArray(_bbTokenList) ? _bbTokenList : [];
+  let inflow = 0, outflow = 0, volume24 = 0, tvl = 0, pools = 0, covered = 0;
+  const seen = new Set();
+  for (const t of list) {
+    if (String(t.pool_type || '').toUpperCase() !== 'UNISWAP_V4') continue;   // V3 covered by Radar
+    const addr = String(t.address || '').toLowerCase();
+    if (!addr || seen.has(addr)) continue;                                     // dedup multi-pool entries
+    seen.add(addr);
+    const vol = Number(t.volume_24h) || 0;
+    volume24 += vol;
+    tvl += Number(t.liquidity_usd) || 0;
+    pools++;
+    const b = Number(t.buys_24h) || 0, s = Number(t.sells_24h) || 0;
+    const tot = b + s;
+    if (vol <= 0 || tot <= 0) continue;
+    inflow += vol * (b / tot);
+    outflow += vol * (s / tot);
+    covered++;
+  }
+  return { inflow, outflow, volume24, tvl, pools, covered };
+}
+// Argus (graduated V3 pools) aggregate. Argus is a third source the registry
+// merges into S.radarTokens, but the flows aggregate skipped it — so the
+// header pills (which use the registry fallback) and the flows numbers
+// disagreed. Argus does not publish buy/sell tx counts, so the inflow/outflow
+// split uses the 24h price direction: rising → 60/40 buy-tilt, falling →
+// 40/60 sell-tilt (conservative, never extreme).
+function argusFlowTotals(argusList) {
+  const list = Array.isArray(argusList) ? argusList : null;
+  let inflow = 0, outflow = 0, volume24 = 0, tvl = 0, pools = 0, covered = 0;
+  const seen = new Set();
+  const toks = list || [];
+  for (const t of toks) {
+    const addr = String(t.address || '').toLowerCase();
+    if (!addr || seen.has(addr)) continue;
+    seen.add(addr);
+    const vol = Number(t.volume24) || 0;
+    volume24 += vol;
+    tvl += Number(t.liquidityUsdc) || 0;
+    pools++;
+    if (vol <= 0) continue;
+    const ch = Number(t.change24h) || 0;
+    const buyShare = ch >= 0 ? 0.6 : 0.4;
+    inflow += vol * buyShare;
+    outflow += vol * (1 - buyShare);
+    covered++;
+  }
+  return { inflow, outflow, volume24, tvl, pools, covered };
+}
 // Inflow/Outflow across ALL tokens (24h) — 'all koin' scope.
 // Per-koin: share buang anggap proporsional ke rasio tx buy/sell, kali volume24.
 // Ini estimasi (radardex ngga nyimpen volume $ buy vs sell terpisah per koin),
@@ -5968,8 +6033,31 @@ async function fetchRadarFlows(limit = 500) {
       outflow += vol * (1 - share);
       covered++;
     });
+    // ---- UNISWAP_V4 merge (BasedBot feed) — keeps the global numbers in sync
+    // with the V4 pools shown everywhere else on the dashboard. Refresh the
+    // cached feed if stale so this works even on first paint.
+    if (!_bbTokenList || Date.now() - _bbTokenListAt > 600000) {
+      try { await fetchBasedBotSwaps(); } catch (e) { /* offline */ }
+    }
+    const v4 = basedBotFlowTotals();
+    totalVolume24 += v4.volume24;
+    totalTvl += v4.tvl;
+    totalPools += v4.pools;
+    inflow += v4.inflow;
+    outflow += v4.outflow;
+    covered += v4.covered;
+    // ---- Argus merge (graduated V3 pools) — same sync goal as the V4 merge:
+    // the registry-based fallback counts Argus, so the flows aggregate must too.
+    const argusList = (await fetchArgusTop()) || [];
+    const ag = argusFlowTotals(argusList);
+    totalVolume24 += ag.volume24;
+    totalTvl += ag.tvl;
+    totalPools += ag.pools;
+    inflow += ag.inflow;
+    outflow += ag.outflow;
+    covered += ag.covered;
     if (!covered) return null;
-    return { inflow, outflow, net: inflow - outflow, count: covered, totalPools, totalVolume24, totalTvl, scope: '24h' };
+    return { inflow, outflow, net: inflow - outflow, count: covered, totalPools, totalVolume24, totalTvl, scope: '24h', v4Pools: v4.pools, v4Volume24: v4.volume24, v4Tvl: v4.tvl, argusPools: ag.pools, argusVolume24: ag.volume24, argusTvl: ag.tvl };
   } catch (e) { return null; }
 }
 
@@ -6042,11 +6130,13 @@ function sumRadarTotals() {
   let vol = 0, tvl = 0, pools = 0;
   for (const a in (S.radarTokens || {})) {
     const t = S.radarTokens[a];
+    if (t.v4) continue;                 // V4 side is added from the feed below (avoid double count)
     vol += t.vol || 0;
     tvl += t.tvl || 0;
     pools++;
   }
-  return { totalVolume24: vol, totalTvl: tvl, totalPools: pools };
+  const v4 = basedBotFlowTotals();
+  return { totalVolume24: vol + v4.volume24, totalTvl: tvl + v4.tvl, totalPools: pools + v4.pools };
 }
 
 function fillTermPills(pools) {
@@ -6063,6 +6153,8 @@ function fillTermPills(pools) {
     fl = (n >= 100) ? sumRadarTotals() : null;
   }
   if (!fl) return;
+  // Both paths aggregate the SAME sources (Radar 500 + Argus + BasedBot V4), so
+  // the pills stay consistent whichever lands first.
   if (v) v.textContent = '$' + fmt(fl.totalVolume24 || 0);
   if (tv) tv.textContent = '$' + fmt(fl.totalTvl || 0);
   const poolCount = fl.totalPools || ((pools || []).length);
