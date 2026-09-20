@@ -1290,6 +1290,8 @@ a.px-btn{display:inline-block;text-align:center;text-decoration:none;width:auto}
 }
 .gl-item .gi-chg{font-variant-numeric:tabular-nums}
 
+/* heat picker V4 badge */
+.ho-v4{display:inline-block;font-style:normal;font-size:9px;font-weight:700;letter-spacing:.4px;color:#61dcd8;border:1px solid rgba(97,220,216,.45);border-radius:4px;padding:0 4px;margin-left:4px;vertical-align:1px;background:rgba(97,220,216,.08)}
 /* token spotlight — main + stat tiles + chart */
 .spot-main{background:linear-gradient(160deg,#4a1768 0%,#3c1154 100%);border:3px solid #000;box-shadow:3px 3px 0 #000,6px 6px 0 rgba(0,0,0,.2)}
 .spot-stat{background:linear-gradient(160deg,#4a1768 0%,#3c1154 100%);border:2px solid #000;box-shadow:2px 2px 0 #000}
@@ -2454,6 +2456,7 @@ function buildPoolsFromRadar(list) {
     const tokenAddr = String(t.address || '').toLowerCase();
     if (tokenAddr) S.radarTokens[tokenAddr] = {
       addr: tokenAddr, symbol: sym, priceB: Number(t.price) || 0,
+      mcap: Number(t.mcap) || 0,
       tvl: Number(t.liquidityUsdc) || 0, vol: Number(t.volume24) || 0,
       icon: t.icon || t.imageUrl || '', fee: 10000,
       spark: Array.isArray(t.spark) ? t.spark : [], change24h: Number(t.change24h) || 0,
@@ -2472,6 +2475,7 @@ function buildPoolsFromRadar(list) {
     fee: 10000, // fee tier 1% (semua pool Arc dari RadarDex = 1%)
     reserveA: liq, reserveB: liq / (price || 1),
     tvl: liq, priceB: price, apr: Math.min(240, Math.max(0.1, apr)),
+    mcap: Number(t.mcap) || 0,
     vol, chg24: t.change24h || 0, spark,
     verified: !!t.verified, launchpad: t.launchpad || '', website: t.website || '', twitter: t.twitter || '',
     v4: Array.isArray(t.versions) && t.versions.includes('v4'),
@@ -2538,7 +2542,7 @@ function buildPoolsFromArgus(argusList) {
     // pool reads unambiguously (e.g. "USDC / UpSideDownCat").
     const label = (sym.toUpperCase() === 'USDC') ? name : sym;
     if (addr) S.radarTokens[addr] = {
-      addr, symbol: sym, priceB: price, tvl: liq, vol,
+      addr, symbol: sym, priceB: price, mcap: Number(a.marketCap) || 0, tvl: liq, vol,
       icon, fee: 10000, spark, change24h: Number(a.change24h) || 0,
       v4: false, versions: [], launchpad: 'argus',
     };
@@ -2547,6 +2551,7 @@ function buildPoolsFromArgus(argusList) {
       icon, fee: 10000,
       reserveA: liq, reserveB: liq / (price || 1),
       tvl: liq, priceB: price, apr: Math.min(240, Math.max(0.1, apr)),
+      mcap: Number(a.marketCap) || 0,
       vol, chg24: Number(a.change24h) || 0, spark,
       verified: false, launchpad: 'argus', website: '', twitter: '',
       v4: false, versions: [],
@@ -2635,7 +2640,7 @@ function buildPoolsFromBasedBot(list) {
     if (!S.radarTokens[addr] || (S.radarTokens[addr] && !S.radarTokens[addr].v4)) {
       S.radarTokens[addr] = {
         addr, symbol: sym, name, decimals: Number.isFinite(Number(t.decimals)) ? Number(t.decimals) : 18,
-        priceB: price, tvl: liq, vol, icon, fee,
+        priceB: price, mcap: Number(t.market_cap_usd) || 0, tvl: liq, vol, icon, fee,
         spark, change24h: Number(t.change_24h) || 0,
         v4: true, versions: ['v4'], pool_type: 'UNISWAP_V4',
       };
@@ -2644,6 +2649,7 @@ function buildPoolsFromBasedBot(list) {
       id: bbPoolId(t), a: 'USDC', b: sym, name, addr, icon,
       fee, reserveA: liq, reserveB: liq / (price || 1),
       tvl: liq, priceB: price, apr: Math.min(240, Math.max(0.1, apr)),
+      mcap: Number(t.market_cap_usd) || 0,
       vol, chg24: Number(t.change_24h) || 0, spark,
       verified: false, launchpad: 'basedbot', website: '', twitter: '',
       v4: true, versions: ['v4'], pool_type: 'UNISWAP_V4',
@@ -2655,7 +2661,12 @@ function buildPoolsFromBasedBot(list) {
 // Append/reconcile BasedBot V4 pools into S.pools. Refreshes vol/liq/price for pools
 // already present (keyed by token address) and appends new ones. Never removes.
 async function mergeBasedBotPools() {
-  if (!_bbTokenList) { try { await fetchBasedBotSwaps(); } catch (e) { /* offline */ } }
+  // Stale (>10 min) or missing token list → refresh from the feed. The worker DO
+  // may cold-start between poller pushes; a fetch here keeps the pool list fresh
+  // even when the whale-feed path was served from a failed source.
+  if (!_bbTokenList || Date.now() - _bbTokenListAt > 600000) {
+    try { await fetchBasedBotSwaps(); } catch (e) { /* offline */ }
+  }
   if (!Array.isArray(_bbTokenList)) return 0;
   const fresh = buildPoolsFromBasedBot(_bbTokenList);
   if (!fresh.length) return 0;
@@ -2725,6 +2736,17 @@ function poolsFingerprint(pools) {
 function radarTokenByAddress(addr) {
   addr = String(addr || '').toLowerCase();
   return S.radarTokens[addr] || S.pools.find(p => String(p.addr || '').toLowerCase() === addr) || null;
+}
+// Market cap of a pool's pair token. Priority: explicit mcap field (RadarDex /token,
+// BasedBot feed, Argus) → S.radarTokens registry → derived estimate from TVL (pool TVL
+// ≈ quote-side depth, mcap ≈ TVL × a typical circ/liquidity ratio is NOT reliable, so
+// only fall back to price×supply when we know neither — 0 means "unknown, sort last-ish").
+function poolMcap(p) {
+  if (!p) return 0;
+  const direct = Number(p.mcap) || 0;
+  if (direct > 0) return direct;
+  const rt = S.radarTokens && S.radarTokens[String(p.addr || '').toLowerCase()];
+  return Number(rt && rt.mcap) || 0;
 }
 function syncTokenMetaFromPools() {
   for (const p of Object.values(S.radarTokens).concat(S.pools)) {
@@ -3002,8 +3024,10 @@ function renderPoolChips() {
     $('ptTxt').textContent = (p.a || '?') + ' / ' + (p.b || '?');
     $('ptIco').innerHTML = p.b === 'USDC' ? '' : poolIconHtml(p, 'pt-ico');
   }
-  // render overlay list
-  $('pmList').innerHTML = S.pools.map(pp => `
+  // render overlay list — sorted by market cap desc (highest first); unknown-mcap
+  // pools keep their original order after the known ones.
+  const sortedPools = S.pools.slice().sort((a, b) => (poolMcap(b) || 0) - (poolMcap(a) || 0));
+  $('pmList').innerHTML = sortedPools.map(pp => `
     <button class="pool-opt ${pp.id===S.selected?'active':''}" data-pool="${pp.id}" type="button">
       ${poolIconHtml(pp, 'po-ico')}
       <span class="po-main">
@@ -3156,13 +3180,13 @@ function rawToDecimal(raw, decimals, precision=8) {
 }
 function swapTokenUniverse() {
   const by = new Map();
-  const add = t => { const a=String(t.address||t.addr||'').toLowerCase(); if (!/^0x[0-9a-f]{40}$/.test(a)) return; by.set(a,{address:a,symbol:t.symbol||t.b||'?',name:t.name||t.symbol||t.b||'Token',decimals:Number.isFinite(Number(t.decimals))?Number(t.decimals):(Number(t.bDec)||18),icon:t.icon||t.imageUrl||'',priceUsd:Number(t.priceUsd||t.priceB||t.price)||0}); };
+  const add = t => { const a=String(t.address||t.addr||'').toLowerCase(); if (!/^0x[0-9a-f]{40}$/.test(a)) return; by.set(a,{address:a,symbol:t.symbol||t.b||'?',name:t.name||t.symbol||t.b||'Token',decimals:Number.isFinite(Number(t.decimals))?Number(t.decimals):(Number(t.bDec)||18),icon:t.icon||t.imageUrl||'',priceUsd:Number(t.priceUsd||t.priceB||t.price)||0,mcapUsd:Number(t.mcap||t.mcapUsd||0)||0}); };
   CFG.tokens.forEach(add);
-  S.pools.forEach(p=>add({address:p.addr,symbol:p.b,name:p.b,decimals:p.bDec||18,icon:p.icon,priceB:p.priceB}));
+  S.pools.forEach(p=>add({address:p.addr,symbol:p.b,name:p.b,decimals:p.bDec||18,icon:p.icon,priceB:p.priceB,mcap:p.mcap}));
   // ALL tokens from RadarDex (not just the TVL-filtered S.pools), so brand-new / tiny tokens appear too.
   for (const a in (S.radarTokens||{})) {
     const t=S.radarTokens[a];
-    add({address:t.addr,symbol:t.symbol,name:t.symbol,decimals:t.decimals||18,icon:t.icon,priceB:t.priceB});
+    add({address:t.addr,symbol:t.symbol,name:t.symbol,decimals:t.decimals||18,icon:t.icon,priceB:t.priceB,mcap:t.mcap});
   }
   add({address:USDC_ADDR,symbol:'USDC',name:'USD Coin',decimals:6,icon:USDC_ICON,priceUsd:1});
   add({address:'0x1061d7f4934542b654e2a4ef7f04f101b4e8018d',symbol:'UNISARC',name:'UNISARC',decimals:18,icon:'assets/unisarc-logo.png',priceUsd:(S.pools.find(p=>(p.b||'').toUpperCase()==='UNISARC')||{}).priceB||0});
@@ -3375,8 +3399,10 @@ function renderSwapPicker(){
     return;
   }
   listEl.dataset.resolving='';
+  // Sort by market cap desc (highest first) — tidy, consistent with Monitor + pool
+  // picker. Pins stay at the bottom; balance is the tiebreaker for unknown-mcap tokens.
   const sorted=uni.filter(t=>!q||t.symbol.toLowerCase().includes(q)||t.name.toLowerCase().includes(q))
-    .sort((a,b)=>(SWAP_PIN_BOTTOM.get(a.address)||0)-(SWAP_PIN_BOTTOM.get(b.address)||0)||(cache[b.address]||0)-(cache[a.address]||0));
+    .sort((a,b)=>(SWAP_PIN_BOTTOM.get(a.address)||0)-(SWAP_PIN_BOTTOM.get(b.address)||0)||((b.mcapUsd||0)-(a.mcapUsd||0))||((cache[b.address]||0)-(cache[a.address]||0)));
   listEl.innerHTML=sorted.map(t=>renderRow(t)).join('')||'<div class="swap-picker-loading">No tokens found</div>';
 }
 // V4-only tokens (no V3 pool) cannot be routed through the V3 quoter/router yet.
@@ -3598,8 +3624,9 @@ function renderMonitor() {
     <div class="stat"><div class="label">Volume 24H</div><div class="value">${fmtUsd(vol)}</div><div class="sub">across all pools</div></div>
     <div class="stat"><div class="label">Fees to LPs 24H</div><div class="value up">${fmtUsd(fees)}</div><div class="sub">swap fees · 85% to LPs</div></div>
     <div class="stat"><div class="label">My Positions</div><div class="value">${fmtUsd(myVal)}</div><div class="sub">${S.positions.length} on-chain</div></div>`;
-  // Sort pools by 24h volume desc (highest first) — argus + radar mixed.
-  const sortedPools = S.pools.slice().sort((a, b) => (b.vol || 0) - (a.vol || 0));
+  // Sort pools by market cap desc (highest first) — argus + radar + basedbot mixed.
+  // Tokens with unknown mcap (0) sort after known ones, keeping the grid tidy.
+  const sortedPools = S.pools.slice().sort((a, b) => (poolMcap(b) || 0) - (poolMcap(a) || 0));
   $('monGrid').innerHTML = sortedPools.map(p => {
     const hasPos = S.positions.find(x => x.meta1 && x.meta1.symbol === p.b);
     const cls = p.spark && p.spark.length ? (p.spark[p.spark.length-1] >= p.spark[0] ? 'good' : 'bad') : 'good';
@@ -5098,8 +5125,41 @@ async function fetchHeatTokens() {
         }
       }
     } catch (e) { /* best-effort */ }
-    // Sort by 24h volume desc (highest first) — argus + radar mixed, consistent with Monitor.
-    _heatTokens.sort((a, b) => (b.volume24 || 0) - (a.volume24 || 0));
+    // Merge BasedBot V4 tokens so the heatmap picker + gainers/losers + liquidity
+    // distribution + migration tracker include them (dedup by address) — same
+    // V4 set the Monitor/screener merges from the shared feed.
+    try {
+      await mergeBasedBotPools();
+      if (Array.isArray(_bbTokenList)) {
+        const seen = new Set(_heatTokens.map(t => String(t.address || '').toLowerCase()));
+        for (const t of _bbTokenList) {
+          const addr = String(t.address || '').toLowerCase();
+          if (!addr || seen.has(addr)) continue;
+          if (String(t.pool_type || '').toUpperCase() !== 'UNISWAP_V4') continue;
+          seen.add(addr);
+          _heatTokens.push({
+            symbol: t.displaySymbol || t.symbol || '?',
+            name: t.name || t.symbol || 'Token',
+            address: addr,
+            price: Number(t.price_usd) || 0,
+            change24h: Number(t.change_24h) || 0,
+            volume24: Number(t.volume_24h) || 0,
+            liquidityUsdc: Number(t.liquidity_usd) || 0,
+            mcap: Number(t.market_cap_usd) || 0,
+            holders: 0,
+            txns24: Number(t.txns_24h) || 0,
+            buys24: Number(t.buys_24h) || 0,
+            sells24: Number(t.sells_24h) || 0,
+            ageSec: 0,
+            icon: t.icon || '',
+            spark: Array.isArray(t.sparkline) ? t.sparkline : [],
+            versions: ['v4'],
+          });
+        }
+      }
+    } catch (e) { /* basedbot merge is best-effort */ }
+    // Sort by market cap desc (highest first) — argus + radar + basedbot mixed, consistent with Monitor.
+    _heatTokens.sort((a, b) => (b.mcap || 0) - (a.mcap || 0));
     return _heatTokens;
   } catch (e) { return []; }
 }
@@ -5119,9 +5179,10 @@ function renderHeatOverlay() {
     const active = (i === _heatIdx);
     const icon = t.icon || '';
     const av = `<span class="ho-av" data-c="${sym[0] || '?'}">${icon ? '<img src="' + icon + '" alt="" loading="lazy" onerror="this.style.display=\'none\';this.parentNode.classList.add(\'fallback\')" />' : ''}</span>`;
+    const v4 = Array.isArray(t.versions) && t.versions.includes('v4');
     html += `<div class="heat-ov-item${active ? ' active' : ''}" data-idx="${i}" data-sym="${sym}">
       ${av}
-      <span class="ho-sym">${sym}</span>
+      <span class="ho-sym">${sym}${v4 ? ' <i class="ho-v4">V4</i>' : ''}</span>
       <span class="ho-price">$${fmt(t.price)}</span>
       <span class="ho-vol">$${fmt(t.volume24 || 0)}</span>
     </div>`;
@@ -5681,7 +5742,7 @@ function renderMigration() {
     if (!list.length) { el.innerHTML = '<div class="feed-empty">' + (up ? 'No rising activity' : 'No pressure detected') + '</div>'; return; }
     el.innerHTML = list.map(x => `<div class="mig-row">
       ${icon(x.t)}
-      <div class="mig-main"><div class="mig-sym">${x.t.symbol}</div><div class="mig-pct">vol $${fmt(x.vol)}</div></div>
+      <div class="mig-main"><div class="mig-sym">${x.t.symbol}${(Array.isArray(x.t.versions) && x.t.versions.includes('v4')) ? ' <i class="ho-v4">V4</i>' : ''}</div><div class="mig-pct">vol $${fmt(x.vol)}</div></div>
       <span class="mig-chg ${up ? 'up' : 'down'}">${x.ch >= 0 ? '+' : ''}${(x.ch).toFixed(1)}%</span>
     </div>`).join('');
   };
@@ -5851,7 +5912,7 @@ function renderSpotlight() {
   body.innerHTML = `<div class="spot-main">
       <span class="ho-av" data-c="${(best.symbol[0] || '?')}">${icon}</span>
       <div class="spot-head">
-        <div class="spot-sym">${best.symbol}</div>
+        <div class="spot-sym">${best.symbol}${(Array.isArray(best.versions) && best.versions.includes('v4')) ? ' <i class="ho-v4">V4</i>' : ''}</div>
         <div class="spot-price">${priceFmt(best.price || 0)}</div>
         <div class="spot-stats">
           <div class="spot-stat"><span class="ss-k">Vol 24h</span><span class="ss-v">$${fmt(best.volume24 || 0)}</span></div>
@@ -5893,8 +5954,8 @@ function renderLiquidityDistribution() {
   const rest = sorted.slice(8);
   const restLiq = rest.reduce((s, t) => s + (t.liquidityUsdc || 0), 0);
   const total = sorted.reduce((s, t) => s + (t.liquidityUsdc || 0), 0) || 1;
-  const items = top.map(t => ({ sym: t.symbol, icon: t.icon || '', liq: t.liquidityUsdc || 0 }));
-  if (rest.length) items.push({ sym: 'Other', icon: '', liq: restLiq });
+  const items = top.map(t => ({ sym: t.symbol, icon: t.icon || '', liq: t.liquidityUsdc || 0, v4: Array.isArray(t.versions) && t.versions.includes('v4') }));
+  if (rest.length) items.push({ sym: 'Other', icon: '', liq: restLiq, v4: false });
 
   // color palette
   const colors = ['#61dcd8', '#d8046a', '#f2b824', '#7ee081', '#7b289e', '#4a7dff', '#ff7a59', '#39d98a', '#b0b6c3'];
@@ -5915,7 +5976,7 @@ function renderLiquidityDistribution() {
     return `<div class="liqd-row">
       ${ldAv}
       <div class="ld-main">
-        <div class="ld-top"><span>${it.sym}</span><span class="ld-val">$${fmt(it.liq)} · ${pct.toFixed(1)}%</span></div>
+        <div class="ld-top"><span>${it.sym}${it.v4 ? ' <i class="ho-v4">V4</i>' : ''}</span><span class="ld-val">$${fmt(it.liq)} · ${pct.toFixed(1)}%</span></div>
         <div class="ld-bar"><div class="ld-fill" style="width:${pct.toFixed(1)}%;background:${colors[i % colors.length]}"></div></div>
       </div>
     </div>`;
@@ -5987,8 +6048,8 @@ async function loadMomTokens() {
         }
       }
     } catch (e) { /* basedbot merge is best-effort */ }
-    // Sort by 24h volume desc so the screener + pool scanner default to highest-first.
-    _momToks.sort((a, b) => (b.volume24 || 0) - (a.volume24 || 0));
+    // Sort by market cap desc so the screener + pool scanner default to biggest-first.
+    _momToks.sort((a, b) => (b.mcap || 0) - (a.mcap || 0));
   } catch (e) {
     if (_momToks) return _momToks;
     throw e;
@@ -6051,7 +6112,7 @@ function renderPoolQuality() {
       <div class="poolq-summary">
         <div class="poolq-score"><b>${q.score.toFixed(0)}</b><small>quality</small></div>
         <div class="poolq-main">
-          <div class="poolq-top"><span class="poolq-pair">${tokenLogo}<span class="poolq-pair-name">USDC / ${sym}</span></span><span class="poolq-verdict">${q.verdict}</span></div>
+          <div class="poolq-top"><span class="poolq-pair">${tokenLogo}<span class="poolq-pair-name">USDC / ${sym}${(Array.isArray(t.versions) && t.versions.includes('v4')) ? ' <i class="ho-v4">V4</i>' : ''}</span></span><span class="poolq-verdict">${q.verdict}</span></div>
           <div class="poolq-confidence">${q.grade} · ${q.confidence}</div>
         </div>
       </div>
@@ -6170,8 +6231,11 @@ async function renderTools() {
 
   // load heat-token picker list once
   if (typeof fetchHeatTokens === 'function' && !_heatTokensLoaded) {
-    _heatTokensLoaded = true;
     const toks = await fetchHeatTokens();
+    // mark loaded ONLY on a non-empty result — a failed/empty first fetch (network
+    // blip, proxy cold start) retries on the next Tools visit instead of leaving
+    // the spotlight / distribution / migration cards skeletoned all session.
+    if (toks && toks.length) _heatTokensLoaded = true;
     // default the heatmap picker to UNISARC
     if (_heatIdx < 0) {
       const uniIdx = toks.findIndex(t => (t.symbol || '').toUpperCase() === 'UNISARC');
@@ -6206,6 +6270,9 @@ async function renderTools() {
           fillTermPills(S.pools);
           renderMigration();
           if (typeof renderPoolQuality === 'function') renderPoolQuality();
+          if (typeof renderGainersLosers === 'function') renderGainersLosers();
+          if (typeof renderSpotlight === 'function') renderSpotlight();
+          if (typeof renderLiquidityDistribution === 'function') renderLiquidityDistribution();
         }
       }
       if (typeof fetchRadarFlows === 'function') {
