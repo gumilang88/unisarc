@@ -3272,14 +3272,31 @@ function scheduleSwapQuote(){ clearTimeout(_swapQuoteTimer); const seq=++S.swap.
 async function runSwapQuote(seq){
   const a=S.swap.tokenIn,b=S.swap.tokenOut; const amountIn=decimalToRaw($('swapAmountIn').value,a.decimals);
   if(amountIn<=0n)return renderSwap(true);
-  // V4-only tokens have no V3 pool — the quoter call would revert. Fail fast with a
-  // clear message instead of a generic "no output from pool".
+  // V4-only tokens have no V3 pool — quote locally from the V4 PoolManager storage
+  // (slot0 + liquidity) using the verified sqrt-math, same source the pool itself uses.
   if(isV4OnlyToken(a.address)||isV4OnlyToken(b.address)){
-    if(seq!==S.swap.quoteSeq)return;
-    S.swap.quote=null;$('swapAmountOut').value='';
-    $('swapQuoteStatus').textContent='Uniswap V4 pool — V4 swap support coming soon';
-    $('swapRate').textContent='Enter an amount';$('swapImpact').textContent='—';$('swapMinOut').textContent='—';
-    renderSwap(false);return;
+    $('swapQuoteStatus').textContent='Reading Uniswap V4 pool…';
+    try{
+      const key=await v4ResolvePoolKey(a.address,b.address);
+      if(!key)throw new Error('no V4 pool for this pair');
+      const st=await v4PoolState(key);
+      if(!st||st.liquidity<=0n||st.sqrtPriceX96<=0n)throw new Error('empty V4 pool');
+      const zeroForOne=String(a.address).toLowerCase()===key.currency0;
+      const out=v4QuoteOutExact(key,zeroForOne,amountIn,st,st.liquidity);
+      if(out<=0n)throw new Error('insufficient liquidity for this amount');
+      if(seq!==S.swap.quoteSeq)return;
+      const baseIn=amountIn/1000n>0n?amountIn/1000n:1n;
+      const baseOut=v4QuoteOutExact(key,zeroForOne,baseIn,st,st.liquidity);
+      const linear=baseOut*amountIn/baseIn; const impact=linear>0n?Math.max(0,Number((linear-out)*100000n/linear)/1000):0;
+      const minOut=out*BigInt(Math.max(0,Math.round((100-S.swap.slippage)*100)))/10000n;
+      S.swap.quote={amountIn,out,minOut,impact,at:Date.now(),tokenIn:a.address,tokenOut:b.address,v4:true,zeroForOne,poolKey:key};
+      const outText=rawToDecimal(out,b.decimals,8); $('swapAmountOut').value=outText;
+      const rate=Number(outText)/(Number($('swapAmountIn').value)||1); $('swapRate').textContent='1 '+a.symbol+' ≈ '+fmt(rate,Math.abs(rate)<.01?6:4)+' '+b.symbol;
+      $('swapImpact').textContent=impact<.01?'< 0.01%':impact.toFixed(2)+'%'; $('swapImpact').style.color=impact>5?'var(--red)':impact>2?'var(--yellow)':'var(--green)';
+      $('swapMinOut').textContent=rawToDecimal(minOut,b.decimals,8)+' '+b.symbol;
+      $('swapQuoteStatus').textContent='V4 quote · Uniswap V4 pool'; renderSwap(false);
+    }catch(e){if(seq!==S.swap.quoteSeq)return;S.swap.quote=null;$('swapAmountOut').value='';$('swapQuoteStatus').textContent='V4 quote unavailable: '+(e.message||e);$('swapRate').textContent='Enter an amount';$('swapImpact').textContent='—';$('swapMinOut').textContent='—';renderSwap(false);}
+    return;
   }
   $('swapQuoteStatus').textContent='Reading Uniswap pool…';
   try{
@@ -4456,9 +4473,11 @@ function v4PoolId(c0, c1, fee, tickSpacing, hooks) {
 }
 // Pools mapping slot = 6 in ARC's PoolManager fork (discovered via storage brute-force).
 // slot0 raw word = sqrtPriceX96 (low 160 bits) | tick (signed int24 at bits 160..183).
+// Read via eth_getStorageAt (raw storage) — the old eth_call with a magic selector
+// returned zeros and hung quotes. Raw storage read verified against live RPC.
 async function v4Slot0(poolIdHex) {
   const base = keccak256Checked(poolIdHex.padStart(64, '0') + uintArg(6));
-  const raw = await ethCall(V4_PM, '0x1e2eaeaf' + base);
+  const raw = await rpc('eth_getStorageAt', [V4_PM, '0x' + base, 'latest']);
   if (!raw || raw === '0x') throw new Error('pool not found');
   const rawB = raw.slice(2).padStart(64, '0');
   const word = BigInt('0x' + rawB);
@@ -4623,8 +4642,8 @@ async function v4PoolState(poolKey) {
 async function v4PoolLiquidity(poolIdHex) {
   const base = BigInt('0x' + keccak256Checked(poolIdHex.padStart(64, '0') + uintArg(6)));
   const slot = base + 1n;
-  const raw = await ethCall(V4_PM, '0x1e2eaeaf' + slot.toString(16).padStart(64, '0'));
-  return BigInt(raw === '0x' ? '0x0' : raw);
+  const raw = await rpc('eth_getStorageAt', [V4_PM, '0x' + slot.toString(16).padStart(64, '0'), 'latest']);
+  return BigInt(raw === '0x' || !raw ? '0x0' : raw);
 }
 // Constant-product-style out quote within the active tick (exact-in, single hop).
 // Uses the standard V3/V4 sqrt math: out = L*(sqrtP_next - sqrtP) in token1 when
