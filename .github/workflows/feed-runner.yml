@@ -43,24 +43,30 @@ jobs:
           push_ok=0; standby=0; fetch_fail=0; push_fail=0; i=0
           while [ "$(date +%s)" -lt "$END" ]; do
             i=$((i+1))
-            # Feed age check — fresh feed means the WSL poller is alive: standby.
-            AGE=$(curl -sS -m 10 -D - -o /dev/null "$WORKER/feed" 2>/dev/null \
-              | awk -F': *' 'tolower($1)=="x-feed-age-sec"{gsub("\r",""); print $2}' | head -1)
-            if [ -n "$AGE" ] && [ "$AGE" -lt 90 ] 2>/dev/null; then
+            # Read feed once: age header + pusher marker in the stored body.
+            #   pusher != gh-daemon && age < 90  → the WSL poller is alive: standby.
+            #   pusher == gh-daemon              → WE are the active pusher: keep the
+            #                                       25 s cadence going (full realtime).
+            curl -sS -m 10 -D hdr.txt -o body.json "$WORKER/feed" 2>/dev/null || true
+            AGE=$(awk -F': *' 'tolower($1)=="x-feed-age-sec"{gsub("\r",""); print $2}' hdr.txt 2>/dev/null | head -1)
+            PUSHER=$(python3 -c "import json;print(json.load(open('body.json')).get('pusher',''))" 2>/dev/null || echo "")
+            if [ "$PUSHER" != "gh-daemon" ] && [ -n "$AGE" ] && [ "$AGE" -lt 90 ] 2>/dev/null; then
               standby=$((standby+1))
-              echo "[$(date -u +%H:%M:%S)] #$i standby (feed age ${AGE}s — WSL poller alive)"
+              echo "[$(date -u +%H:%M:%S)] #$i standby (age ${AGE:-n/a}s, pusher '${PUSHER:-wsl}' — WSL poller alive)"
               sleep 25
               continue
             fi
-            # Feed stale/missing (WSL down) — fetch basedbot + push.
+            # Feed stale or we own it — fetch basedbot + push (tagged gh-daemon so
+            # the next cycle knows to keep pushing without waiting for the 90 s gap).
             if timeout 100 python3 basedbot_fetch.py --feed 40 30 > feed.json 2>/dev/null \
                && [ "$(head -c 1 feed.json)" = "{" ]; then
+              python3 -c "import json;d=json.load(open('feed.json'));d['pusher']='gh-daemon';json.dump(d,open('feed.json','w'))"
               CODE=$(curl -sS -m 15 -X PUT "$WORKER/push" \
                 -H "Content-Type: application/json" -H "X-Push-Token: $PUSH_TOKEN" \
                 --data-binary @feed.json -o /dev/null -w "%{http_code}")
               if [ "$CODE" = "200" ]; then
                 push_ok=$((push_ok+1))
-                echo "[$(date -u +%H:%M:%S)] #$i pushed ok (feed age was ${AGE:-n/a}s)"
+                echo "[$(date -u +%H:%M:%S)] #$i pushed ok (took over from age ${AGE:-n/a}s)"
               else
                 push_fail=$((push_fail+1))
                 echo "[$(date -u +%H:%M:%S)] #$i push HTTP $CODE"
