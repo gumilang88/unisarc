@@ -1,0 +1,83 @@
+name: feed-runner
+
+# Eternal realtime feed daemon (NOT a cron schedule).
+# One run loops for ~5h40m pushing the BasedBot feed to the unisarc-feed Worker
+# every ~25 s — same cadence as the WSL poller. When the loop window ends, the
+# final step dispatches the NEXT run (workflow_dispatch), so the daemon never
+# stops. Hot-standby logic: if the feed is still fresh (<90 s old, i.e. the WSL
+# poller is alive and pushing), the loop sleeps without touching basedbot —
+# so this runner only becomes the active pusher when WSL is down/off.
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  actions: write
+
+concurrency:
+  group: feed-runner
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install curl_cffi
+        run: pip install curl_cffi
+
+      - name: Realtime feed loop
+        env:
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: |
+          set -u
+          WORKER=https://unisarc-feed.akunftx99.workers.dev
+          END=$(( $(date +%s) + 20400 ))   # 5h40m loop window (< 350 min job cap)
+          push_ok=0; standby=0; fetch_fail=0; push_fail=0; i=0
+          while [ "$(date +%s)" -lt "$END" ]; do
+            i=$((i+1))
+            # Feed age check — fresh feed means the WSL poller is alive: standby.
+            AGE=$(curl -sS -m 10 -D - -o /dev/null "$WORKER/feed" 2>/dev/null \
+              | awk -F': *' 'tolower($1)=="x-feed-age-sec"{gsub("\r",""); print $2}' | head -1)
+            if [ -n "$AGE" ] && [ "$AGE" -lt 90 ] 2>/dev/null; then
+              standby=$((standby+1))
+              echo "[$(date -u +%H:%M:%S)] #$i standby (feed age ${AGE}s — WSL poller alive)"
+              sleep 25
+              continue
+            fi
+            # Feed stale/missing (WSL down) — fetch basedbot + push.
+            if timeout 100 python3 basedbot_fetch.py --feed 40 30 > feed.json 2>/dev/null \
+               && [ "$(head -c 1 feed.json)" = "{" ]; then
+              CODE=$(curl -sS -m 15 -X PUT "$WORKER/push" \
+                -H "Content-Type: application/json" -H "X-Push-Token: $PUSH_TOKEN" \
+                --data-binary @feed.json -o /dev/null -w "%{http_code}")
+              if [ "$CODE" = "200" ]; then
+                push_ok=$((push_ok+1))
+                echo "[$(date -u +%H:%M:%S)] #$i pushed ok (feed age was ${AGE:-n/a}s)"
+              else
+                push_fail=$((push_fail+1))
+                echo "[$(date -u +%H:%M:%S)] #$i push HTTP $CODE"
+              fi
+            else
+              fetch_fail=$((fetch_fail+1))
+              echo "[$(date -u +%H:%M:%S)] #$i basedbot fetch failed"
+            fi
+            sleep 25
+          done
+          echo "window done: pushed=$push_ok standby=$standby fetch_fail=$fetch_fail push_fail=$push_fail"
+
+      - name: Chain next run (daemon never stops)
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          sleep 5
+          gh workflow run feed-runner.yml --ref main
+          echo "chained next feed-runner run"
