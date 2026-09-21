@@ -3197,7 +3197,7 @@ function swapTokenUniverse() {
     add({address:t.addr,symbol:t.symbol,name:t.symbol,decimals:t.decimals||18,icon:t.icon,priceB:t.priceB,mcap:t.mcap,vol:t.vol});
   }
   add({address:USDC_ADDR,symbol:'USDC',name:'USD Coin',decimals:6,icon:USDC_ICON,priceUsd:1});
-  add({address:'0xc1ADFFCAC98824FcC648767e55A02349CC98f63F',symbol:'UNISARC',name:'UNISARC',decimals:18,icon:'assets/unisarc-logo.png',priceUsd:(S.pools.find(p=>(p.b||'').toUpperCase()==='UNISARC')||{}).priceB||0});
+  add({address:'0xc1ADFFCAC98824FcC648767e55A02349CC98f63F',symbol:'UNISARC',name:'UNISARC',decimals:18,icon:'assets/unisarc-logo.png',priceUsd:(S.pools.find(p=>(p.b||'').toUpperCase()==='UNISARC')||{}).priceB||0,v4:true,versions:['v4'],pool_type:'UNISWAP_V4'});
   return [...by.values()];
 }
 function initSwapState() {
@@ -3437,7 +3437,9 @@ function isV4OnlyToken(addr){
   const rt=S.radarTokens[a];
   if(rt&&rt.v4) return true;
   const p=S.pools.find(x=>String(x.addr||'').toLowerCase()===a&&x.v4);
-  return !!p;
+  if(p) return true;
+  // universe-level flag (e.g. hardcoded UNISARC entry) — V4 even when no pool row exists
+  return swapTokenUniverse().some(x=>x.address===a&&x.v4);
 }
 function chooseSwapToken(addr){let t=(S.swap.resolvedTokens||{})[addr]||swapTokenUniverse().find(x=>x.address===addr);if(!t)return;const side=S.swap.pickerSide;if(side==='in'){if(t.address===S.swap.tokenOut.address)S.swap.tokenOut=S.swap.tokenIn;S.swap.tokenIn=t;}else{if(t.address===S.swap.tokenIn.address)S.swap.tokenIn=S.swap.tokenOut;S.swap.tokenOut=t;}closeSwapPicker();scheduleSwapQuote();refreshSwapBalances();}
 function applySwapPct(pct){
@@ -4599,6 +4601,8 @@ async function v4Permit2Allowance(token, owner, spender) {
 // Returns { currency0, currency1, fee, tickSpacing, hooks, poolId } or null.
 // poolId from feed == keccak256(abi.encode(PoolKey)) — verified on-chain; tickSpacing
 // is brute-forced from the known ARC set when the feed value doesn't match.
+// Resolved keys are cached per pair (15 min) so repeated quotes stay fast.
+const _v4PoolKeyCache = new Map();
 function v4FindFeedToken(tokenAddr) {
   const a = String(tokenAddr || '').toLowerCase();
   const list = Array.isArray(_bbTokenList) ? _bbTokenList : [];
@@ -4607,29 +4611,66 @@ function v4FindFeedToken(tokenAddr) {
 async function v4ResolvePoolKey(tokenA, tokenB) {
   const a = String(tokenA || '').toLowerCase(), b = String(tokenB || '').toLowerCase();
   if (!/^0x[0-9a-f]{40}$/.test(a) || !/^0x[0-9a-f]{40}$/.test(b)) return null;
-  const feedT = v4FindFeedToken(a) || v4FindFeedToken(b);
-  if (!feedT) return null;
-  const other = v4FindFeedToken(a) ? b : a;   // the quote side (usually USDC)
-  const quote = String(feedT.quote_address || '').toLowerCase() || USDC_ADDR;
-  const tok = String(feedT.address || '').toLowerCase();
-  // currency0 < currency1 numerically
-  const pair = [quote, tok].sort();
-  const fee = Number(feedT.pool_real_fee) || 10000;
-  const hooks = String(feedT.pool_hooks || '0x0000000000000000000000000000000000000000').toLowerCase();
-  const feedPoolId = String(feedT.pool_address || '').toLowerCase().replace('0x', '');
-  // brute-force tickSpacing until poolId matches the feed's pool_address
-  const spacings = [200, 100, 60, 50, 25, 10, 5, 1];
-  for (const ts of spacings) {
-    const pid = v4PoolId(pair[0], pair[1], fee, ts, hooks);
-    if (feedPoolId && pid === feedPoolId.replace('0x', '')) {
-      return { currency0: pair[0], currency1: pair[1], fee, tickSpacing: ts, hooks, poolId: pid };
+  // per-pair cache (15 min) — the on-chain grid is slow on first resolve; cache the
+  // resolved PoolKey so subsequent quotes (every keystroke) are 1-2 RPC reads.
+  const cacheKey = [a, b].sort().join(':');
+  const cached = _v4PoolKeyCache.get(cacheKey);
+  if (cached && Date.now() - cached.at < 900000) return cached.key;
+  // The pool searched is always between the TWO REQUESTED tokens (a, b) — never
+  // substitute a feed "quote_address" for one of them: that would resolve the
+  // wrong pool for V4→V4 pairs and break pairs like USDC↔UNISARC (USDC itself
+  // appears in the feed as a V4 row, so a naive find() latches onto the wrong side).
+  const pair = [a, b].sort();
+  // ---- Path 1: feed tokens resolve offline (poolId match, zero RPC) ----
+  const feedA = v4FindFeedToken(a), feedB = v4FindFeedToken(b);
+  const feedT = feedA || feedB;
+  if (feedT) {
+    const fee = Number(feedT.pool_real_fee) || 10000;
+    const hooks = String(feedT.pool_hooks || '0x0000000000000000000000000000000000000000').toLowerCase();
+    const feedPoolId = String(feedT.pool_address || '').toLowerCase().replace('0x', '');
+    const spacings = [200, 100, 60, 50, 25, 10, 5, 1];
+    for (const ts of spacings) {
+      const pid = v4PoolId(pair[0], pair[1], fee, ts, hooks);
+      if (feedPoolId && pid === feedPoolId.replace('0x', '')) {
+        const key = { currency0: pair[0], currency1: pair[1], fee, tickSpacing: ts, hooks, poolId: pid };
+        _v4PoolKeyCache.set(cacheKey, { at: Date.now(), key });
+        return key;
+      }
     }
+    // feed poolId missing/unmatched — fall through to the on-chain grid below
   }
-  // feed poolId missing/unmatched — fall back to ts=200 (most common on ARC) and verify on-chain
-  const ts = 200;
-  const pid = v4PoolId(pair[0], pair[1], fee, ts, hooks);
-  try { await v4Slot0(pid); return { currency0: pair[0], currency1: pair[1], fee, tickSpacing: ts, hooks, poolId: pid }; }
-  catch (e) { return null; }
+  // ---- Path 2 (universal): on-chain grid over common ARC V4 configs ----
+  // Works for ANY V4 token (feed or not): try (fee, ts, hooks) combos and keep
+  // the first whose pool storage (slot 6) is live. Order = most common on ARC:
+  // Argus launches (fee 10000, ts 200, hooks d825…) then hookless tiers.
+  const grid = [
+    { fee: 10000, ts: 200, hooks: '0xd8255a411efa59adcfd01b540d7d67adc363e044' },  // Argus launchpad
+    { fee: 10000, ts: 200, hooks: '0x0000000000000000000000000000000000000000' },
+    { fee: 10000, ts: 100, hooks: '0x0000000000000000000000000000000000000000' },
+    { fee: 10000, ts: 60,  hooks: '0x0000000000000000000000000000000000000000' },
+    { fee: 10000, ts: 50,  hooks: '0x0000000000000000000000000000000000000000' },
+    { fee: 10000, ts: 25,  hooks: '0x0000000000000000000000000000000000000000' },
+    { fee: 10000, ts: 10,  hooks: '0x0000000000000000000000000000000000000000' },
+    { fee: 10000, ts: 5,   hooks: '0x0000000000000000000000000000000000000000' },
+    { fee: 10000, ts: 1,   hooks: '0x0000000000000000000000000000000000000000' },
+    { fee: 3000,  ts: 200, hooks: '0x0000000000000000000000000000000000000000' },
+    { fee: 3000,  ts: 60,  hooks: '0x0000000000000000000000000000000000000000' },
+    { fee: 1000,  ts: 200, hooks: '0x0000000000000000000000000000000000000000' },
+    { fee: 500,   ts: 10,  hooks: '0x0000000000000000000000000000000000000000' },
+    { fee: 100,   ts: 1,   hooks: '0x0000000000000000000000000000000000000000' },
+  ];
+  for (const g of grid) {
+    const pid = v4PoolId(pair[0], pair[1], g.fee, g.ts, g.hooks);
+    try {
+      const slot = await v4Slot0(pid);          // throws when storage read fails
+      if (slot && (slot.sqrtPriceX96 > 0n || slot.tick !== 0)) {
+        const key = { currency0: pair[0], currency1: pair[1], fee: g.fee, tickSpacing: g.ts, hooks: g.hooks, poolId: pid };
+        _v4PoolKeyCache.set(cacheKey, { at: Date.now(), key });
+        return key;
+      }
+    } catch (e) { /* storage read error — try next config */ }
+  }
+  return null;
 }
 // V4 quoter: read the PoolManager pools[poolId] slot0 via storage (slot 6). Returns
 // { sqrtPriceX96, tick } — same source the PoolManager itself uses.
