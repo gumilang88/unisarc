@@ -6709,11 +6709,8 @@ async function renderTools() {
     // blip, proxy cold start) retries on the next Tools visit instead of leaving
     // the spotlight / distribution / migration cards skeletoned all session.
     if (toks && toks.length) _heatTokensLoaded = true;
-    // default the heatmap picker to UNISARC
-    if (_heatIdx < 0) {
-      const uniIdx = toks.findIndex(t => (t.symbol || '').toUpperCase() === 'UNISARC');
-      _heatIdx = uniIdx >= 0 ? uniIdx : 0;
-    }
+    // default the heatmap picker to the top token (highest volume)
+    if (_heatIdx < 0) _heatIdx = 0;
     if (_heatIdx >= 0 && toks[_heatIdx]) {
       const lbl = $t('heatPickLabel'); if (lbl) lbl.textContent = toks[_heatIdx].symbol;
       const pic = $t('heatPickIcon'); if (pic) { pic.src = toks[_heatIdx].icon || ''; pic.style.display = toks[_heatIdx].icon ? '' : 'none'; }
