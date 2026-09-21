@@ -1,0 +1,42 @@
+name: BasedBot feed push (backup for WSL poller)
+
+# Keeps unisarc.xyz V4 data alive when the WSL poller is down (PC off / WSL
+# restart). Runs every 5 min from GitHub infra. curl_cffi impersonates Chrome
+# TLS, the only fingerprint that passes basedbot.app's Cloudflare check.
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: feed-push
+  cancel-in-progress: false
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install curl_cffi
+        run: pip install curl_cffi
+
+      - name: Fetch and push feed
+        env:
+          PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
+        run: |
+          python3 basedbot_fetch.py --feed 40 30 > feed.json
+          python3 - << 'PY'
+          import json
+          d = json.load(open('feed.json'))
+          print(f"tokens={d.get('tokens')} swaps={len(d.get('swaps', []))} v4={sum(1 for t in d.get('tokens_list', []) if str(t.get('pool_type','')).upper()=='UNISWAP_V4')}")
+          PY
+          curl -sS -X PUT "https://unisarc-feed.akunftx99.workers.dev/push" \
+            -H "Content-Type: application/json" \
+            -H "X-Push-Token: $PUSH_TOKEN" \
+            --data-binary @feed.json -w "\nHTTP:%{http_code}\n"
