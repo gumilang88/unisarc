@@ -6420,10 +6420,8 @@ function renderLiquidityDistribution() {
   const body = $t('liqdBody'); if (!body) return;
   const toks = (_heatTokens || []).filter(t => (t.liquidityUsdc || 0) > 0);
   if (!toks.length) { body.innerHTML = '<div class="liqd-empty"><span class="skel-line w80"></span><span class="skel-line w60"></span></div>'; return; }
-  // sort by liquidity, but pin UNISARC (the token with the official website) to #1
+  // sort by liquidity desc — no pinned token
   const sorted = toks.slice().sort((a, b) => (b.liquidityUsdc || 0) - (a.liquidityUsdc || 0));
-  const uniIdx = sorted.findIndex(t => (t.symbol || '').toUpperCase() === 'UNISARC');
-  if (uniIdx > 0) { const u = sorted.splice(uniIdx, 1)[0]; sorted.unshift(u); }
   const top = sorted.slice(0, 8);
   const rest = sorted.slice(8);
   const restLiq = rest.reduce((s, t) => s + (t.liquidityUsdc || 0), 0);
