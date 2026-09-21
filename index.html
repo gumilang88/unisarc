@@ -2482,9 +2482,9 @@ function buildPoolsFromRadar(list) {
     versions: Array.isArray(t.versions) ? t.versions : [],
     });
     }
-    // pin the UNISARC/USDC pool to position #1 so it's the default everywhere
-    const uniIdx = out.findIndex(p => (p.b || '').toUpperCase() === 'UNISARC');
-    if (uniIdx > 0) { const u = out.splice(uniIdx, 1)[0]; out.unshift(u); }
+    // Rank by 24h volume desc (highest first) — the top pool everywhere is the
+    // most-traded pair. No pinned token.
+    out.sort((a, b) => (b.vol || 0) - (a.vol || 0));
     return out;
     }
 function poolsFromSnapshot() { return buildPoolsFromRadar(RADAR_SNAPSHOT); }
@@ -2536,6 +2536,9 @@ function buildPoolsFromArgus(argusList) {
     const apr = liq > 0 ? (vol * 0.01 * 0.85 / liq) * 365 * 100 : 0;
     const addr = String(a.address || '').toLowerCase();
     const icon = argusLogoUrl(a.imageUrl);
+    // UNISARC launched on Argus but graduated tokens are regular V3; UNISARC itself
+    // is still live on the bonding curve → tag V4 so it flows into the V4 paths.
+    const isUnisarc = addr === UNISARC_ADDR.toLowerCase();
     // Some memecoins deliberately use a well-known symbol (USDC/EURC/PI/AI/…), which
     // collides with the USDC quote side and would render "USDC / USDC". Use the token's
     // NAME as the display label when its symbol clashes with the quote token, so every
@@ -2544,7 +2547,7 @@ function buildPoolsFromArgus(argusList) {
     if (addr) S.radarTokens[addr] = {
       addr, symbol: sym, priceB: price, mcap: Number(a.marketCap) || 0, tvl: liq, vol,
       icon, fee: 10000, spark, change24h: Number(a.change24h) || 0,
-      v4: false, versions: [], launchpad: 'argus',
+      v4: isUnisarc, versions: isUnisarc ? ['v4'] : [], launchpad: 'argus',
     };
     out.push({
       id: 'ARGUS-' + addr, a: 'USDC', b: label, addr,
@@ -2554,7 +2557,7 @@ function buildPoolsFromArgus(argusList) {
       mcap: Number(a.marketCap) || 0,
       vol, chg24: Number(a.change24h) || 0, spark,
       verified: false, launchpad: 'argus', website: '', twitter: '',
-      v4: false, versions: [],
+      v4: isUnisarc, versions: isUnisarc ? ['v4'] : [],
     });
   }
   return out;
@@ -2715,10 +2718,15 @@ async function fetchUnisarcToken() {
 }
 function injectUnisarcPool(pool) {
   if (!pool) return;
-  const i = S.pools.findIndex(p => (p.b || '').toUpperCase() === 'UNISARC');
-  if (i === 0) { S.pools[0] = pool; return; }          // already pinned — refresh data
-  if (i > 0) S.pools.splice(i, 1);                       // exists elsewhere — move to top
-  S.pools.unshift(pool);                                 // ensure it's #1
+  // Keep UNISARC PRESENT but never pinned: refresh its data if a pool for the
+  // address already exists (anywhere in the list), else append it. The 24h-volume
+  // sort in every renderer decides its actual rank.
+  const i = S.pools.findIndex(p => String(p.addr || '').toLowerCase() === UNISARC_ADDR);
+  if (i >= 0) {
+    Object.assign(S.pools[i], { tvl: pool.tvl, vol: pool.vol, priceB: pool.priceB, apr: pool.apr, chg24: pool.chg24, spark: pool.spark, icon: pool.icon || S.pools[i].icon });
+    return;
+  }
+  S.pools.push(pool);
 }
 
 // Lightweight fingerprint of the pool set for change detection: an array of
@@ -3024,9 +3032,9 @@ function renderPoolChips() {
     $('ptTxt').textContent = (p.a || '?') + ' / ' + (p.b || '?');
     $('ptIco').innerHTML = p.b === 'USDC' ? '' : poolIconHtml(p, 'pt-ico');
   }
-  // render overlay list — sorted by market cap desc (highest first); unknown-mcap
+  // render overlay list — sorted by 24h volume desc (highest first); unknown-vol
   // pools keep their original order after the known ones.
-  const sortedPools = S.pools.slice().sort((a, b) => (poolMcap(b) || 0) - (poolMcap(a) || 0));
+  const sortedPools = S.pools.slice().sort((a, b) => (b.vol || 0) - (a.vol || 0));
   $('pmList').innerHTML = sortedPools.map(pp => `
     <button class="pool-opt ${pp.id===S.selected?'active':''}" data-pool="${pp.id}" type="button">
       ${poolIconHtml(pp, 'po-ico')}
@@ -3180,13 +3188,13 @@ function rawToDecimal(raw, decimals, precision=8) {
 }
 function swapTokenUniverse() {
   const by = new Map();
-  const add = t => { const a=String(t.address||t.addr||'').toLowerCase(); if (!/^0x[0-9a-f]{40}$/.test(a)) return; by.set(a,{address:a,symbol:t.symbol||t.b||'?',name:t.name||t.symbol||t.b||'Token',decimals:Number.isFinite(Number(t.decimals))?Number(t.decimals):(Number(t.bDec)||18),icon:t.icon||t.imageUrl||'',priceUsd:Number(t.priceUsd||t.priceB||t.price)||0,mcapUsd:Number(t.mcap||t.mcapUsd||0)||0}); };
+  const add = t => { const a=String(t.address||t.addr||'').toLowerCase(); if (!/^0x[0-9a-f]{40}$/.test(a)) return; by.set(a,{address:a,symbol:t.symbol||t.b||'?',name:t.name||t.symbol||t.b||'Token',decimals:Number.isFinite(Number(t.decimals))?Number(t.decimals):(Number(t.bDec)||18),icon:t.icon||t.imageUrl||'',priceUsd:Number(t.priceUsd||t.priceB||t.price)||0,mcapUsd:Number(t.mcap||t.mcapUsd||0)||0,vol24:Number(t.vol||t.volume24||t.vol24||0)||0}); };
   CFG.tokens.forEach(add);
-  S.pools.forEach(p=>add({address:p.addr,symbol:p.b,name:p.b,decimals:p.bDec||18,icon:p.icon,priceB:p.priceB,mcap:p.mcap}));
+  S.pools.forEach(p=>add({address:p.addr,symbol:p.b,name:p.b,decimals:p.bDec||18,icon:p.icon,priceB:p.priceB,mcap:p.mcap,vol:p.vol}));
   // ALL tokens from RadarDex (not just the TVL-filtered S.pools), so brand-new / tiny tokens appear too.
   for (const a in (S.radarTokens||{})) {
     const t=S.radarTokens[a];
-    add({address:t.addr,symbol:t.symbol,name:t.symbol,decimals:t.decimals||18,icon:t.icon,priceB:t.priceB,mcap:t.mcap});
+    add({address:t.addr,symbol:t.symbol,name:t.symbol,decimals:t.decimals||18,icon:t.icon,priceB:t.priceB,mcap:t.mcap,vol:t.vol});
   }
   add({address:USDC_ADDR,symbol:'USDC',name:'USD Coin',decimals:6,icon:USDC_ICON,priceUsd:1});
   add({address:'0xc1ADFFCAC98824FcC648767e55A02349CC98f63F',symbol:'UNISARC',name:'UNISARC',decimals:18,icon:'assets/unisarc-logo.png',priceUsd:(S.pools.find(p=>(p.b||'').toUpperCase()==='UNISARC')||{}).priceB||0});
@@ -3399,10 +3407,10 @@ function renderSwapPicker(){
     return;
   }
   listEl.dataset.resolving='';
-  // Sort by market cap desc (highest first) — tidy, consistent with Monitor + pool
-  // picker. Pins stay at the bottom; balance is the tiebreaker for unknown-mcap tokens.
+  // Sort by 24h volume desc (highest first) — the most-traded token is the top
+  // row everywhere. Pins stay at the bottom; balance is the tiebreaker for unknown-vol tokens.
   const sorted=uni.filter(t=>!q||t.symbol.toLowerCase().includes(q)||t.name.toLowerCase().includes(q))
-    .sort((a,b)=>(SWAP_PIN_BOTTOM.get(a.address)||0)-(SWAP_PIN_BOTTOM.get(b.address)||0)||((b.mcapUsd||0)-(a.mcapUsd||0))||((cache[b.address]||0)-(cache[a.address]||0)));
+    .sort((a,b)=>(SWAP_PIN_BOTTOM.get(a.address)||0)-(SWAP_PIN_BOTTOM.get(b.address)||0)||((b.vol24||0)-(a.vol24||0))||((cache[b.address]||0)-(cache[a.address]||0)));
   listEl.innerHTML=sorted.map(t=>renderRow(t)).join('')||'<div class="swap-picker-loading">No tokens found</div>';
 }
 // V4-only tokens (no V3 pool) cannot be routed through the V3 quoter/router yet.
@@ -3639,10 +3647,10 @@ function renderMonitor() {
     <div class="stat"><div class="label">Volume 24H</div><div class="value">${fmtUsd(vol)}</div><div class="sub">across all pools</div></div>
     <div class="stat"><div class="label">Fees to LPs 24H</div><div class="value up">${fmtUsd(fees)}</div><div class="sub">swap fees · 85% to LPs</div></div>
     <div class="stat"><div class="label">My Positions</div><div class="value">${fmtUsd(myVal)}</div><div class="sub">${S.positions.length} on-chain</div></div>`;
-  // Sort pools by market cap desc (highest first) — argus + radar + basedbot mixed.
-  // Tokens with unknown mcap (0) sort after known ones, keeping the grid tidy.
-  const sortedPools = S.pools.slice().sort((a, b) => (poolMcap(b) || 0) - (poolMcap(a) || 0));
-  $('monGrid').innerHTML = sortedPools.map(p => {
+    // Sort pools by 24h volume desc (highest first) — the top row on every page
+    // reflects real trading activity. Tokens with unknown vol (0) sort last.
+    const sortedPools = S.pools.slice().sort((a, b) => (b.vol || 0) - (a.vol || 0));
+    $('monGrid').innerHTML = sortedPools.map(p => {
     const hasPos = S.positions.find(x => x.meta1 && x.meta1.symbol === p.b);
     const cls = p.spark && p.spark.length ? (p.spark[p.spark.length-1] >= p.spark[0] ? 'good' : 'bad') : 'good';
     // Logo with letter fallback: if the <img> fails to load, swap to a colored letter avatar.
@@ -5085,7 +5093,8 @@ async function ensureMonitorPools() {
   // embedded pool snapshot immediately, then replace it with live Radar data.
   if (!S.pools.length) {
     S.pools = poolsFromSnapshot();
-    if (!S.selected) S.selected = (S.pools.find(p => (p.b || '').toUpperCase() === 'UNISARC') || S.pools[0])?.id || '';
+    // default pool = ranked #1 by 24h volume (no pinned token)
+    if (!S.selected) S.selected = S.pools[0]?.id || '';
   }
   renderMonitor();
   if (!_monitorLoadPromise) {
@@ -5098,8 +5107,10 @@ async function ensureMonitorPools() {
       }
       await mergeArgusPools();
       await mergeBasedBotPools();
-      const uni = S.pools.find(p => (p.b || '').toUpperCase() === 'UNISARC');
-      if (uni && (!S.pools.find(p=>p.id===S.selected) || !S._userPickedPool)) S.selected = uni.id;
+      // volume-ranked master list → S.pools[0] = most-traded pool; default
+      // selection follows it (no pinned token)
+      S.pools.sort((a, b) => (b.vol || 0) - (a.vol || 0));
+      if (!S.pools.find(p=>p.id===S.selected) || !S._userPickedPool) S.selected = S.pools[0]?.id || S.selected;
       renderPoolChips();
       renderMonitor();
     })().catch(()=>{}).finally(() => { _monitorLoadPromise = null; });
@@ -5404,7 +5415,8 @@ window.addEventListener('load', async ()=>{
   reveal();
   const _safety = setTimeout(reveal, 1200);
   S.pools = poolsFromSnapshot();
-  S.selected = (S.pools.find(p => (p.b || '').toUpperCase() === 'UNISARC') || S.pools[0])?.id || '';
+  // default pool = ranked #1 by 24h volume (snapshot is volume-sorted; no pinned token)
+  S.selected = S.pools[0]?.id || '';
   initSwapState(); renderSwap(true);
   // set the active view from the URL hash EARLY and render, then reveal —
   // so the page appears directly on the right tab with NO flash/jump to Positions.
@@ -5454,19 +5466,21 @@ async function refreshPools(force) {
   const l = await fetchRadarTop();
   if (!l || !l.length) return;
   S.pools = buildPoolsFromRadar(l);
-  // Always ensure UNISARC (platform token) is present + pinned #1, even when it's
-  // outside RadarDex's top-500 volume ranking.
-  const uni = await fetchUnisarcToken();
-  injectUnisarcPool(uni);
+  // UNISARC (platform token) stays in the list via its RadarDex entry / the Argus
+  // token — present but never pinned; all rankings are by 24h volume.
   await mergeArgusPools();
   await mergeBasedBotPools();
+  const uni = await fetchUnisarcToken();
+  if (uni) injectUnisarcPool(uni);
+  // keep the master list volume-ranked so S.pools[0] = most-traded pool (argus /
+  // basedbot merges append at the end — this re-ranks everything by 24h volume)
+  S.pools.sort((a, b) => (b.vol || 0) - (a.vol || 0));
   const fp = poolsFingerprint(S.pools);
   if (!force && fp === S._lastFp) return;   // no meaningful change → skip re-render
   S._lastFp = fp;
   syncTokenMetaFromPools();
-  // default-select the UNISARC/USDC pool on first live load (pinned to #1)
-  const uniPool = S.pools.find(p => (p.b || '').toUpperCase() === 'UNISARC');
-  if (uniPool && (!S.pools.find(p=>p.id===S.selected) || !S._userPickedPool)) S.selected = uniPool.id;
+  // default-select the highest-volume pool on first live load (ranked #1 by vol)
+  if (!S.pools.find(p=>p.id===S.selected) || !S._userPickedPool) S.selected = S.pools[0].id;
   renderPoolChips(); renderAddSide(); renderMonitor(); renderSwap(false);
   // keep header pills (Volume 24h / TVL / Pools) in sync with the fresh pool data
   if (typeof fillTermPills === 'function') fillTermPills(S.pools);
@@ -5537,8 +5551,8 @@ async function fetchHeatTokens() {
         }
       }
     } catch (e) { /* basedbot merge is best-effort */ }
-    // Sort by market cap desc (highest first) — argus + radar + basedbot mixed, consistent with Monitor.
-    _heatTokens.sort((a, b) => (b.mcap || 0) - (a.mcap || 0));
+    // Sort by 24h volume desc (highest first) — argus + radar + basedbot mixed, consistent with Monitor.
+    _heatTokens.sort((a, b) => (b.volume24 || 0) - (a.volume24 || 0));
     return _heatTokens;
   } catch (e) { return []; }
 }
@@ -6508,8 +6522,9 @@ async function loadMomTokens() {
         }
       }
     } catch (e) { /* basedbot merge is best-effort */ }
-    // Sort by market cap desc so the screener + pool scanner default to biggest-first.
-    _momToks.sort((a, b) => (b.mcap || 0) - (a.mcap || 0));
+    // Rank ALL pools by 24h volume desc — the picker defaults to the most-traded
+    // pair, so the top token everywhere = highest volume.
+    _momToks.sort((a, b) => (b.volume24 || 0) - (a.volume24 || 0));
   } catch (e) {
     if (_momToks) return _momToks;
     throw e;
